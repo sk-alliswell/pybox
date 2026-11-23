@@ -1,11 +1,11 @@
 //! Local, single-user control plane for the qualified sandbox workload.
+use crate::host_gate::{acquire_manager, home, private_directory};
 use anyhow::{bail, Context, Result};
-use fs2::FileExt;
 use python_sandbox_controller::{guard, platform, Cancel, Image, Lease};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
-use std::fs::{self, File, OpenOptions};
+use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
@@ -17,9 +17,9 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 const MAX_RECORDS: usize = 500;
 const MAX_QUEUED: usize = 32;
 const LOG_BYTES: usize = 16384;
-const HTML: &str = include_str!("../console/index.html");
-const CSS: &str = include_str!("../console/style.css");
-const JS: &str = include_str!("../console/app.js");
+const HTML: &str = include_str!("../../console/index.html");
+const CSS: &str = include_str!("../../console/style.css");
+const JS: &str = include_str!("../../console/app.js");
 
 fn now() -> u64 {
     SystemTime::now()
@@ -31,43 +31,6 @@ fn random_id() -> Result<String> {
     let mut bytes = [0u8; 32];
     getrandom::fill(&mut bytes).map_err(|e| anyhow::anyhow!("random source: {e}"))?;
     Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
-}
-fn home() -> Result<PathBuf> {
-    Ok(PathBuf::from(
-        std::env::var_os(if cfg!(windows) { "USERPROFILE" } else { "HOME" })
-            .context("user home is unavailable")?,
-    )
-    .join(".pybox"))
-}
-fn private_directory(path: &Path) -> Result<()> {
-    fs::create_dir_all(path)?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        fs::set_permissions(path, fs::Permissions::from_mode(0o700))?;
-    }
-    Ok(())
-}
-pub fn offline_gate() -> Result<File> {
-    gate(false)
-}
-fn gate(exclusive: bool) -> Result<File> {
-    let folder = home()?;
-    private_directory(&folder)?;
-    let f = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(false)
-        .open(folder.join("manager.lock"))?;
-    if exclusive {
-        FileExt::try_lock_exclusive(&f)
-            .context("another manager or standalone CLI is active for this user")?;
-    } else {
-        FileExt::try_lock_shared(&f)
-            .context("manager is active; use pybox submit, jobs or stop")?;
-    }
-    Ok(f)
 }
 fn save(path: &Path, value: &impl Serialize) -> Result<()> {
     let temp = path.with_extension("pending");
@@ -897,7 +860,7 @@ pub fn run(args: &[std::ffi::OsString]) -> Result<()> {
             _ => bail!("unknown manager option"),
         }
     }
-    let _gate = gate(true)?;
+    let _gate = acquire_manager()?;
     let root = root.canonicalize()?;
     let shutdown = Arc::new(AtomicBool::new(false));
     let signal = shutdown.clone();

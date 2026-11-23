@@ -5,14 +5,16 @@ acquires one of two OS-held leases, optionally prepares a clean snapshot, launch
 the pinned `hluk` VMM under an OS guard, validates the workload result, and verifies
 process/output-reader cleanup before reporting success.
 
-- `src/lib.rs`: artifact validation, image identity, preparation and leases.
-- `src/main.rs`: CLI, cancellation, fixed workload and final JSON.
-- `src/guard.rs`: output/deadline bounds and cleanup receipts.
-- `src/platform/windows.rs`: Job Object at process birth, explicit handle list,
-  suspended launch, one CPU and kill-on-close.
-- `src/platform/unix.rs`: exec-only limiter, CPU/address-space limits, affinity,
-  process-group cleanup and parent-death SIGKILL. The policy pipe stays CLOEXEC in
-  the parent; only the forked child clears it before entering the limiter.
+- `src/lib.rs` exposes the `python_sandbox_controller` library API.
+- `src/sandbox/` handles bundle and snapshot integrity, image execution,
+  cancellation, execution leases, output and deadline bounds, and cleanup receipts.
+- `src/main.rs` dispatches standalone CLI and optional manager commands.
+- `src/host_gate.rs` coordinates standalone and managed execution with a per-user lock.
+- `src/sandbox/platform/windows.rs` sets the Job Object at process birth and
+  configures the explicit handle list, suspended launch, one CPU and kill-on-close.
+- `src/sandbox/platform/unix.rs` provides an exec-only limiter, CPU and address-space
+  limits, affinity, process-group cleanup and parent-death SIGKILL. The policy pipe
+  stays CLOEXEC in the parent. The forked child clears it before entering the limiter.
 - `guest/`: source and dependency locks for the actual guest workload.
 - `scripts/`: development-only image conversion, packaging and notice collection.
 
@@ -41,10 +43,12 @@ disabled. The prior workroom demo's network-enabled broker is not included.
 
 ## Management mode (v0.2)
 
-`src/manager.rs` adds a loopback HTTP service, a single-user OS lock, an authenticated
-API, bounded queue and durable job records. The embedded `console/` assets use that
-same API. Manager worker threads call the existing image/lease/guard functions;
-there is no shell/Python host helper or weakened launch policy. Thread-local guard
+The default Cargo feature `manager` enables `src/addons/manager.rs`, which
+provides a loopback HTTP service, authenticated API, bounded queue and durable
+job records. The embedded `console/` assets use that same API. With
+`--no-default-features`, the standalone CLI still acquires the shared per-user
+lock before accessing a bundle. Manager worker threads call the sandbox API
+directly and use the same image, lease and process guard policy. Thread-local guard
 monitors report native spawn, output and verified reap events. They do not grant
 additional execution capabilities.
 
@@ -54,6 +58,18 @@ includes integrity verification and waiting for preparation. Settings are copied
 into each job at submission. A supervisor crash leaves interrupted, cleanup-unknown
 history and blocks new launches. Legacy and other-user processes are out of scope.
 See MANAGER.md for the API and exact persistence/recovery boundaries.
+
+The agent runtime roadmap puts spawning, checkpoint/resume and memory flush in
+the runtime lifecycle. The console and SDK can act as clients of that lifecycle
+through its API.
+
+## External services
+
+`gateway/` is a standalone host-side Cargo workspace for LLM/MCP routing,
+request limits and telemetry. Its simulator is a separate development tool.
+The sandbox and local manager build independently of both. See the
+[agent runtime roadmap](AGENT-RUNTIME-ROADMAP.md) for feature ownership and
+verification targets.
 
 ## Ownership
 

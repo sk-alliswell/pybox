@@ -60,18 +60,56 @@ these runtime archives. Virtualization access is mandatory; there is no host fal
 See [runtime commands](docs/RUN.md), [architecture and boundaries](docs/ARCHITECTURE.md),
 [building and packaging](docs/BUILDING.md), and [validation](docs/VALIDATION.md).
 
+## Runtime requirements and roadmap
+
+A release presented as an agent runtime must preserve these capabilities:
+
+- **Agent spawning.** Start the requested agent in a guarded VM from verified
+  code and inputs. Give each run its own identity, resource limits and outputs.
+- **Pause and resume.** Persist a checkpoint at a supported boundary, release
+  the VM while waiting, and continue in a fresh VM from the verified checkpoint.
+  Repeated resume requests must never start the same continuation twice.
+- **Memory flush.** Persist the agent state explicitly selected for retention
+  before returning a successful pause, handoff or resume-capable shutdown.
+  Report failed writes and keep the last valid state available for recovery.
+- **Isolation and cleanup.** Bound CPU, memory, time, output and concurrency.
+  Cancel safely, verify resource reclamation and refuse new execution when
+  cleanup is uncertain.
+- **Lifecycle and results.** Expose stable run status, logs, outcomes and
+  cleanup evidence. Keep state, artifacts and permissions scoped to their run
+  or workspace.
+
+**Implemented in this checkout.** The standalone CLI runs the pinned workload
+in a guarded VM, validates runtime artifacts, prepares and restores an empty
+startup snapshot, and enforces execution leases, deadlines, cancellation and
+cleanup checks. The default local manager adds a bounded queue, job history,
+logs, cancellation and a loopback API and console. General agent spawning,
+checkpoint-based resume and durable agent-memory flush are tracked separately
+from these existing capabilities.
+
+See the [agent runtime roadmap](docs/AGENT-RUNTIME-ROADMAP.md) for the full
+capability inventory, current coverage and acceptance criteria. Update the
+relevant roadmap entry and verification evidence when a change affects a
+runtime requirement.
+
 ## Develop
 
 ```sh
 cargo build --release --locked --bin pybox
 cargo test --locked --all-features
+cargo test --locked --no-default-features
 python -m unittest discover -s tests -v
 ```
 
 The Rust package is `pybox-sandbox`; its existing library name
 `python_sandbox_controller` is preserved. Cargo registry publishing is disabled.
-The source build creates the controller only. Runtime inputs are separate release
-assets; see BUILDING.md for obtaining or rebuilding them.
+The source build includes the local manager and console by default. For a
+standalone sandbox CLI, use `cargo build --release --locked --no-default-features --bin pybox`.
+The standalone build honors the same per-user execution lock as the default
+build. The [Gateway](gateway/README.md) is built and run separately.
+
+Runtime inputs are separate release assets. See [BUILDING.md](docs/BUILDING.md)
+for obtaining or rebuilding them.
 
 The library exposes guarded native execution and image/snapshot lifecycle APIs.
 Its low-level process guard is **not** itself a VM boundary: only use a trusted VMM

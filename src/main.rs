@@ -5,7 +5,10 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-mod manager;
+mod host_gate;
+
+#[cfg(feature = "manager")]
+mod addons;
 
 struct Args {
     action: String,
@@ -61,7 +64,12 @@ fn arguments() -> Result<Args> {
                 parsed.cancel_after = Some(Duration::from_millis(n));
             }
             "--help" | "-h" => {
-                println!("pybox [run|prepare|status] [--root DIR] [--cold] [--events] [--timeout-ms 1..15000] [--cancel-after-ms N]\npybox manage [--root DIR] [--data DIR] [--port 8790] [--open]\npybox console | jobs | stop JOB_ID\npybox submit [--project NAME] [--cold] [--timeout-ms N] [--action run|prepare|verify]\nNative controller; no host Python, uv or Docker required. WHP/KVM required.");
+                println!("pybox [run|prepare|status] [--root DIR] [--cold] [--events] [--timeout-ms 1..15000] [--cancel-after-ms N]");
+                #[cfg(feature = "manager")]
+                println!("pybox manage [--root DIR] [--data DIR] [--port 8790] [--open]\npybox console | jobs | stop JOB_ID\npybox submit [--project NAME] [--cold] [--timeout-ms N] [--action run|prepare|verify]");
+                println!(
+                    "Native controller; no host Python, uv or Docker required. WHP/KVM required."
+                );
                 std::process::exit(0);
             }
             other => bail!("unknown option: {other}"),
@@ -71,7 +79,7 @@ fn arguments() -> Result<Args> {
 }
 
 fn execute(args: &Args, cancel: &Cancel) -> Result<Value> {
-    let _manager_gate = manager::offline_gate()?;
+    let _manager_gate = host_gate::acquire_standalone()?;
     let image = Image::open(&args.root, cancel)?;
     let capability = platform::capability();
     if capability["available"] != true {
@@ -119,9 +127,10 @@ fn execute(args: &Args, cancel: &Cancel) -> Result<Value> {
 }
 
 fn main() {
+    #[cfg(any(unix, feature = "manager"))]
+    let raw: Vec<_> = std::env::args_os().skip(1).collect();
     #[cfg(unix)]
     {
-        let raw: Vec<_> = std::env::args_os().skip(1).collect();
         if raw.first().is_some_and(|v| v == "--__limit-exec") {
             if let Err(error) = platform::limiter(&raw[1..]) {
                 eprintln!("native limiter: {error:#}");
@@ -130,13 +139,13 @@ fn main() {
             return;
         }
     }
-    let raw: Vec<_> = std::env::args_os().skip(1).collect();
+    #[cfg(feature = "manager")]
     if let Some(action) = raw.first().and_then(|s| s.to_str()) {
         if ["manage", "console", "jobs", "submit", "stop"].contains(&action) {
             let result = if action == "manage" {
-                manager::run(&raw[1..])
+                addons::manager::run(&raw[1..])
             } else {
-                manager::client(action, &raw[1..])
+                addons::manager::client(action, &raw[1..])
             };
             if let Err(error) = result {
                 eprintln!("{error:#}");
