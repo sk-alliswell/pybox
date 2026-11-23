@@ -1,9 +1,9 @@
 # Agent runtime roadmap
 
 This inventory covers a self-hosted runtime that accepts agent work, runs it
-in an isolated VM, and manages its state across executions. The baseline here
-is the Pybox v0.2 code in this checkout. A draft PR or a standalone service can
-provide evidence for a capability before it is available through the runtime.
+in an isolated VM, and manages its state across executions. It covers the v0.2
+baseline and the registered agent lifecycle in this checkout. A draft PR or a
+standalone service can provide evidence before a capability ships in the runtime.
 
 - **Implemented** means this checkout exposes the behavior through a normal
   entry point, within the limits in the table.
@@ -25,10 +25,10 @@ provide evidence for a capability before it is available through the runtime.
 | Cancellation and cleanup | Implemented | Cancellation and deadlines stop owned processes. The CLI and manager report cleanup evidence and block launches when cleanup is uncertain. |
 | Job submission and queue | Implemented | The default local manager accepts run, prepare and verify jobs through its authenticated loopback API. It bounds the queue, snapshots settings at submission and assigns a job ID. |
 | Job status, results and logs | Implemented | The local CLI/API and console expose job state, bounded logs, workload results and cleanup receipts. The manager retains bounded job history on disk. |
-| Agent spawning | Partial | Native launch runs the pinned workload. Full support requires a caller to submit an eligible agent definition and inputs, then receive a distinct run ID, enforced policy and attributable results. |
+| Agent spawning | Partial | The standalone CLI accepts the registered checklist agent with bounded inputs and assigns a run ID. Expand registration to further eligible agent definitions. |
 | Child agents and concurrency budgets | Draft | Establish parent/child ownership, enforce inherited resource and cancellation policy, and preserve lineage as agents start and finish. |
-| Pause, checkpoint and resume | Draft | At a supported boundary, persist checkpoint identity and data, then release the VM. Resume in a fresh VM from that checkpoint. Reject corrupt or incompatible checkpoints and prevent duplicate continuation. |
-| Agent-memory flush | Planned | Write selected durable agent state before acknowledging pause, handoff or resume-capable shutdown. Test restart and interrupted writes. A failed flush must leave the last committed state recoverable. |
+| Pause, checkpoint and resume | Implemented | The registered agent pauses at one cooperative boundary. A digest-bound checkpoint can resume in a fresh VM through a single-use claim. Corrupt and stale requests are refused. |
+| Agent-memory flush | Implemented | The checklist agent's bounded LangGraph saver state is synced and published before the controller stops its VM. Successful publication and verified cleanup are required for resume. Additional state types and handoff remain open. |
 | Human approval and external waits | Draft | Correlate a decision or result with the waiting run and checkpoint. Wait without an active VM and accept only an authorized resolution that matches the pending request. |
 | Workspace files and output artifacts | Draft | Persist explicitly allowed files and artifacts across VMs with ownership, byte limits, and verified restore. Test path confinement and workspace separation. |
 | Workflow orchestration | Draft | Define ordered or dependent runs, record transitions, and preserve cancellation and recovery semantics across steps. |
@@ -43,10 +43,9 @@ provide evidence for a capability before it is available through the runtime.
 | LLM/MCP routing, budgets and cost reporting | Optional | The standalone Gateway owns upstream credentials, request routing and usage accounting. Exercise any runtime integration through an explicit host service interface. |
 | Simulation and operator tools | Optional | The gateway simulator, experimental analysis tools and workroom UI are outside the runtime contract. The v0.2 manager console is the default UI for local job operations. |
 
-The existing startup snapshot contains empty framework state. The memory-flush
-target concerns data selected for persistence by an active agent, such as
-conversation state or task memory. The runtime must define which state is
-eligible before providing a flush guarantee.
+The startup snapshot contains empty framework state. The checklist lifecycle
+persists selected graph state in a separate, run-scoped record. See the
+[agent lifecycle documentation and verification](AGENT-LIFECYCLE.md).
 
 Baseline evidence is in [architecture](ARCHITECTURE.md), [runtime commands](RUN.md),
 [local manager](MANAGER.md) and [manager validation](MANAGER-VALIDATION.md).
@@ -60,11 +59,11 @@ covers context compaction, evaluation and Git/CI deliverable tracking.
 1. **Keep the native baseline green.** Build the standalone CLI and the default
    manager. Check that both honor the execution lock and that image verification,
    launch, cancellation, cleanup and local job history still work.
-2. **Complete the core agent lifecycle.** Deliver agent spawning, checkpoint
-   and resume, and durable memory flush through one supported entry point.
-   Demonstrate a run that flushes state, releases its VM, restarts in a fresh
-   VM and reaches its final result once. Exercise interrupted flushes, invalid
-   checkpoints and duplicate resume requests.
+2. **Complete the first agent lifecycle.** The standalone checklist agent can
+   spawn, flush state, release its VM and reach its result once in a fresh VM.
+   The native verification covers invalid checkpoints, interrupted writes
+   and duplicate resume requests. Extend this contract when adding agents
+   and additional checkpoint boundaries.
 3. **Make multi-step execution recoverable.** Add approval, workspace artifacts,
    child-agent controls, effect reconciliation, idempotent submissions and
    durable recovery. Prove isolation between runs and correctness after a

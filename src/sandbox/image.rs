@@ -160,6 +160,24 @@ impl Image {
         cancel: &Cancel,
         events: bool,
     ) -> Result<guard::Receipt> {
+        let mut args = self.execution_args(snapshot)?;
+        args.extend(["--exec".into(), SOURCE.into()]);
+        guard::run(
+            &self.binary,
+            &args,
+            &self.root,
+            guard::Profile::Execution,
+            timeout,
+            8192,
+            cancel,
+            events,
+            "run",
+        )
+    }
+    pub(crate) fn execution_args(
+        &self,
+        snapshot: Option<&Path>,
+    ) -> Result<Vec<std::ffi::OsString>> {
         let mut args = if let Some(path) = snapshot {
             vec!["snapshot".into(), "run".into(), path.as_os_str().to_owned()]
         } else {
@@ -197,18 +215,7 @@ impl Image {
                 .into(),
             );
         }
-        args.extend(["--exec".into(), SOURCE.into()]);
-        guard::run(
-            &self.binary,
-            &args,
-            &self.root,
-            guard::Profile::Execution,
-            timeout,
-            8192,
-            cancel,
-            events,
-            "run",
-        )
+        Ok(args)
     }
     pub fn accepts(&self, body: &Value) -> bool {
         body["passed"] == true

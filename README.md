@@ -4,9 +4,9 @@ A native Rust controller for a lightweight, Hyperlight-backed Python sandbox on
 Windows x64 and Linux x64. This is the independent home of the sandbox previously
 developed inside QC. It has no runtime dependency on the QC application.
 
-**Status: experimental, private project.** The current CLI runs a fixed, real
-LangGraph/deepagents verification workload. It is not yet an arbitrary-script CLI
-or a production service for untrusted tenants.
+**Status: experimental, private project.** The CLI runs a fixed
+LangGraph/deepagents verification workload and a registered checklist agent
+with checkpoint-based resume. The runtime targets local, single-user execution.
 
 ## Download and run
 
@@ -79,13 +79,14 @@ A release presented as an agent runtime must preserve these capabilities:
   cleanup evidence. Keep state, artifacts and permissions scoped to their run
   or workspace.
 
-**Implemented in this checkout.** The standalone CLI runs the pinned workload
-in a guarded VM, validates runtime artifacts, prepares and restores an empty
-startup snapshot, and enforces execution leases, deadlines, cancellation and
-cleanup checks. The default local manager adds a bounded queue, job history,
-logs, cancellation and a loopback API and console. General agent spawning,
-checkpoint-based resume and durable agent-memory flush are tracked separately
-from these existing capabilities.
+**Implemented in this checkout.** The standalone CLI validates runtime
+artifacts, prepares and restores an empty startup snapshot, and enforces
+execution leases, deadlines, cancellation and cleanup checks. The default
+local manager adds a bounded queue, job history, logs, cancellation and a
+loopback API and console. The registered checklist agent supports
+`pybox agent spawn`, `status` and `resume`. It flushes its LangGraph state before
+releasing the VM and allows one continuation launch per checkpoint. See the
+[agent lifecycle commands and guarantees](docs/AGENT-LIFECYCLE.md).
 
 See the [agent runtime roadmap](docs/AGENT-RUNTIME-ROADMAP.md) for the full
 capability inventory, current coverage and acceptance criteria. Update the

@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
+mod agent_cli;
 mod host_gate;
 
 #[cfg(feature = "manager")]
@@ -65,6 +66,7 @@ fn arguments() -> Result<Args> {
             }
             "--help" | "-h" => {
                 println!("pybox [run|prepare|status] [--root DIR] [--cold] [--events] [--timeout-ms 1..15000] [--cancel-after-ms N]");
+                println!("{}", agent_cli::USAGE);
                 #[cfg(feature = "manager")]
                 println!("pybox manage [--root DIR] [--data DIR] [--port 8790] [--open]\npybox console | jobs | stop JOB_ID\npybox submit [--project NAME] [--cold] [--timeout-ms N] [--action run|prepare|verify]");
                 println!(
@@ -127,7 +129,6 @@ fn execute(args: &Args, cancel: &Cancel) -> Result<Value> {
 }
 
 fn main() {
-    #[cfg(any(unix, feature = "manager"))]
     let raw: Vec<_> = std::env::args_os().skip(1).collect();
     #[cfg(unix)]
     {
@@ -138,6 +139,23 @@ fn main() {
             }
             return;
         }
+    }
+    if raw.first().is_some_and(|arg| arg == "agent") {
+        if raw[1..]
+            .first()
+            .is_some_and(|arg| arg == "--help" || arg == "-h")
+        {
+            println!("{}", agent_cli::USAGE);
+            return;
+        }
+        match signal_cancel(None).and_then(|cancel| agent_cli::run(&raw[1..], &cancel)) {
+            Ok(value) => println!("{value}"),
+            Err(error) => {
+                eprintln!("{error:#}");
+                std::process::exit(1);
+            }
+        }
+        return;
     }
     #[cfg(feature = "manager")]
     if let Some(action) = raw.first().and_then(|s| s.to_str()) {
@@ -161,16 +179,12 @@ fn main() {
             std::process::exit(2);
         }
     };
-    let signal = Arc::new(AtomicBool::new(false));
-    let handler = signal.clone();
-    if let Err(e) = ctrlc::set_handler(move || handler.store(true, Ordering::Relaxed)) {
-        eprintln!("signal handler unavailable: {e}");
-        std::process::exit(2);
-    }
-    let cancel = Cancel {
-        signal,
-        began: Instant::now(),
-        after: args.cancel_after,
+    let cancel = match signal_cancel(args.cancel_after) {
+        Ok(cancel) => cancel,
+        Err(e) => {
+            eprintln!("{e:#}");
+            std::process::exit(2);
+        }
     };
     let result = execute(&args, &cancel);
     match result {
@@ -197,4 +211,16 @@ fn main() {
             std::process::exit(1);
         }
     }
+}
+
+fn signal_cancel(after: Option<Duration>) -> Result<Cancel> {
+    let signal = Arc::new(AtomicBool::new(false));
+    let handler = signal.clone();
+    ctrlc::set_handler(move || handler.store(true, Ordering::Relaxed))
+        .context("signal handler unavailable")?;
+    Ok(Cancel {
+        signal,
+        began: Instant::now(),
+        after,
+    })
 }

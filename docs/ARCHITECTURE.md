@@ -36,10 +36,10 @@ owner-controlled files. The low-level guard can launch arbitrary native programs
 calling it directly does not make a native program a guest.
 
 The guest root is writable. Independent scratch quotas, Linux VMM namespaces and
-seccomp, Windows AppContainer/LPAC, total host-memory accounting, persistent guest
-checkpoints and a multitenant service authorization layer are not implemented.
-The CLI only supports its declared fixed Python image contract. Networking is
-disabled. The prior workroom demo's network-enabled broker is not included.
+seccomp, Windows AppContainer/LPAC, total host-memory accounting, general
+process-memory checkpointing and multitenant service authorization are not implemented.
+The CLI uses its declared Python image contract for both the fixed workload
+and the registered agent. Networking is disabled. The prior workroom demo's network-enabled broker is not included.
 
 ## Management mode (v0.2)
 
@@ -59,9 +59,14 @@ into each job at submission. A supervisor crash leaves interrupted, cleanup-unkn
 history and blocks new launches. Legacy and other-user processes are out of scope.
 See MANAGER.md for the API and exact persistence/recovery boundaries.
 
-The agent runtime roadmap puts spawning, checkpoint/resume and memory flush in
-the runtime lifecycle. The console and SDK can act as clients of that lifecycle
-through its API.
+## Agent lifecycle
+
+`src/agent_runtime/` owns spawning, memory flush and resume. The standalone CLI
+takes the same per-user gate and bundle leases as the native runner. The guard
+observes the guest's flush frame while the VM is alive and waits for durable
+publication before stopping it. The runtime records verified cleanup separately
+and claims a checkpoint before starting its continuation. See the
+[agent lifecycle contract](AGENT-LIFECYCLE.md) for state and retry behavior.
 
 ## External services
 

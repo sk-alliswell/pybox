@@ -163,6 +163,25 @@ pub fn run_streaming(
     phase: &str,
     observer: Option<Observer>,
 ) -> Result<Receipt> {
+    run_controlled(
+        program, args, cwd, profile, timeout, cap, cancel, events, phase, observer, None,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn run_controlled(
+    program: &Path,
+    args: &[OsString],
+    cwd: &Path,
+    profile: Profile,
+    timeout: Duration,
+    cap: usize,
+    cancel: &Cancel,
+    events: bool,
+    phase: &str,
+    observer: Option<Observer>,
+    stop_after_flush: Option<&AtomicBool>,
+) -> Result<Receipt> {
     let start = Instant::now();
     if cancel.cancelled() {
         anyhow::bail!("cancelled before native launch");
@@ -242,6 +261,10 @@ pub fn run_streaming(
         match child.poll() {
             Ok(Some(value)) => {
                 code = Some(value);
+                break;
+            }
+            Ok(None) if stop_after_flush.is_some_and(|flag| flag.load(Ordering::Acquire)) => {
+                cause = Some("paused".into());
                 break;
             }
             Ok(None) => {}
