@@ -1,0 +1,94 @@
+{
+ "model": "Qwen2.5-0.5B-Instruct q4_k_m, llama.cpp, 4 CPU threads",
+ "prefill": [
+  {
+   "prompt_tokens": 250,
+   "seconds": 0.668,
+   "tokens_per_s": 374
+  },
+  {
+   "prompt_tokens": 500,
+   "seconds": 1.749,
+   "tokens_per_s": 286
+  },
+  {
+   "prompt_tokens": 1000,
+   "seconds": 4.225,
+   "tokens_per_s": 237
+  },
+  {
+   "prompt_tokens": 2000,
+   "seconds": 8.624,
+   "tokens_per_s": 232
+  },
+  {
+   "prompt_tokens": 4000,
+   "seconds": 20.051,
+   "tokens_per_s": 199
+  },
+  {
+   "prompt_tokens": 6000,
+   "seconds": 35.719,
+   "tokens_per_s": 168
+  }
+ ],
+ "cached": [
+  {
+   "prompt_tokens": 1000,
+   "shared": 0.5,
+   "cold_s": 4.405,
+   "warm_s": 1.977,
+   "saved_of_shared": 1.102
+  },
+  {
+   "prompt_tokens": 1000,
+   "shared": 0.7,
+   "cold_s": 4.052,
+   "warm_s": 1.322,
+   "saved_of_shared": 0.963
+  },
+  {
+   "prompt_tokens": 1000,
+   "shared": 0.9,
+   "cold_s": 4.332,
+   "warm_s": 0.493,
+   "saved_of_shared": 0.985
+  },
+  {
+   "prompt_tokens": 1000,
+   "shared": 0.99,
+   "cold_s": 3.898,
+   "warm_s": 0.077,
+   "saved_of_shared": 0.99
+  },
+  {
+   "prompt_tokens": 4000,
+   "shared": 0.5,
+   "cold_s": 20.553,
+   "warm_s": 11.646,
+   "saved_of_shared": 0.867
+  },
+  {
+   "prompt_tokens": 4000,
+   "shared": 0.7,
+   "cold_s": 19.074,
+   "warm_s": 7.599,
+   "saved_of_shared": 0.859
+  },
+  {
+   "prompt_tokens": 4000,
+   "shared": 0.9,
+   "cold_s": 20.478,
+   "warm_s": 3.073,
+   "saved_of_shared": 0.944
+  },
+  {
+   "prompt_tokens": 4000,
+   "shared": 0.99,
+   "cold_s": 21.208,
+   "warm_s": 0.311,
+   "saved_of_shared": 0.995
+  }
+ ],
+ "gen_tokens_per_s": 38.4
+}

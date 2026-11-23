@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pybox gateway</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f4f2; --surface: #fcfcfb; --border: #e2e1dc; --grid: #ebeae6;
+  --text: #0b0b0b; --text2: #52514e; --muted: #8a8983;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
+  --good: #1a7f4b; --bad: #c0362c; --tint: #eef4fc;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #121211; --surface: #1a1a19; --border: #32322f; --grid: #282826;
+    --text: #f0efec; --text2: #c3c2b7; --muted: #8f8e86;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --good: #4cc38a; --bad: #f0786e; --tint: #1d2836;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+header { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+h1 { font-size: 15px; margin: 0 8px 0 0; font-weight: 650; }
+nav { display: flex; gap: 2px; flex-wrap: wrap; }
+nav button { border: 0; background: none; color: var(--text2); padding: 6px 10px; border-radius: 6px; font: inherit; cursor: pointer; }
+nav button[aria-selected=true] { background: var(--tint); color: var(--text); font-weight: 600; }
+.controls { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+select, input, .btn { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; }
+.btn { cursor: pointer; }
+main { padding: 16px 20px 40px; max-width: 1400px; margin: 0 auto; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(12, 1fr); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; grid-column: span 12; min-width: 0; }
+.c6 { grid-column: span 6; } .c4 { grid-column: span 4; } .c8 { grid-column: span 8; }
+@media (max-width: 900px) { .c6, .c4, .c8 { grid-column: span 12; } }
+.card h2 { font-size: 13px; font-weight: 650; margin: 0 0 2px; }
+.card .sub { color: var(--text2); font-size: 12px; margin: 0 0 10px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; grid-column: span 12; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile .k { color: var(--text2); font-size: 12px; }
+.tile .v { font-size: 24px; font-weight: 650; letter-spacing: -0.01em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .n { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { color: var(--text2); font-weight: 550; font-size: 12px; position: sticky; top: 0; background: var(--surface); }
+td.num, th.num { text-align: right; }
+td.wrap { white-space: normal; }
+td:not(.num):not(.wrap) { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+tr.click { cursor: pointer; } tr.click:hover td { background: var(--tint); }
+.scroll { overflow: auto; max-height: 420px; }
+.cellbar { display: inline-block; height: 8px; border-radius: 0 4px 4px 0; background: var(--s1); vertical-align: middle; margin-right: 6px; }
+.pos { color: var(--good); } .neg { color: var(--bad); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text2); margin: 4px 0 6px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+svg { display: block; width: 100%; }
+svg text { fill: var(--text2); font-size: 11px; }
+.tip { position: fixed; pointer-events: none; background: var(--text); color: var(--surface); padding: 6px 9px; border-radius: 6px; font-size: 12px; z-index: 20; white-space: pre; display: none; }
+.empty { color: var(--muted); padding: 24px 0; text-align: center; }
+.err { background: var(--surface); border: 1px solid var(--bad); color: var(--bad); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; display: none; }
+.seg { display: flex; height: 26px; border-radius: 6px; overflow: hidden; gap: 2px; background: var(--surface); }
+.seg div { min-width: 2px; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.wf-row { display: grid; grid-template-columns: 290px 1fr 80px; gap: 8px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--grid); font-size: 12.5px; }
+.wf-track { position: relative; height: 14px; }
+.wf-bar { position: absolute; top: 2px; height: 10px; border-radius: 3px; min-width: 2px; }
+.pill { display: inline-block; padding: 0 6px; border-radius: 9px; font-size: 11px; border: 1px solid var(--border); color: var(--text2); }
+</style>
+</head>
+<body>
+<header>
+  <h1>pybox gateway</h1>
+  <nav id="tabs"></nav>
+  <div class="controls">
+    <select id="project" title="프로젝트"><option value="">모든 프로젝트</option></select>
+    <select id="team" title="팀"><option value="">모든 팀</option></select>
+    <select id="range">
+      <option value="900000">최근 15분</option><option value="3600000" selected>최근 1시간</option>
+      <option value="21600000">최근 6시간</option><option value="86400000">최근 24시간</option>
+      <option value="604800000">최근 7일</option><option value="2592000000">최근 30일</option>
+    </select>
+    <label style="font-size:12px;color:var(--text2)"><input type="checkbox" id="auto" checked> 자동 새로고침</label>
+    <button class="btn" id="reload">새로고침</button>
+  </div>
+</header>
+<main>
+  <div class="err" id="err"></div>
+  <div id="view"></div>
+</main>
+<div class="tip" id="tip"></div>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (k === "html") e.innerHTML = v; else if (v != null) e.setAttribute(k, v);
+  }
+  for (const k of kids.flat()) if (k != null) e.append(k.nodeType ? k : document.createTextNode(k));
+  return e;
+};
+const svg = (tag, attrs = {}, ...kids) => {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) if (v != null) e.setAttribute(k, v);
+  for (const k of kids.flat()) if (k != null) e.append(k.nodeType ? k : document.createTextNode(k));
+  return e;
+};
+const SERIES = ["--s1", "--s2", "--s3", "--s4", "--s5", "--s6", "--s7", "--s8"].map((v) => `var(${v})`);
+
+// ---- formatting
+const nf = (d) => new Intl.NumberFormat("ko-KR", { maximumFractionDigits: d, minimumFractionDigits: d });
+const fmt = {
+  int: (v) => v == null ? "–" : nf(0).format(v),
+  compact: (v) => v == null ? "–" : new Intl.NumberFormat("ko-KR", { notation: "compact", maximumFractionDigits: 1 }).format(v),
+  usd: (v) => v == null ? "–" : "$" + (Math.abs(v) >= 100 ? nf(0).format(v) : Math.abs(v) >= 1 ? nf(2).format(v) : nf(4).format(v)),
+  ms: (v) => v == null ? "–" : v >= 10000 ? nf(1).format(v / 1000) + " s" : v >= 1000 ? nf(2).format(v / 1000) + " s" : nf(v < 10 ? 1 : 0).format(v) + " ms",
+  pct: (v) => v == null ? "–" : nf(1).format(v * 100) + "%",
+  x: (v) => v == null ? "–" : (v >= 0 ? "+" : "") + nf(Math.abs(v) >= 10 ? 0 : 1).format(v * 100) + "%",
+  tps: (v) => v == null ? "–" : nf(1).format(v) + " tok/s",
+  bytes: (v) => v == null ? "–" : v >= 1e9 ? nf(2).format(v / 1e9) + " GB" : v >= 1e6 ? nf(1).format(v / 1e6) + " MB" : v >= 1e3 ? nf(1).format(v / 1e3) + " KB" : v + " B",
+  text: (v) => v == null || v === "" ? "(없음)" : String(v),
+  time: (v) => { const d = new Date(v), p = (n) => String(n).padStart(2, "0"); return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; },
+  clock: (v, span) => { const d = new Date(v); return span > 2 * 864e5 ? `${d.getMonth() + 1}/${d.getDate()}` : d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false }); },
+};
+
+// ---- state & API
+const state = { tab: location.hash.slice(1) || "roi", group: "user_id", trace: null };
+let token = sessionStorage.getItem("gw-admin") || "";
+async function api(path, body) {
+  for (;;) {
+    const res = await fetch(path, {
+      method: body ? "POST" : "GET",
+      headers: { ...(body ? { "content-type": "application/json" } : {}), ...(token ? { authorization: "Bearer " + token } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (res.status === 401) {
+      const t = prompt("게이트웨이 관리자 토큰(admin_token)을 입력하세요");
+      if (!t) throw new Error("관리자 토큰이 필요합니다");
+      token = t.trim(); sessionStorage.setItem("gw-admin", token); continue;
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error?.message || res.statusText);
+    return data;
+  }
+}
+function win() { const span = +$("#range").value, to = Date.now() + 1000; return { from: to - span, to, span }; }
+function baseFilter() {
+  const f = {};
+  if ($("#project").value) f.project_id = [$("#project").value];
+  if ($("#team").value) f.team_id = [$("#team").value];
+  return f;
+}
+const q = (o) => api("/gateway/obs/query", { from: win().from, to: win().to, ...o, filter: { ...baseFilter(), ...(o.filter || {}) } }).then((r) => r.rows);
+function bucketFor(span) { for (const b of [5e3, 1e4, 3e4, 6e4, 3e5, 9e5, 36e5, 216e5, 864e5]) if (span / b <= 72) return b; return 864e5; }
+
+// ---- components
+const tipEl = $("#tip");
+function tip(ev, text) { if (!text) { tipEl.style.display = "none"; return; } tipEl.textContent = text; tipEl.style.display = "block"; const x = Math.min(ev.clientX + 14, innerWidth - tipEl.offsetWidth - 8); tipEl.style.left = x + "px"; tipEl.style.top = ev.clientY + 14 + "px"; }
+function card(cls, title, sub, ...body) { return el("section", { class: "card " + (cls || "") }, el("h2", {}, title), sub ? el("p", { class: "sub" }, sub) : null, ...body); }
+function tiles(items) { return el("div", { class: "tiles" }, items.map((t) => el("div", { class: "tile" }, el("div", { class: "k" }, t.k), el("div", { class: "v " + (t.cls || "") }, t.v), t.n ? el("div", { class: "n" }, t.n) : null))); }
+function table(rows, cols, opts = {}) {
+  if (!rows.length) return el("div", { class: "empty" }, "이 기간에 데이터가 없습니다");
+  const max = {};
+  for (const c of cols) if (c.bar) max[c.key] = Math.max(...rows.map((r) => +r[c.key] || 0), 1e-12);
+  return el("div", { class: "scroll" }, el("table", {},
+    el("thead", {}, el("tr", {}, cols.map((c) => el("th", { class: c.num ? "num" : "" }, c.label)))),
+    el("tbody", {}, rows.map((r) => el("tr", { class: opts.onRow ? "click" : "", onclick: opts.onRow ? () => opts.onRow(r) : null },
+      cols.map((c) => {
+        const v = r[c.key], text = (c.fmt || fmt.text)(v, r);
+        const td = el("td", { class: (c.num ? "num " : "") + (c.cls ? c.cls(v, r) : "") + (c.wrap ? " wrap" : "") });
+        if (c.bar) td.append(el("span", { class: "cellbar", style: `width:${Math.max(2, 60 * (+v || 0) / max[c.key])}px` }));
+        if (!c.num && !c.wrap) td.title = text;
+        if (c.link && r[c.link]) td.append(el("a", { href: r[c.link], target: "_blank", rel: "noreferrer" }, text)); else td.append(text);
+        return td;
+      }))))));
+}
+/** Line chart: one y axis, crosshair tooltip, legend above when there are 2+ series. */
+function lineChart(series, { yfmt = fmt.int, span, height = 190 } = {}) {
+  const pts = series.flatMap((s) => s.points);
+  if (!pts.length) return el("div", { class: "empty" }, "이 기간에 데이터가 없습니다");
+  const W = 640, H = height, m = { l: 52, r: 12, t: 8, b: 22 };
+  const x0 = Math.min(...pts.map((p) => p[0])), x1 = Math.max(...pts.map((p) => p[0]), x0 + 1);
+  const ymax = Math.max(...pts.map((p) => p[1] || 0)) * 1.08 || 1;
+  const X = (t) => m.l + (t - x0) / (x1 - x0) * (W - m.l - m.r), Y = (v) => H - m.b - (v / ymax) * (H - m.t - m.b);
+  const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img" });
+  for (let i = 0; i <= 3; i++) { const v = ymax * i / 3, y = Y(v); g.append(svg("line", { x1: m.l, x2: W - m.r, y1: y, y2: y, stroke: "var(--grid)" }), svg("text", { x: m.l - 6, y: y + 4, "text-anchor": "end" }, yfmt(v))); }
+  for (let i = 0; i <= 4; i++) { const t = x0 + (x1 - x0) * i / 4; g.append(svg("text", { x: X(t), y: H - 6, "text-anchor": i === 0 ? "start" : i === 4 ? "end" : "middle" }, fmt.clock(t, span))); }
+  series.forEach((s, i) => {
+    const color = s.color || SERIES[i % 8], d = s.points.filter((p) => p[1] != null).map((p, j) => `${j ? "L" : "M"}${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join("");
+    g.append(svg("path", { d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+    if (s.points.length === 1) g.append(svg("circle", { cx: X(s.points[0][0]), cy: Y(s.points[0][1] || 0), r: 4, fill: color }));
+  });
+  const hair = svg("line", { y1: m.t, y2: H - m.b, stroke: "var(--muted)", "stroke-dasharray": "3 3", visibility: "hidden" });
+  g.append(hair);
+  const times = [...new Set(pts.map((p) => p[0]))].sort((a, b) => a - b);
+  g.addEventListener("mousemove", (ev) => {
+    const r = g.getBoundingClientRect(), t = x0 + ((ev.clientX - r.left) / r.width * W - m.l) / (W - m.l - m.r) * (x1 - x0);
+    const near = times.reduce((a, b) => Math.abs(b - t) < Math.abs(a - t) ? b : a);
+    hair.setAttribute("x1", X(near)); hair.setAttribute("x2", X(near)); hair.setAttribute("visibility", "visible");
+    tip(ev, new Date(near).toLocaleString("ko-KR", { hour12: false }) + "\n" + series.map((s) => { const p = s.points.find((p) => p[0] === near); return `${s.name}: ${p ? yfmt(p[1]) : "–"}`; }).join("\n"));
+  });
+  g.addEventListener("mouseleave", () => { hair.setAttribute("visibility", "hidden"); tip(); });
+  const legend = series.length > 1 ? el("div", { class: "legend" }, series.map((s, i) => el("span", {}, el("i", { style: `background:${s.color || SERIES[i % 8]}` }), s.name))) : null;
+  return el("div", {}, legend, g);
+}
+const seriesOf = (rows, key, name, color) => ({ name, color, points: rows.map((r) => [r.bucket, r[key]]) });
+function splitSeries(rows, dim, key, top = 6) {
+  const totals = {}; for (const r of rows) totals[r[dim]] = (totals[r[dim]] || 0) + (r[key] || 0);
+  return Object.keys(totals).sort((a, b) => totals[b] - totals[a]).slice(0, top).map((name) => ({ name: fmt.text(name), points: rows.filter((r) => r[dim] === name).map((r) => [r.bucket, r[key]]) }));
+}
+
+// ---- tabs
+const GROUPS = { user_id: "사용자", session_id: "세션", agent_id: "에이전트", model: "모델", project_id: "프로젝트", team_id: "팀", run_id: "실행(run)" };
+const roiCls = (v) => v == null ? "" : v >= 0 ? "pos" : "neg";
+
+const TABS = {
+  roi: { label: "ROI", async render() {
+    const w = win(), r = await api(`/gateway/obs/roi?from=${w.from}&to=${w.to}`), t = r.total;
+    const keep = (rows, key) => rows.filter((x) => (!$("#project").value || key !== "project" || x.name === $("#project").value));
+    const groupCols = (label) => [
+      { key: "name", label }, { key: "cost_usd", label: "투입 비용", num: 1, fmt: fmt.usd, bar: 1 },
+      { key: "value_usd", label: "산출 가치", num: 1, fmt: fmt.usd }, { key: "roi", label: "ROI", num: 1, fmt: fmt.x, cls: roiCls },
+      { key: "accepted", label: "채택 산출물", num: 1, fmt: (v, x) => `${v} / ${x.deliverables}` },
+      { key: "cost_per_accepted", label: "채택 1건당 비용", num: 1, fmt: fmt.usd },
+      { key: "unattributed_usd", label: "미귀속 비용", num: 1, fmt: fmt.usd }, { key: "requests", label: "요청", num: 1, fmt: fmt.int }, { key: "tokens", label: "토큰", num: 1, fmt: fmt.compact },
+    ];
+    return [
+      tiles([
+        { k: "투입 비용", v: fmt.usd(t.cost_usd), n: `요청 ${fmt.int(t.requests)}건 · 토큰 ${fmt.compact(t.tokens)}` },
+        { k: "산출 가치", v: fmt.usd(t.value_usd), n: `채택된 산출물 ${t.accepted}건 기준` },
+        { k: "ROI", v: fmt.x(t.roi), cls: roiCls(t.roi), n: "(가치 − 비용) ÷ 비용" },
+        { k: "산출물에 귀속된 비용", v: fmt.pct(t.cost_usd ? t.attributed_usd / t.cost_usd : null), n: `미귀속 ${fmt.usd(t.unattributed_usd)}` },
+        { k: "채택 1건당 비용", v: fmt.usd(t.cost_per_accepted), n: `산출물 ${t.deliverables}건 중 ${t.accepted}건 채택` },
+      ]),
+      el("div", { class: "grid", style: "margin-top:12px" },
+        card("", "프로젝트별", "비용이 큰 순서", table(keep(r.projects, "project"), groupCols("프로젝트"))),
+        card("", "팀별", "비용이 큰 순서", table(r.teams, groupCols("팀"))),
+        card("", "산출물별", "이 기간에 비용이 발생했거나 완료된 산출물. 가치는 채택(accepted)된 것만 계산합니다.", table(r.deliverables, [
+          { key: "title", label: "산출물", fmt: (v, x) => v || x.deliverable_id, link: "url", wrap: 1 }, { key: "kind", label: "종류" }, { key: "project_id", label: "프로젝트" }, { key: "team_id", label: "팀" },
+          { key: "status", label: "상태" }, { key: "cost_usd", label: "투입 비용", num: 1, fmt: fmt.usd, bar: 1 }, { key: "value_usd", label: "가치", num: 1, fmt: (v, x) => x.status === "accepted" ? fmt.usd(v) : "–" },
+          { key: "roi", label: "ROI", num: 1, fmt: (v, x) => x.status === "in_progress" ? "–" : fmt.x(v), cls: (v, x) => x.status === "in_progress" ? "" : roiCls(v) }, { key: "runs", label: "실행 수", num: 1, fmt: fmt.int }, { key: "requests", label: "요청", num: 1, fmt: (v) => nf(0).format(v) }, { key: "tokens", label: "토큰", num: 1, fmt: fmt.compact },
+        ])),
+        r.unregistered.length ? card("", "등록되지 않은 산출물 ID", "요청에는 붙어 있지만 산출물로 등록되지 않은 ID입니다. 등록하면 위 표에 들어옵니다.", table(r.unregistered, [{ key: "deliverable_id", label: "ID" }, { key: "cost_usd", label: "비용", num: 1, fmt: fmt.usd }, { key: "requests", label: "요청", num: 1, fmt: (v) => nf(0).format(v) }])) : null),
+    ];
+  } },
+
+  perf: { label: "사용량·성능", async render() {
+    const w = win(), b = bucketFor(w.span);
+    const [tot, series, byModel, groups] = await Promise.all([
+      q({ metrics: ["count", "sum:input_tokens", "sum:output_tokens", "sum:cost_usd", "rate:is_error", "p50:ttft_ms", "p95:ttft_ms", "p50:gen_ms", "p95:gen_ms", "p50:output_tps", "rate:client_abort"] }),
+      q({ bucket_ms: b, metrics: ["count", "p50:ttft_ms", "p95:ttft_ms", "p50:gen_ms", "p95:gen_ms", "sum:input_tokens", "sum:output_tokens"] }),
+      q({ bucket_ms: b, group_by: ["model"], metrics: ["p50:output_tps"] }),
+      q({ group_by: [state.group], metrics: ["count", "sum:cost_usd", "sum:input_tokens", "sum:output_tokens", "p50:ttft_ms", "p95:ttft_ms", "p50:gen_ms", "p95:gen_ms", "p50:output_tps", "rate:is_error"], order_by: "sum:cost_usd", limit: 200 }),
+    ]);
+    const t = tot[0] || {};
+    const sel = el("select", { onchange: (e) => { state.group = e.target.value; refresh(); } }, Object.entries(GROUPS).map(([k, v]) => el("option", { value: k, ...(k === state.group ? { selected: "" } : {}) }, v + "별")));
+    return [
+      tiles([
+        { k: "요청", v: fmt.int(t.count), n: `오류 ${fmt.pct(t["rate:is_error"])} · 클라이언트 중단 ${fmt.pct(t["rate:client_abort"])}` },
+        { k: "첫 토큰까지 (TTFT) p50", v: fmt.ms(t["p50:ttft_ms"]), n: `p95 ${fmt.ms(t["p95:ttft_ms"])}` },
+        { k: "토큰 생성시간 p50", v: fmt.ms(t["p50:gen_ms"]), n: `p95 ${fmt.ms(t["p95:gen_ms"])}` },
+        { k: "출력 속도 p50", v: fmt.tps(t["p50:output_tps"]), n: "출력 토큰 ÷ 생성시간" },
+        { k: "토큰", v: fmt.compact((t["sum:input_tokens"] || 0) + (t["sum:output_tokens"] || 0)), n: `입력 ${fmt.compact(t["sum:input_tokens"])} · 출력 ${fmt.compact(t["sum:output_tokens"])}` },
+        { k: "비용", v: fmt.usd(t["sum:cost_usd"]) },
+      ]),
+      el("div", { class: "grid", style: "margin-top:12px" },
+        card("c6", "첫 토큰까지 걸린 시간 (TTFT)", "게이트웨이가 요청을 받은 시점부터 첫 콘텐츠 토큰까지", lineChart([seriesOf(series, "p50:ttft_ms", "p50"), seriesOf(series, "p95:ttft_ms", "p95")], { yfmt: fmt.ms, span: w.span })),
+        card("c6", "토큰 생성시간", "첫 토큰부터 스트림 종료까지", lineChart([seriesOf(series, "p50:gen_ms", "p50"), seriesOf(series, "p95:gen_ms", "p95")], { yfmt: fmt.ms, span: w.span })),
+        card("c6", "요청 수", `${fmt.ms(b)} 단위`, lineChart([seriesOf(series, "count", "요청")], { span: w.span })),
+        card("c6", "모델별 출력 속도 (p50)", "초당 출력 토큰", lineChart(splitSeries(byModel, "model", "p50:output_tps"), { yfmt: (v) => nf(0).format(v), span: w.span })),
+        card("", el("span", {}, "차원별 집계 ", sel), "비용이 큰 순서. 시간대별 변화는 위 그래프, 여기서는 누가 얼마나 썼는지 봅니다.", table(groups, [
+          { key: state.group, label: GROUPS[state.group] }, { key: "count", label: "요청", num: 1, fmt: fmt.int }, { key: "sum:cost_usd", label: "비용", num: 1, fmt: fmt.usd, bar: 1 },
+          { key: "sum:input_tokens", label: "입력 토큰", num: 1, fmt: fmt.compact }, { key: "sum:output_tokens", label: "출력 토큰", num: 1, fmt: fmt.compact },
+          { key: "p50:ttft_ms", label: "TTFT p50", num: 1, fmt: fmt.ms }, { key: "p95:ttft_ms", label: "TTFT p95", num: 1, fmt: fmt.ms },
+          { key: "p50:gen_ms", label: "생성시간 p50", num: 1, fmt: fmt.ms }, { key: "p95:gen_ms", label: "생성시간 p95", num: 1, fmt: fmt.ms },
+          { key: "p50:output_tps", label: "출력 속도", num: 1, fmt: fmt.tps }, { key: "rate:is_error", label: "오류율", num: 1, fmt: fmt.pct },
+        ]))),
+    ];
+  } },
+
+  net: { label: "통신 지연", async render() {
+    const w = win(), b = bucketFor(w.span);
+    const SEG = [["client_to_gw_ms", "클라이언트 → 게이트웨이"], ["gw_overhead_ms", "게이트웨이 처리"], ["queue_ms", "게이트웨이 대기열"], ["retry_wait_ms", "재시도 대기"], ["upstream_ttfb_ms", "LiteLLM 응답 헤더까지"], ["litellm_overhead_ms", "(그중 LiteLLM 자체 처리)"]];
+    const metrics = SEG.flatMap(([k]) => [`avg:${k}`, `p50:${k}`, `p95:${k}`, `p99:${k}`]);
+    const [tot, series, traffic, byInst] = await Promise.all([
+      q({ metrics: [...metrics, "count", "avg:ttft_ms", "avg:total_ms", "avg:attempts"] }),
+      q({ bucket_ms: b, metrics: ["p95:queue_ms", "p95:upstream_ttfb_ms", "p95:client_to_gw_ms"] }),
+      q({ bucket_ms: b, metrics: ["sum:client_req_bytes", "sum:client_resp_bytes", "sum:upstream_req_bytes", "sum:upstream_resp_bytes"] }),
+      q({ group_by: ["litellm_instance"], metrics: ["count", "p50:upstream_ttfb_ms", "p95:upstream_ttfb_ms", "p95:queue_ms", "avg:attempts", "rate:is_error"], order_by: "count" }),
+    ]);
+    const t = tot[0] || {};
+    const bars = SEG.slice(0, 5).map(([k, label], i) => ({ label, v: t[`avg:${k}`] || 0, color: SERIES[i] }));
+    const first = Math.max(0, (t["avg:ttft_ms"] || 0) - bars.slice(1).reduce((a, x) => a + x.v, 0));
+    bars.push({ label: "헤더 이후 첫 토큰까지", v: first, color: SERIES[5] });
+    const sum = bars.reduce((a, x) => a + x.v, 0) || 1;
+    const sumT = (k) => traffic.reduce((a, r) => a + (r[k] || 0), 0);
+    return [
+      tiles([
+        { k: "게이트웨이 대기열 p95", v: fmt.ms(t["p95:queue_ms"]), n: `평균 ${fmt.ms(t["avg:queue_ms"])}` },
+        { k: "LiteLLM 응답 헤더까지 p95", v: fmt.ms(t["p95:upstream_ttfb_ms"]), n: `p50 ${fmt.ms(t["p50:upstream_ttfb_ms"])}` },
+        { k: "클라이언트 → 게이트웨이 p95", v: fmt.ms(t["p95:client_to_gw_ms"]), n: "클라이언트가 보낸 시각 헤더가 있을 때만" },
+        { k: "평균 시도 횟수", v: t["avg:attempts"] == null ? "–" : nf(2).format(t["avg:attempts"]), n: "1.00이면 재시도 없음" },
+        { k: "클라이언트 구간 트래픽", v: fmt.bytes(sumT("sum:client_req_bytes") + sumT("sum:client_resp_bytes")), n: `올림 ${fmt.bytes(sumT("sum:client_req_bytes"))} · 내림 ${fmt.bytes(sumT("sum:client_resp_bytes"))}` },
+        { k: "서버 구간 트래픽", v: fmt.bytes(sumT("sum:upstream_req_bytes") + sumT("sum:upstream_resp_bytes")), n: `올림 ${fmt.bytes(sumT("sum:upstream_req_bytes"))} · 내림 ${fmt.bytes(sumT("sum:upstream_resp_bytes"))}` },
+      ]),
+      el("div", { class: "grid", style: "margin-top:12px" },
+        card("", "첫 토큰까지의 시간은 어디서 쓰이나", "요청 한 건의 평균을 구간별로 나눈 것",
+          el("div", { class: "seg" }, bars.filter((x) => x.v > 0).map((x) => el("div", { style: `flex:${x.v / sum};background:${x.color}`, onmousemove: (e) => tip(e, `${x.label}\n평균 ${fmt.ms(x.v)} (${fmt.pct(x.v / sum)})`), onmouseleave: () => tip() }))),
+          el("div", { class: "legend", style: "margin-top:8px" }, bars.map((x) => el("span", {}, el("i", { style: `background:${x.color}` }), `${x.label} ${fmt.ms(x.v)}`)))),
+        card("c6", "구간별 지연", "분위수", table(SEG.map(([k, label]) => ({ label, avg: t[`avg:${k}`], p50: t[`p50:${k}`], p95: t[`p95:${k}`], p99: t[`p99:${k}`] })), [
+          { key: "label", label: "구간" }, { key: "avg", label: "평균", num: 1, fmt: fmt.ms }, { key: "p50", label: "p50", num: 1, fmt: fmt.ms }, { key: "p95", label: "p95", num: 1, fmt: fmt.ms }, { key: "p99", label: "p99", num: 1, fmt: fmt.ms }])),
+        card("c6", "구간별 지연 추이 (p95)", "", lineChart([seriesOf(series, "p95:upstream_ttfb_ms", "LiteLLM 응답 헤더까지", SERIES[4]), seriesOf(series, "p95:queue_ms", "게이트웨이 대기열", SERIES[2]), seriesOf(series, "p95:client_to_gw_ms", "클라이언트 → 게이트웨이", SERIES[0])], { yfmt: fmt.ms, span: w.span })),
+        card("c6", "트래픽", `${fmt.ms(b)} 단위 바이트`, lineChart([seriesOf(traffic, "sum:client_resp_bytes", "클라이언트로 내림"), seriesOf(traffic, "sum:upstream_req_bytes", "LiteLLM으로 올림")], { yfmt: fmt.bytes, span: w.span })),
+        card("c6", "LiteLLM 서버별 지연", "실제로 연결된 주소 기준", table(byInst, [
+          { key: "litellm_instance", label: "서버" }, { key: "count", label: "요청", num: 1, fmt: fmt.int, bar: 1 }, { key: "p50:upstream_ttfb_ms", label: "헤더까지 p50", num: 1, fmt: fmt.ms },
+          { key: "p95:upstream_ttfb_ms", label: "p95", num: 1, fmt: fmt.ms }, { key: "p95:queue_ms", label: "대기열 p95", num: 1, fmt: fmt.ms }, { key: "rate:is_error", label: "오류율", num: 1, fmt: fmt.pct }]))),
+    ];
+  } },
+
+  cache: { label: "캐시", async render() {
+    const w = win(), b = bucketFor(w.span);
+    const M = ["count", "ratio:cache_read_tokens/input_tokens", "rate:prompt_cache_hit", "sum:cache_read_tokens", "sum:cache_write_tokens", "sum:cache_saved_usd", "sum:cost_usd", "rate:litellm_cache_hit"];
+    const [tot, series, byModel, effect, gw] = await Promise.all([
+      q({ metrics: M }), q({ bucket_ms: b, metrics: ["ratio:cache_read_tokens/input_tokens", "rate:prompt_cache_hit"] }),
+      q({ group_by: ["model"], metrics: M, order_by: "sum:cache_read_tokens" }),
+      q({ group_by: ["prompt_cache_hit"], filter: { stream: [true], litellm_cache_hit: [false] }, metrics: ["count", "p50:ttft_ms", "p95:ttft_ms", "avg:input_tokens"] }),
+      q({ group_by: ["gateway_cache"], metrics: ["count"] }),
+    ]);
+    const t = tot[0] || {}, gwN = (k) => (gw.find((r) => r.gateway_cache === k) || {}).count || 0;
+    const [byAgent] = await Promise.all([q({ group_by: ["agent_id"], metrics: M, order_by: "sum:cache_read_tokens", limit: 100 })]);
+    const cols = (label, key) => [{ key, label }, { key: "count", label: "요청", num: 1, fmt: fmt.int }, { key: "ratio:cache_read_tokens/input_tokens", label: "캐시된 입력 비율", num: 1, fmt: fmt.pct, bar: 1 },
+      { key: "rate:prompt_cache_hit", label: "적중 요청 비율", num: 1, fmt: fmt.pct }, { key: "sum:cache_read_tokens", label: "캐시 읽기 토큰", num: 1, fmt: fmt.compact },
+      { key: "sum:cache_write_tokens", label: "캐시 쓰기 토큰", num: 1, fmt: fmt.compact }, { key: "sum:cache_saved_usd", label: "절감액", num: 1, fmt: fmt.usd }];
+    return [
+      tiles([
+        { k: "캐시된 입력 토큰 비율", v: fmt.pct(t["ratio:cache_read_tokens/input_tokens"]), n: "서빙 쪽 프리픽스(KV) 캐시에서 읽은 입력" },
+        { k: "프롬프트 캐시 적중 요청", v: fmt.pct(t["rate:prompt_cache_hit"]), n: `캐시 읽기 ${fmt.compact(t["sum:cache_read_tokens"])} 토큰` },
+        { k: "캐시로 절감한 비용", v: fmt.usd(t["sum:cache_saved_usd"]), n: `실제 비용 ${fmt.usd(t["sum:cost_usd"])}` },
+        { k: "LiteLLM 응답 캐시 적중", v: fmt.pct(t["rate:litellm_cache_hit"]), n: "x-litellm-cache-key 응답 헤더 기준" },
+        { k: "게이트웨이 캐시 적중", v: fmt.int(gwN("hit") + gwN("shared")), n: `적중 ${gwN("hit")} · 동시 요청 공유 ${gwN("shared")} · 미스 ${gwN("miss")}` },
+      ]),
+      el("div", { class: "grid", style: "margin-top:12px" },
+        card("c6", "프롬프트 캐시 추이", "입력 토큰 중 캐시에서 읽은 비율과, 캐시가 적중한 요청의 비율", lineChart([seriesOf(series, "ratio:cache_read_tokens/input_tokens", "캐시된 입력 비율"), seriesOf(series, "rate:prompt_cache_hit", "적중 요청 비율")], { yfmt: fmt.pct, span: w.span })),
+        card("c6", "캐시 적중이 첫 토큰 시간에 주는 영향", "스트리밍 요청만, LiteLLM 응답 캐시 적중은 제외. 입력 길이가 다르면 단순 비교가 어려우니 평균 입력 토큰을 같이 봅니다.", table(effect.map((r) => ({ ...r, label: r.prompt_cache_hit === "true" ? "캐시 적중" : "캐시 미적중" })), [
+          { key: "label", label: "" }, { key: "count", label: "요청", num: 1, fmt: fmt.int }, { key: "p50:ttft_ms", label: "TTFT p50", num: 1, fmt: fmt.ms, bar: 1 }, { key: "p95:ttft_ms", label: "TTFT p95", num: 1, fmt: fmt.ms }, { key: "avg:input_tokens", label: "평균 입력 토큰", num: 1, fmt: fmt.int }])),
+        card("c6", "모델별", "", table(byModel, cols("모델", "model"))),
+        card("c6", "에이전트별", "캐시가 잘 안 먹는 에이전트는 프롬프트 앞부분이 매번 바뀌는지 확인하세요", table(byAgent, cols("에이전트", "agent_id")))),
+    ];
+  } },
+
+  keys: { label: "키·서버·IP", async render() {
+    const M = ["count", "sum:cost_usd", "sum:total_tokens", "p95:ttft_ms", "rate:is_error", "uniq:agent_id"];
+    const dims = [["gateway_key_id", "게이트웨이 키 (에이전트 토큰)", "토큰의 SHA-256 앞 12자리. 원문은 저장하지 않습니다."], ["litellm_key", "LiteLLM 키", "업스트림 설정의 key_alias 또는 LiteLLM이 알려준 키 이름"],
+      ["litellm_cluster", "LiteLLM 클러스터", "업스트림 설정의 cluster 라벨"], ["litellm_instance", "LiteLLM 서버", "실제로 연결된 주소"], ["client_ip", "클라이언트 IP", "게이트웨이에 접속한 쪽"], ["upstream_ip", "서버 IP", "게이트웨이가 접속한 쪽"], ["litellm_model_id", "LiteLLM 배포 (공급자 키 단위)", "LiteLLM이 고른 배포 ID. 공급자 키별 집계는 이 값으로 봅니다."]];
+    const res = await Promise.all(dims.map(([d]) => q({ group_by: [d], metrics: M, order_by: "sum:cost_usd", limit: 100 })));
+    return [el("div", { class: "grid" }, dims.map(([d, label, sub], i) => card("c6", label + "별", sub, table(res[i], [
+      { key: d, label }, { key: "count", label: "요청", num: 1, fmt: fmt.int }, { key: "sum:cost_usd", label: "비용", num: 1, fmt: fmt.usd, bar: 1 }, { key: "sum:total_tokens", label: "토큰", num: 1, fmt: fmt.compact },
+      { key: "p95:ttft_ms", label: "TTFT p95", num: 1, fmt: fmt.ms }, { key: "rate:is_error", label: "오류율", num: 1, fmt: fmt.pct }, { key: "uniq:agent_id", label: "에이전트", num: 1, fmt: fmt.int }]))))];
+  } },
+
+  traces: { label: "트레이스", async render() {
+    const w = win();
+    const list = async (order_by) => (await api("/gateway/obs/rows", { from: w.from, to: w.to, filter: baseFilter(), order_by, limit: 60 })).rows;
+    const [recent, slow] = await Promise.all([list("ts"), list("total_ms")]);
+    const cols = [{ key: "ts", label: "시각", fmt: fmt.time }, { key: "agent_id", label: "에이전트" }, { key: "model", label: "모델" }, { key: "status", label: "상태", num: 1, cls: (v) => v >= 400 || v === 0 ? "neg" : "" },
+      { key: "ttft_ms", label: "TTFT", num: 1, fmt: fmt.ms }, { key: "total_ms", label: "전체", num: 1, fmt: fmt.ms, bar: 1 }, { key: "total_tokens", label: "토큰", num: 1, fmt: fmt.int }, { key: "cost_usd", label: "비용", num: 1, fmt: fmt.usd }];
+    const open = async (r) => { state.trace = { id: r.trace_id, ts: r.ts }; $("#wf").replaceChildren(await waterfall()); $("#wf").scrollIntoView({ behavior: "smooth", block: "start" }); };
+    return [el("div", { class: "grid" },
+      card("c6", "최근 요청", "행을 누르면 아래에 트레이스가 열립니다", table(recent, cols, { onRow: open })),
+      card("c6", "가장 느린 요청", "전체 시간 기준", table(slow, cols, { onRow: open })),
+      el("div", { id: "wf", style: "grid-column: span 12" }, state.trace ? await waterfall() : card("", "트레이스", "위에서 요청을 고르세요")))];
+  } },
+};
+
+async function waterfall() {
+  const { id, ts } = state.trace, t = await api(`/gateway/obs/trace/${id}?around=${ts}`);
+  if (!t.spans.length) return card("", "트레이스", id, el("div", { class: "empty" }, "스팬이 아직 없습니다 (보관 기간이 지났거나 쓰기 대기 중)"));
+  const t0 = Math.min(...t.spans.map((s) => s.start_us)), t1 = Math.max(...t.spans.map((s) => s.start_us + s.duration_ms * 1000)), span = Math.max(t1 - t0, 1);
+  const kids = {}, ids = new Set(t.spans.map((s) => s.span_id));
+  for (const s of t.spans) (kids[ids.has(s.parent_span_id) ? s.parent_span_id : ""] ||= []).push(s);
+  const rows = [], walk = (pid, depth) => { for (const s of (kids[pid] || []).sort((a, b) => a.start_us - b.start_us)) { rows.push([s, depth]); walk(s.span_id, depth + 1); } };
+  walk("", 0);
+  const services = [...new Set(t.spans.map((s) => s.service))], color = (s) => SERIES[services.indexOf(s.service) % 8];
+  const req = t.requests[0] || {};
+  return card("", "트레이스 " + id, `스팬 ${t.spans.length}개 · 전체 ${fmt.ms(span / 1000)} · 요청 ${t.requests.length}건${req.run_id ? " · run " + req.run_id : ""}`,
+    el("div", { class: "legend" }, services.map((s) => el("span", {}, el("i", { style: `background:${SERIES[services.indexOf(s) % 8]}` }), s || "(서비스 없음)"))),
+    el("div", {}, rows.map(([s, depth]) => el("div", { class: "wf-row", onmousemove: (e) => tip(e, `${s.service} · ${s.name}\n시작 +${fmt.ms((s.start_us - t0) / 1000)} · ${fmt.ms(s.duration_ms)}\n` + Object.entries(s.attrs || {}).filter(([, v]) => v != null && typeof v !== "object").slice(0, 14).map(([k, v]) => `${k}: ${v}`).join("\n")), onmouseleave: () => tip() },
+      el("div", { style: `padding-left:${depth * 14}px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap` }, s.name, " ", s.status === "error" ? el("span", { class: "pill neg" }, "오류") : null),
+      el("div", { class: "wf-track" }, el("div", { class: "wf-bar", style: `left:${(s.start_us - t0) / span * 100}%;width:${Math.max(0.3, s.duration_ms * 1000 / span * 100)}%;background:${color(s)}` })),
+      el("div", { class: "num", style: "text-align:right;font-variant-numeric:tabular-nums" }, fmt.ms(s.duration_ms))))));
+}
+
+// ---- shell
+async function loadFilters() {
+  const w = win();
+  for (const [id, col] of [["project", "project_id"], ["team", "team_id"]]) {
+    const vals = await api(`/gateway/obs/values?col=${col}&from=${w.from}&to=${w.to}`), sel = $("#" + id), cur = sel.value;
+    sel.replaceChildren(sel.options[0], ...vals.map((v) => el("option", { value: v.value }, v.value)));
+    sel.value = [...sel.options].some((o) => o.value === cur) ? cur : "";
+  }
+}
+let seq = 0;
+async function refresh() {
+  const mine = ++seq, tab = TABS[state.tab] || TABS.roi;
+  try {
+    const kids = await tab.render();
+    if (mine !== seq) return;
+    const y = scrollY; $("#view").replaceChildren(...kids.filter(Boolean)); scrollTo(0, y);
+    $("#err").style.display = "none";
+  } catch (e) { $("#err").textContent = "데이터를 불러오지 못했습니다: " + e.message; $("#err").style.display = "block"; }
+}
+$("#tabs").append(...Object.entries(TABS).map(([k, t]) => el("button", { "data-tab": k, onclick: () => { state.tab = k; location.hash = k; mark(); refresh(); } }, t.label)));
+function mark() { for (const b of $("#tabs").children) b.setAttribute("aria-selected", b.dataset.tab === state.tab); }
+for (const id of ["project", "team"]) $("#" + id).addEventListener("change", refresh);
+$("#range").addEventListener("change", () => loadFilters().then(refresh));
+$("#reload").addEventListener("click", () => loadFilters().then(refresh));
+setInterval(() => { if ($("#auto").checked && !document.hidden) refresh(); }, 15000);
+mark(); loadFilters().then(refresh, (e) => { $("#err").textContent = e.message; $("#err").style.display = "block"; });
+</script>
+</body>
+</html>

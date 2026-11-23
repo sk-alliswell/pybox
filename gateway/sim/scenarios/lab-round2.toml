@@ -1,0 +1,31 @@
+# The same lab stack in the second measurement session (the machine was about
+# 15% faster that day). Model-server numbers are fitted from
+# sat-direct-patient.jsonl. Callers changed too: batch waits up to ten
+# minutes, a caller that gets 503 comes back after retry-after, and
+# interactive callers tell the gateway they can wait 12 s.
+extends = "lab-round1.toml"
+name = "lab-round2"
+
+[[model_server]]
+name = "qwen-srv"
+tokens_per_s = 23.21
+jitter = 0.068
+prefill_ms = 217
+abandon_extra_ms = 30
+
+[[model_server]]
+name = "smol-srv"
+tokens_per_s = 32.88
+jitter = 0.087
+prefill_ms = 135
+abandon_extra_ms = 47
+
+[[client]]
+name = "interactive"
+max_wait_ms = 12000
+retry = true
+
+[[client]]
+name = "batch"
+timeout_s = 600
+retry = true

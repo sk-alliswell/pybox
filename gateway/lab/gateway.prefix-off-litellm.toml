@@ -1,0 +1,38 @@
+# Prefix-cache routing test (prefix_drive.py), local models only.
+# One upstream, three LiteLLM proxies behind it (ports 4011-4013), each in
+# front of its own llama.cpp server, each serving the same
+# model with one request at a time and one cache slot (it keeps the KV state
+# of the last prompt it read). Routing looks at load only.
+listen = "127.0.0.1:8787"
+admin_token = "lab-admin"
+
+[obs]
+backend = "memory"
+memory_rows = 100000
+
+[[upstreams]]
+name = "local"
+base_url = "http://127.0.0.1:9211"
+kind = "litellm"
+api_key = "sk-lab-master"
+max_queue = 2000
+affinity = "off"
+
+[[upstreams.backends]]
+name = "s1"
+base_url = "http://127.0.0.1:4011"
+max_concurrency = 1
+
+[[upstreams.backends]]
+name = "s2"
+base_url = "http://127.0.0.1:4012"
+max_concurrency = 1
+
+[[upstreams.backends]]
+name = "s3"
+base_url = "http://127.0.0.1:4013"
+max_concurrency = 1
+
+[[agents]]
+id = "lab"
+token = "lab-agent"

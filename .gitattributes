@@ -1,0 +1,11 @@
+* text=auto eol=lf
+*.exe binary
+*.dll binary
+*.cpio binary
+*.docx binary
+*.zip binary
+*.gz binary
+# These exact bytes are hashed by the qualified guest image contract.
+guest/harness.py -text whitespace=cr-at-eol
+guest/entrypoint.py -text whitespace=cr-at-eol
+licenses/* -whitespace

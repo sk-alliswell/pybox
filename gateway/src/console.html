@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pybox gateway 콘솔</title>
+<style>:root {
+  color-scheme: light;
+  --bg: #f4f4f2; --surface: #fcfcfb; --border: #e2e1dc; --grid: #ebeae6;
+  --text: #0b0b0b; --text2: #52514e; --muted: #8a8983;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
+  --good: #1a7f4b; --bad: #c0362c; --tint: #eef4fc;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #121211; --surface: #1a1a19; --border: #32322f; --grid: #282826;
+    --text: #f0efec; --text2: #c3c2b7; --muted: #8f8e86;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --good: #4cc38a; --bad: #f0786e; --tint: #1d2836;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+header { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+h1 { font-size: 15px; margin: 0 8px 0 0; font-weight: 650; }
+nav { display: flex; gap: 2px; flex-wrap: wrap; }
+nav button { border: 0; background: none; color: var(--text2); padding: 6px 10px; border-radius: 6px; font: inherit; cursor: pointer; }
+nav button[aria-selected=true] { background: var(--tint); color: var(--text); font-weight: 600; }
+.controls { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+select, input, .btn { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; }
+.btn { cursor: pointer; }
+main { padding: 16px 20px 40px; max-width: 1400px; margin: 0 auto; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(12, 1fr); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; grid-column: span 12; min-width: 0; }
+.c6 { grid-column: span 6; } .c4 { grid-column: span 4; } .c8 { grid-column: span 8; }
+@media (max-width: 900px) { .c6, .c4, .c8 { grid-column: span 12; } }
+.card h2 { font-size: 13px; font-weight: 650; margin: 0 0 2px; }
+.card .sub { color: var(--text2); font-size: 12px; margin: 0 0 10px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; grid-column: span 12; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile .k { color: var(--text2); font-size: 12px; }
+.tile .v { font-size: 24px; font-weight: 650; letter-spacing: -0.01em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .n { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { color: var(--text2); font-weight: 550; font-size: 12px; position: sticky; top: 0; background: var(--surface); }
+td.num, th.num { text-align: right; }
+td.wrap { white-space: normal; }
+td:not(.num):not(.wrap) { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+tr.click { cursor: pointer; } tr.click:hover td { background: var(--tint); }
+.scroll { overflow: auto; max-height: 420px; }
+.cellbar { display: inline-block; height: 8px; border-radius: 0 4px 4px 0; background: var(--s1); vertical-align: middle; margin-right: 6px; }
+.pos { color: var(--good); } .neg { color: var(--bad); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text2); margin: 4px 0 6px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+svg { display: block; width: 100%; }
+svg text { fill: var(--text2); font-size: 11px; }
+.tip { position: fixed; pointer-events: none; background: var(--text); color: var(--surface); padding: 6px 9px; border-radius: 6px; font-size: 12px; z-index: 20; white-space: pre; display: none; }
+.empty { color: var(--muted); padding: 24px 0; text-align: center; }
+.err { background: var(--surface); border: 1px solid var(--bad); color: var(--bad); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; display: none; }
+.seg { display: flex; height: 26px; border-radius: 6px; overflow: hidden; gap: 2px; background: var(--surface); }
+.seg div { min-width: 2px; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.wf-row { display: grid; grid-template-columns: 290px 1fr 80px; gap: 8px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--grid); font-size: 12.5px; }
+.wf-track { position: relative; height: 14px; }
+.wf-bar { position: absolute; top: 2px; height: 10px; border-radius: 3px; min-width: 2px; }
+.pill { display: inline-block; padding: 0 6px; border-radius: 9px; font-size: 11px; border: 1px solid var(--border); color: var(--text2); }
+header a.link { color: var(--text2); font-size: 12.5px; text-decoration: none; border-bottom: 1px dotted var(--muted); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text2); }
+.field input, .field select, .field textarea { min-width: 110px; }
+textarea { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; width: 100%; resize: vertical; }
+.btn.primary { background: var(--s1); border-color: var(--s1); color: #fff; font-weight: 600; }
+.btn.small { padding: 2px 7px; font-size: 12px; }
+.btn.danger { color: var(--bad); }
+.meter { display: inline-block; width: 90px; height: 8px; border-radius: 4px; background: var(--grid); vertical-align: middle; margin-right: 6px; overflow: hidden; }
+.meter > i { display: block; height: 100%; background: var(--s1); border-radius: 4px; }
+.meter.over > i { background: var(--bad); }
+.state { display: inline-flex; align-items: center; gap: 5px; }
+.state::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.state.run::before { background: var(--s1); } .state.ok::before { background: var(--good); } .state.bad::before { background: var(--bad); } .state.warn::before { background: var(--s4); }
+dialog { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); padding: 18px 20px; width: min(520px, 92vw); }
+dialog::backdrop { background: rgba(0,0,0,.35); }
+dialog h3 { margin: 0 0 10px; font-size: 15px; }
+dialog .row { margin-top: 10px; }
+.note { color: var(--text2); font-size: 12px; margin: 6px 0 0; }
+.token { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; background: var(--tint); padding: 8px 10px; border-radius: 6px; word-break: break-all; user-select: all; }
+.inline { display: inline-flex; gap: 6px; align-items: center; font-weight: 400; margin-left: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>pybox gateway 콘솔</h1>
+  <nav id="tabs"></nav>
+  <div class="controls">
+    <a class="link" href="/gateway/dashboard">ROI·트레이스 대시보드</a>
+    <select id="range" title="조회 기간">
+      <option value="300000">최근 5분</option><option value="900000" selected>최근 15분</option><option value="3600000">최근 1시간</option>
+      <option value="21600000">최근 6시간</option><option value="86400000">최근 24시간</option><option value="604800000">최근 7일</option>
+    </select>
+    <label style="font-size:12px;color:var(--text2)"><input type="checkbox" id="auto" checked> 자동 새로고침</label>
+    <button class="btn" id="reload">새로고침</button>
+  </div>
+</header>
+<main>
+  <div class="err" id="err"></div>
+  <div id="view"></div>
+</main>
+<div class="tip" id="tip"></div>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") e.className = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (k === "value") e.value = v; else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat(3)) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(k));
+  return e;
+};
+const svg = (tag, attrs = {}, ...kids) => {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) if (v != null) e.setAttribute(k, v);
+  for (const k of kids.flat()) if (k != null) e.append(k.nodeType ? k : document.createTextNode(k));
+  return e;
+};
+const SERIES = ["--s1", "--s2", "--s3", "--s4", "--s5", "--s6", "--s7", "--s8"].map((v) => `var(${v})`);
+
+// ---- formatting
+const nf = (d) => new Intl.NumberFormat("ko-KR", { maximumFractionDigits: d, minimumFractionDigits: d });
+const fmt = {
+  int: (v) => v == null ? "–" : nf(0).format(v),
+  num: (v) => v == null ? "–" : Math.abs(v) >= 100 ? nf(0).format(v) : Math.abs(v) >= 10 ? nf(1).format(v) : nf(2).format(v),
+  compact: (v) => v == null ? "–" : new Intl.NumberFormat("ko-KR", { notation: "compact", maximumFractionDigits: 1 }).format(v),
+  usd: (v) => v == null ? "–" : "$" + (Math.abs(v) >= 100 ? nf(0).format(v) : Math.abs(v) >= 1 ? nf(2).format(v) : nf(4).format(v)),
+  ms: (v) => v == null ? "–" : v >= 10000 ? nf(1).format(v / 1000) + " s" : v >= 1000 ? nf(2).format(v / 1000) + " s" : nf(v < 10 ? 1 : 0).format(v) + " ms",
+  pct: (v) => v == null ? "–" : nf(1).format(v * 100) + "%",
+  tps: (v) => v == null ? "–" : nf(1).format(v) + " tok/s",
+  text: (v) => v == null || v === "" ? "(없음)" : String(v),
+  time: (v) => { if (!v) return "–"; const d = new Date(v), p = (n) => String(n).padStart(2, "0"); return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; },
+  clock: (v, span) => { const d = new Date(v); return span > 2 * 864e5 ? `${d.getMonth() + 1}/${d.getDate()}` : span <= 9e5 ? fmt.time(v) : d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", hour12: false }); },
+  dur: (ms) => ms == null ? "–" : ms < 1000 ? nf(0).format(ms) + " ms" : ms < 60000 ? nf(1).format(ms / 1000) + "초" : nf(1).format(ms / 60000) + "분",
+};
+
+// ---- state & API
+const state = {
+  tab: location.hash.slice(1) || "live", run: null,
+  job: { name: "", upstream: "", model: "", prompts: "API 게이트웨이가 하는 일을 두 문장으로 설명해줘.\n좋은 커밋 메시지를 쓰는 요령 세 가지.\np95와 p99 지연의 차이는?", count: 60, concurrency: 12, max_tokens: 96, project_id: "", team_id: "", weight: 1 },
+  tokGroup: "agent_id",
+  lat: { metric: "total_ms", dim: "model", model: "" },
+  ex: { op: "p95", col: "total_ms", dim: "model", bucket: 0, fcol: "", fval: "", compare: false },
+};
+let token = sessionStorage.getItem("gw-admin") || "";
+async function api(path, body, method) {
+  for (;;) {
+    const res = await fetch(path, {
+      method: method || (body ? "POST" : "GET"),
+      headers: { ...(body ? { "content-type": "application/json" } : {}), ...(token ? { authorization: "Bearer " + token } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (res.status === 401) {
+      const t = prompt("게이트웨이 관리자 토큰(admin_token)을 입력하세요");
+      if (!t) throw new Error("관리자 토큰이 필요합니다");
+      token = t.trim(); sessionStorage.setItem("gw-admin", token); continue;
+    }
+    const data = res.status === 204 ? {} : await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error?.message || res.statusText);
+    return data;
+  }
+}
+function win() { const span = +$("#range").value, to = Date.now() + 1000; return { from: to - span, to, span }; }
+// A bucket that is still filling would draw as a dip at the right edge, so bucketed queries stop at the last full one.
+const qraw = (o, w = win()) => api("/gateway/obs/query", { from: w.from, to: o.bucket_ms ? Math.floor(w.to / o.bucket_ms) * o.bucket_ms : w.to, ...o });
+const q = (o, w) => qraw(o, w).then((r) => r.rows);
+function bucketFor(span) { for (const b of [5e3, 1e4, 3e4, 6e4, 3e5, 9e5, 36e5, 216e5, 864e5]) if (span / b <= 72) return b; return 864e5; }
+const act = (fn) => async (...a) => { try { await fn(...a); refresh(); } catch (e) { showErr(e.message); } };
+function showErr(m) { $("#err").textContent = m; $("#err").style.display = m ? "block" : "none"; }
+
+// ---- components
+const tipEl = $("#tip");
+function tip(ev, text) { if (!text) { tipEl.style.display = "none"; return; } tipEl.textContent = text; tipEl.style.display = "block"; const x = Math.min(ev.clientX + 14, innerWidth - tipEl.offsetWidth - 8); tipEl.style.left = x + "px"; tipEl.style.top = Math.min(ev.clientY + 14, innerHeight - tipEl.offsetHeight - 8) + "px"; }
+function card(cls, title, sub, ...body) { return el("section", { class: "card " + (cls || "") }, el("h2", {}, title), sub ? el("p", { class: "sub" }, sub) : null, ...body); }
+function tiles(items) { return el("div", { class: "tiles" }, items.map((t) => el("div", { class: "tile" }, el("div", { class: "k" }, t.k), el("div", { class: "v " + (t.cls || "") }, t.v), t.n ? el("div", { class: "n" }, t.n) : null))); }
+const grid = (...kids) => el("div", { class: "grid", style: "margin-top:12px" }, ...kids);
+function table(rows, cols, opts = {}) {
+  if (!rows.length) return el("div", { class: "empty" }, opts.empty || "이 기간에 데이터가 없습니다");
+  const max = {};
+  for (const c of cols) if (c.bar) max[c.key] = Math.max(...rows.map((r) => +r[c.key] || 0), 1e-12);
+  return el("div", { class: "scroll" }, el("table", {},
+    el("thead", {}, el("tr", {}, cols.map((c) => el("th", { class: c.num ? "num" : "" }, c.label)))),
+    el("tbody", {}, rows.map((r) => el("tr", { class: opts.onRow ? "click" : "", onclick: opts.onRow ? () => opts.onRow(r) : null },
+      cols.map((c) => {
+        const v = r[c.key], td = el("td", { class: (c.num ? "num " : "") + (c.cls ? c.cls(v, r) : "") + (c.wrap ? " wrap" : "") });
+        if (c.node) { td.append(c.node(v, r) ?? ""); return td; }
+        const text = (c.fmt || fmt.text)(v, r);
+        if (c.bar) td.append(el("span", { class: "cellbar", style: `width:${Math.max(2, 60 * (+v || 0) / max[c.key])}px` }));
+        if (!c.num && !c.wrap) td.title = text;
+        td.append(text);
+        return td;
+      }))))));
+}
+function selectOf(options, value, onchange, attrs = {}) {
+  return el("select", { ...attrs, onchange: (e) => onchange(e.target.value) }, options.map(([v, label]) => el("option", { value: v, selected: String(v) === String(value) }, label)));
+}
+/** Line chart: one y axis, crosshair tooltip, legend above when there are 2+ series. */
+function lineChart(series, { yfmt = fmt.int, span, height = 190, marks = [], wide = false } = {}) {
+  const pts = series.flatMap((s) => s.points).filter((p) => p[1] != null);
+  if (!pts.length) return el("div", { class: "empty" }, "이 기간에 데이터가 없습니다");
+  const W = wide ? 1300 : 640, H = height, m = { l: 56, r: 12, t: 8, b: 22 };
+  const x0 = Math.min(...pts.map((p) => p[0])), x1 = Math.max(...pts.map((p) => p[0]), x0 + 1);
+  const ymax = Math.max(...pts.map((p) => p[1] || 0), ...marks.map((k) => k.v)) * 1.08 || 1;
+  const X = (t) => m.l + (t - x0) / (x1 - x0) * (W - m.l - m.r), Y = (v) => H - m.b - (v / ymax) * (H - m.t - m.b);
+  const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img" });
+  for (let i = 0; i <= 3; i++) { const v = ymax * i / 3, y = Y(v); g.append(svg("line", { x1: m.l, x2: W - m.r, y1: y, y2: y, stroke: "var(--grid)" }), svg("text", { x: m.l - 6, y: y + 4, "text-anchor": "end" }, yfmt(v))); }
+  const xt = wide ? 8 : 4;
+  for (let i = 0; i <= xt; i++) { const t = x0 + (x1 - x0) * i / xt; g.append(svg("text", { x: X(t), y: H - 6, "text-anchor": i === 0 ? "start" : i === xt ? "end" : "middle" }, fmt.clock(t, span))); }
+  for (const k of marks) g.append(svg("line", { x1: m.l, x2: W - m.r, y1: Y(k.v), y2: Y(k.v), stroke: "var(--muted)", "stroke-dasharray": "5 4" }), svg("text", { x: W - m.r, y: Y(k.v) - 4, "text-anchor": "end" }, k.label));
+  series.forEach((s, i) => {
+    const color = s.color || SERIES[i % 8], d = s.points.filter((p) => p[1] != null).map((p, j) => `${j ? "L" : "M"}${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join("");
+    g.append(svg("path", { d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-dasharray": s.dash || null, opacity: s.dash ? 0.7 : 1 }));
+    if (s.points.length === 1) g.append(svg("circle", { cx: X(s.points[0][0]), cy: Y(s.points[0][1] || 0), r: 4, fill: color }));
+  });
+  const hair = svg("line", { y1: m.t, y2: H - m.b, stroke: "var(--muted)", "stroke-dasharray": "3 3", visibility: "hidden" });
+  g.append(hair);
+  const times = [...new Set(pts.map((p) => p[0]))].sort((a, b) => a - b);
+  g.addEventListener("mousemove", (ev) => {
+    const r = g.getBoundingClientRect(), t = x0 + ((ev.clientX - r.left) / r.width * W - m.l) / (W - m.l - m.r) * (x1 - x0);
+    const near = times.reduce((a, b) => Math.abs(b - t) < Math.abs(a - t) ? b : a);
+    hair.setAttribute("x1", X(near)); hair.setAttribute("x2", X(near)); hair.setAttribute("visibility", "visible");
+    tip(ev, new Date(near).toLocaleString("ko-KR", { hour12: false }) + "\n" + series.map((s) => { const p = s.points.find((p) => p[0] === near); return `${s.name}: ${p && p[1] != null ? yfmt(p[1]) : "–"}`; }).join("\n"));
+  });
+  g.addEventListener("mouseleave", () => { hair.setAttribute("visibility", "hidden"); tip(); });
+  const legend = series.length > 1 ? el("div", { class: "legend" }, series.map((s, i) => el("span", {}, el("i", { style: `background:${s.color || SERIES[i % 8]}` }), s.name))) : null;
+  return el("div", {}, legend, g);
+}
+const seriesOf = (rows, key, name, color, scale = 1) => ({ name, color, points: rows.map((r) => [r.bucket, r[key] == null ? null : r[key] * scale]) });
+/** Top series by total; colour follows the name, not the rank. */
+function splitSeries(rows, dim, key, top = 8, scale = 1) {
+  const totals = {}; for (const r of rows) totals[r[dim]] = (totals[r[dim]] || 0) + (r[key] || 0);
+  const names = Object.keys(totals).sort((a, b) => totals[b] - totals[a]).slice(0, top).sort();
+  return names.map((name) => ({ name: fmt.text(name), points: rows.filter((r) => r[dim] === name).map((r) => [r.bucket, r[key] == null ? null : r[key] * scale]) }));
+}
+/** Histogram over the query engine's log bins, with percentile markers. */
+function histogram(bins, bounds, marks, xfmt = fmt.ms) {
+  const idx = bins.map((c, i) => c > 0 ? i : -1).filter((i) => i >= 0);
+  if (!idx.length) return el("div", { class: "empty" }, "이 기간에 데이터가 없습니다");
+  const lo = Math.max(0, idx[0] - 1), hi = Math.min(bins.length - 1, idx[idx.length - 1] + 1), n = hi - lo + 1;
+  const W = 640, H = 220, m = { l: 56, r: 12, t: 44, b: 24 }, max = Math.max(...bins), total = bins.reduce((a, b) => a + b, 0);
+  const bw = (W - m.l - m.r) / n, Y = (v) => H - m.b - (v / max) * (H - m.t - m.b);
+  const X = (v) => m.l + (Math.log10(Math.max(v, bounds[lo])) - Math.log10(bounds[lo])) / (Math.log10(bounds[hi + 1]) - Math.log10(bounds[lo])) * (W - m.l - m.r);
+  const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img" });
+  for (let i = 0; i <= 3; i++) { const v = max * i / 3; g.append(svg("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: "var(--grid)" }), svg("text", { x: m.l - 6, y: Y(v) + 4, "text-anchor": "end" }, fmt.int(Math.round(v)))); }
+  for (let i = lo; i <= hi; i++) {
+    const x = m.l + (i - lo) * bw, h = H - m.b - Y(bins[i]);
+    if (bins[i]) g.append(svg("rect", { x: x + 1, y: Y(bins[i]), width: Math.max(1, bw - 2), height: Math.max(1, h), rx: Math.min(3, bw / 3), fill: "var(--s1)" }));
+    const hit = svg("rect", { x, y: m.t, width: bw, height: H - m.t - m.b, fill: "transparent" });
+    hit.addEventListener("mousemove", (ev) => tip(ev, `${xfmt(bounds[i])} ~ ${xfmt(bounds[i + 1])}\n${fmt.int(bins[i])}건 (${fmt.pct(bins[i] / total)})`));
+    hit.addEventListener("mouseleave", () => tip());
+    g.append(hit);
+  }
+  const step = Math.max(1, Math.ceil(n / 8));
+  for (let i = lo; i <= hi + 1; i += step) g.append(svg("text", { x: m.l + (i - lo) * bw, y: H - 6, "text-anchor": "middle" }, xfmt(bounds[i])));
+  marks.filter((k) => k.v != null).forEach((k, j) => g.append(svg("line", { x1: X(k.v), x2: X(k.v), y1: 6 + j * 12, y2: H - m.b, stroke: "var(--text)", "stroke-dasharray": "4 3" }), svg("text", { x: X(k.v) + 4, y: 14 + j * 12, style: "fill:var(--text)" }, `${k.label} ${xfmt(k.v)}`)));
+  return g;
+}
+/** Time × value-bin heatmap: one hue, darker = more requests. */
+function heatmap(rows, key, bounds, span, bucket, yfmt = fmt.ms) {
+  const cells = rows.filter((r) => r[key]);
+  if (!cells.length) return el("div", { class: "empty" }, "이 기간에 데이터가 없습니다");
+  let lo = 99, hi = 0, max = 0;
+  for (const r of cells) r[key].forEach((c, i) => { if (c) { lo = Math.min(lo, i); hi = Math.max(hi, i); max = Math.max(max, c); } });
+  const W = 1300, H = 240, m = { l: 56, r: 12, t: 8, b: 22 }, t0 = cells[0].bucket, t1 = cells[cells.length - 1].bucket + bucket;
+  const cw = (W - m.l - m.r) / ((t1 - t0) / bucket), ch = (H - m.t - m.b) / (hi - lo + 1);
+  const g = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img" });
+  for (const r of cells) r[key].forEach((c, i) => {
+    if (!c) return;
+    const rect = svg("rect", { x: m.l + (r.bucket - t0) / bucket * cw + 0.5, y: m.t + (hi - i) * ch + 0.5, width: Math.max(1, cw - 1), height: Math.max(1, ch - 1), rx: 1.5, fill: "var(--s1)", opacity: (0.12 + 0.88 * Math.sqrt(c / max)).toFixed(3) });
+    rect.addEventListener("mousemove", (ev) => tip(ev, `${fmt.time(r.bucket)}\n${yfmt(bounds[i])} ~ ${yfmt(bounds[i + 1])}\n${fmt.int(c)}건`));
+    rect.addEventListener("mouseleave", () => tip());
+    g.append(rect);
+  });
+  const step = Math.max(1, Math.ceil((hi - lo + 1) / 6));
+  for (let i = lo; i <= hi + 1; i += step) g.append(svg("text", { x: m.l - 6, y: m.t + (hi + 1 - i) * ch + 4, "text-anchor": "end" }, yfmt(bounds[i])));
+  for (let i = 0; i <= 8; i++) { const t = t0 + (t1 - t0) * i / 8; g.append(svg("text", { x: m.l + (W - m.l - m.r) * i / 8, y: H - 6, "text-anchor": i === 0 ? "start" : i === 8 ? "end" : "middle" }, fmt.clock(t, span))); }
+  return el("div", {}, g, el("div", { class: "legend" }, el("span", {}, "옅음 = 적음"), el("span", {}, el("i", { style: "background:var(--s1);opacity:.25" }), el("i", { style: "background:var(--s1);opacity:.55" }), el("i", { style: "background:var(--s1)" }), `진함 = 많음 (칸당 최대 ${fmt.int(max)}건)`)));
+}
+function dialog(title, body, buttons) {
+  const d = el("dialog", {}, el("h3", {}, title), body, el("div", { class: "row", style: "justify-content:flex-end;margin-top:16px" }, buttons.map(([label, cls, fn]) => el("button", { class: "btn " + cls, onclick: async () => { try { if (fn && (await fn()) === false) return; d.close(); } catch (e) { alert(e.message); } } }, label))));
+  d.addEventListener("close", () => { d.remove(); refresh(); });
+  document.body.append(d); d.showModal(); return d;
+}
+const field = (label, input) => el("label", { class: "field" }, label, input);
+const numOrNull = (s) => s === "" || s == null ? null : +s;
+
+// ---- shared lookups
+const DIMS = { model: "모델", upstream: "API(업스트림)", agent_id: "에이전트", team_id: "팀", project_id: "프로젝트", user_id: "사용자", session_id: "세션", run_id: "실행(run)", gateway_key_id: "게이트웨이 키", litellm_key: "LiteLLM 키", litellm_cluster: "클러스터", litellm_instance: "LiteLLM 서버", client_ip: "클라이언트 IP", status: "HTTP 상태", error_type: "오류 종류" };
+const LAT = { total_ms: "전체 응답시간", ttft_ms: "첫 토큰까지 (TTFT)", model_ttft_ms: "TTFT − 게이트웨이 대기", queue_ms: "게이트웨이 대기열", gen_ms: "토큰 생성시간", upstream_ttfb_ms: "LiteLLM 응답 헤더까지", gw_overhead_ms: "게이트웨이 처리", client_to_gw_ms: "클라이언트 → 게이트웨이", litellm_overhead_ms: "LiteLLM 자체 처리", max_chunk_gap_ms: "가장 긴 청크 간격" };
+const NUMS = { ...LAT, output_tps: "출력 속도 (tok/s)", input_tokens: "입력 토큰", output_tokens: "출력 토큰", total_tokens: "전체 토큰", cache_read_tokens: "캐시에서 읽은 토큰", cost_usd: "비용 (USD)", attempts: "시도 횟수", retry_wait_ms: "재시도 대기", client_req_bytes: "요청 바이트", upstream_resp_bytes: "응답 바이트", is_error: "오류 여부", client_abort: "클라이언트 중단", prompt_cache_hit: "프롬프트 캐시 적중" };
+const fmtFor = (col, op) => op === "count" || op === "uniq" ? fmt.int : op === "rate" ? fmt.pct : col.endsWith("_ms") ? fmt.ms : col === "cost_usd" ? fmt.usd : col.includes("tokens") ? fmt.compact : fmt.num;
+
+const TABS = {
+  // ------------------------------------------------------------------ live
+  live: { label: "실시간", every: 2000, async render() {
+    const [lv, ups] = await Promise.all([api("/gateway/live"), api("/gateway/upstreams")]);
+    const S = lv.samples, names = Object.keys(lv.now.upstreams);
+    const tot = (s, k) => names.reduce((a, n) => a + (s.upstreams[n]?.[k] || 0), 0);
+    // Rates from cumulative counters, over a 5-sample window to steady the line.
+    const rate = (k) => S.map((s, i) => { const p = S[Math.max(0, i - 5)], dt = (s.ts - p.ts) / 1000; return [s.ts, dt > 0 ? Math.max(0, (s[k] - p[k]) / dt) : null]; }).slice(1);
+    const last = (arr) => arr.length ? arr[arr.length - 1][1] : null;
+    const reqRate = rate("requests"), outRate = rate("output_tokens"), cap = names.reduce((a, n) => a + lv.now.upstreams[n].max_concurrency, 0);
+    const cool = names.filter((n) => lv.now.upstreams[n].cooldown_ms > 0);
+    const agents = Object.entries(lv.agents).map(([id, a]) => ({ id, ...a })).sort((a, b) => b.inflight + b.queued - a.inflight - a.queued);
+    const span = S.length ? S[S.length - 1].ts - S[0].ts : 0;
+    return [
+      tiles([
+        { k: "처리 중", v: `${fmt.int(tot(lv.now, "inflight"))} / ${fmt.int(cap)}`, n: "업스트림 동시 실행 한도 합계 대비" },
+        { k: "대기열", v: fmt.int(tot(lv.now, "queued")), n: "슬롯을 기다리는 요청" },
+        { k: "초당 요청", v: fmt.num(last(reqRate)), n: "최근 5초 평균, 도착 기준" },
+        { k: "초당 출력 토큰", v: fmt.num(last(outRate)), n: "최근 5초 평균, 응답 완료 기준" },
+        { k: "429 쿨다운", v: cool.length ? cool.join(", ") : "없음", cls: cool.length ? "neg" : "", n: cool.length ? "해당 업스트림 전체가 잠시 멈춤" : "모든 업스트림 정상" },
+        { k: "활성 에이전트", v: fmt.int(agents.length), n: "지금 처리 중이거나 대기 중" },
+      ]),
+      grid(
+        card("c6", "처리 중인 요청", "업스트림별, 1초 간격. 한도에 붙어 있으면 그 뒤는 대기열로 갑니다.", lineChart(names.map((n) => ({ name: n, points: S.map((s) => [s.ts, s.upstreams[n]?.inflight ?? null]) })), { span })),
+        card("c6", "대기열 길이", "업스트림별", lineChart(names.map((n) => ({ name: n, points: S.map((s) => [s.ts, s.upstreams[n]?.queued ?? null]) })), { span })),
+        card("c6", "초당 출력 토큰", "응답이 끝난 시점에 집계", lineChart([{ name: "출력 토큰/초", points: outRate }], { span, yfmt: fmt.num })),
+        card("c6", "초당 요청", "게이트웨이에 도착한 요청", lineChart([{ name: "요청/초", points: reqRate }], { span, yfmt: fmt.num })),
+        card("c6", "업스트림 상태", "", table(ups.upstreams, [
+          { key: "name", label: "API" }, { key: "x", label: "처리 중 / 한도", num: 1, fmt: (_, r) => `${r.scheduler.inflight} / ${r.max_concurrency}` },
+          { key: "y", label: "대기", num: 1, fmt: (_, r) => fmt.int(r.scheduler.queued) },
+          { key: "z", label: "상태", node: (_, r) => r.scheduler.cooldown_ms > 0 ? el("span", { class: "state warn" }, `쿨다운 ${fmt.dur(r.scheduler.cooldown_ms)}`) : el("span", { class: "state ok" }, "정상") },
+          { key: "r", label: "누적 요청", num: 1, fmt: (_, r) => fmt.int(r.counters.requests) }, { key: "l", label: "429", num: 1, fmt: (_, r) => fmt.int(r.counters.rate_limited) }])),
+        card("c6", "지금 움직이는 에이전트", "처리 중 + 대기 중이 많은 순서", table(agents, [
+          { key: "id", label: "에이전트" }, { key: "inflight", label: "처리 중", num: 1, fmt: fmt.int, bar: 1 }, { key: "queued", label: "대기", num: 1, fmt: fmt.int },
+          { key: "requests", label: "누적 요청", num: 1, fmt: fmt.int }, { key: "output_tokens", label: "누적 출력 토큰", num: 1, fmt: fmt.compact }], { empty: "지금은 요청이 없습니다" }))),
+    ];
+  } },
+
+  // ------------------------------------------------------------------ jobs
+  jobs: { label: "작업", every: 3000, async render() {
+    const w = win(), f = state.job;
+    const [jobs, ups, models, runs] = await Promise.all([
+      api("/gateway/jobs"), api("/gateway/upstreams"), api("/gateway/models"),
+      q({ group_by: ["run_id", "agent_id", "project_id"], filter: {}, metrics: ["count", "min:ts", "max:ts", "sum:total_tokens", "sum:output_tokens", "sum:cost_usd", "rate:is_error", "p50:total_ms", "p95:total_ms", "p95:queue_ms"], order_by: "max:ts", limit: 300 }),
+    ]);
+    if (!f.upstream) f.upstream = ups.upstreams[0]?.name || "";
+    const mlist = [...new Set(models.models.filter((m) => m.upstream === f.upstream).map((m) => m.id))];
+    if (!mlist.includes(f.model)) f.model = mlist[0] || f.model;
+    const bind = (k, num) => ({ value: f[k], oninput: (e) => { f[k] = num ? +e.target.value : e.target.value; } });
+    const start = act(async () => {
+      await api("/gateway/jobs", { name: f.name, upstream: f.upstream, model: f.model, prompts: f.prompts.split("\n"), count: f.count, concurrency: f.concurrency, max_tokens: f.max_tokens, project_id: f.project_id || null, team_id: f.team_id || null, weight: f.weight });
+    });
+    const named = runs.filter((r) => r.run_id);
+    const detail = state.run ? await api("/gateway/obs/rows", { from: w.from, to: w.to, filter: { run_id: [state.run] }, limit: 300 }).then((r) => r.rows) : null;
+    return [
+      grid(
+        card("", "새 작업 실행", "같은 모델에 프롬프트를 여러 번 보내는 배치입니다. 게이트웨이가 자기 자신에게 요청하므로 동시 실행 한도, 공정 대기열, 로그가 다른 에이전트와 똑같이 적용됩니다.",
+          el("div", { class: "row" },
+            field("작업 이름", el("input", { placeholder: "예: 야간 요약", ...bind("name") })),
+            field("API", selectOf(ups.upstreams.map((u) => [u.name, `${u.name} (한도 ${u.max_concurrency})`]), f.upstream, (v) => { f.upstream = v; refresh(); })),
+            field("모델", mlist.length ? selectOf(mlist.map((m) => [m, m]), f.model, (v) => { f.model = v; }) : el("input", { placeholder: "모델 이름", ...bind("model") })),
+            field("요청 수", el("input", { type: "number", min: 1, style: "width:90px", ...bind("count", 1) })),
+            field("동시 실행", el("input", { type: "number", min: 1, style: "width:90px", ...bind("concurrency", 1) })),
+            field("max_tokens", el("input", { type: "number", min: 1, style: "width:90px", ...bind("max_tokens", 1) })),
+            field("가중치", el("input", { type: "number", min: 1, style: "width:70px", ...bind("weight", 1) })),
+            field("프로젝트", el("input", { style: "width:120px", ...bind("project_id") })),
+            field("팀", el("input", { style: "width:120px", ...bind("team_id") })),
+            el("button", { class: "btn primary", onclick: start }, "실행")),
+          el("div", { style: "margin-top:8px" }, field("프롬프트 (한 줄에 하나, 차례로 돌아가며 사용)", el("textarea", { rows: 3, ...bind("prompts") })))),
+        card("", "콘솔에서 실행한 작업", "게이트웨이를 다시 시작하면 이 목록은 비워집니다. 요청 기록은 아래 실행 기록과 저장소에 남습니다.", table(jobs.jobs, [
+          { key: "name", label: "작업" }, { key: "state", label: "상태", node: (v) => el("span", { class: "state " + ({ running: "run", done: "ok", cancelled: "warn", cancelling: "warn" })[v] }, ({ running: "실행 중", done: "완료", cancelled: "취소됨", cancelling: "취소 중" })[v]) },
+          { key: "model", label: "모델" }, { key: "upstream", label: "API" },
+          { key: "ok", label: "진행", node: (_, r) => el("span", {}, el("span", { class: "meter" }, el("i", { style: `width:${(r.ok + r.failed) / r.count * 100}%` })), `${fmt.int(r.ok + r.failed)} / ${fmt.int(r.count)}`) },
+          { key: "inflight", label: "열린 요청", num: 1, fmt: fmt.int }, { key: "failed", label: "실패", num: 1, fmt: fmt.int, cls: (v) => v ? "neg" : "" },
+          { key: "created_ms", label: "시작", num: 1, fmt: fmt.time }, { key: "finished_ms", label: "걸린 시간", num: 1, fmt: (v, r) => fmt.dur((v || Date.now()) - r.created_ms) },
+          { key: "last_error", label: "마지막 오류", wrap: 1, fmt: (v) => v || "" },
+          { key: "id", label: "", node: (v, r) => r.state === "running" ? el("button", { class: "btn small danger", onclick: act(() => api("/gateway/jobs/" + v, null, "DELETE")) }, "취소") : el("button", { class: "btn small", onclick: () => { state.run = v; refresh(); } }, "요청 보기") },
+        ], { empty: "아직 실행한 작업이 없습니다" })),
+        card("", "실행(run) 기록", `에이전트가 x-gateway-run-id로 묶어 보낸 요청 묶음, 최근 순. 행을 누르면 그 실행의 요청이 아래에 열립니다. (${fmt.int(named.length)}건)`, table(named, [
+          { key: "run_id", label: "실행" }, { key: "agent_id", label: "에이전트" }, { key: "project_id", label: "프로젝트" },
+          { key: "min:ts", label: "시작", num: 1, fmt: fmt.time }, { key: "max:ts", label: "걸린 시간", num: 1, fmt: (v, r) => fmt.dur(v - r["min:ts"] + (r["p50:total_ms"] || 0)) },
+          { key: "count", label: "요청", num: 1, fmt: fmt.int }, { key: "rate:is_error", label: "오류율", num: 1, fmt: fmt.pct, cls: (v) => v ? "neg" : "" },
+          { key: "sum:output_tokens", label: "출력 토큰", num: 1, fmt: fmt.compact }, { key: "sum:cost_usd", label: "비용", num: 1, fmt: fmt.usd, bar: 1 },
+          { key: "p95:total_ms", label: "응답 p95", num: 1, fmt: fmt.ms }, { key: "p95:queue_ms", label: "대기 p95", num: 1, fmt: fmt.ms },
+        ], { onRow: (r) => { state.run = r.run_id; refresh(); } })),
+        detail ? card("", `실행 ${state.run}의 요청`, `${detail.length}건 (최대 300건)`, el("div", { style: "margin-bottom:6px" }, el("button", { class: "btn small", onclick: () => { state.run = null; refresh(); } }, "닫기")), table(detail, [
+          { key: "ts", label: "시각", fmt: fmt.time }, { key: "model", label: "모델" }, { key: "status", label: "상태", num: 1, cls: (v) => v >= 400 || !v ? "neg" : "" },
+          { key: "queue_ms", label: "대기", num: 1, fmt: fmt.ms }, { key: "ttft_ms", label: "TTFT", num: 1, fmt: fmt.ms }, { key: "total_ms", label: "전체", num: 1, fmt: fmt.ms, bar: 1 },
+          { key: "input_tokens", label: "입력", num: 1, fmt: fmt.int }, { key: "output_tokens", label: "출력", num: 1, fmt: fmt.int }, { key: "output_tps", label: "속도", num: 1, fmt: fmt.tps },
+          { key: "cost_usd", label: "비용", num: 1, fmt: fmt.usd }, { key: "attempts", label: "시도", num: 1 }, { key: "trace_id", label: "트레이스", fmt: (v) => v, cls: () => "mono" }])) : null),
+    ];
+  } },
+
+  // ------------------------------------------------------------------ APIs & keys
+  apis: { label: "API·키", async render() {
+    const [ups, ag, st, perf, keyUse] = await Promise.all([
+      api("/gateway/upstreams"), api("/gateway/agents"), api("/gateway/stats"),
+      q({ group_by: ["upstream"], metrics: ["count", "rate:is_error", "p50:upstream_ttfb_ms", "p95:upstream_ttfb_ms", "p99:upstream_ttfb_ms", "p95:queue_ms", "avg:attempts", "sum:cost_usd"] }),
+      q({ group_by: ["agent_id"], metrics: ["count", "sum:total_tokens", "sum:cost_usd", "rate:is_error", "p95:total_ms", "max:ts"], limit: 2000 }),
+    ]);
+    const P = Object.fromEntries(perf.map((r) => [r.upstream, r])), U = Object.fromEntries(keyUse.map((r) => [r.agent_id, r]));
+    const rows = ag.agents.map((a) => ({ ...a, s: st.agents[a.id] || {}, u: U[a.id] || {} }));
+    const used = (s) => (s.input_tokens || 0) + (s.output_tokens || 0) + (s.cache_read_tokens || 0) + (s.cache_write_tokens || 0);
+    const showToken = (title, r) => dialog(title, el("div", {}, el("p", { class: "note" }, "이 토큰은 지금 한 번만 보입니다. 에이전트의 API 키 자리에 넣으세요."), el("div", { class: "token" }, r.token)), [["닫기", "primary"]]);
+    const form = (a) => {
+      const v = { id: a?.id || "", weight: a?.weight ?? 1, max_concurrency: a?.max_concurrency ?? "", token_budget: a?.token_budget ?? "", project_id: a?.project_id || "", team_id: a?.team_id || "", user_id: a?.user_id || "" };
+      const inp = (k, attrs = {}) => el("input", { value: v[k], oninput: (e) => { v[k] = e.target.value; }, ...attrs });
+      dialog(a ? `키 수정: ${a.id}` : "새 에이전트 키", el("div", {},
+        el("div", { class: "row" }, a ? null : field("에이전트 ID", inp("id")), field("가중치", inp("weight", { type: "number", min: 1, style: "width:80px" })), field("동시 실행 한도", inp("max_concurrency", { type: "number", min: 1, placeholder: "제한 없음", style: "width:110px" })), field("토큰 예산", inp("token_budget", { type: "number", min: 0, placeholder: "제한 없음", style: "width:130px" }))),
+        el("div", { class: "row" }, field("프로젝트", inp("project_id")), field("팀", inp("team_id")), field("사용자", inp("user_id"))),
+        el("p", { class: "note" }, "가중치가 2면 붐빌 때 다른 에이전트보다 두 배 자주 차례가 옵니다. 토큰 예산은 입력+출력 누적이며 넘으면 429를 받습니다.")),
+      [["취소", ""], [a ? "저장" : "만들기", "primary", async () => {
+        const body = { weight: +v.weight || 1, max_concurrency: numOrNull(v.max_concurrency), token_budget: numOrNull(v.token_budget), project_id: v.project_id || null, team_id: v.team_id || null, user_id: v.user_id || null };
+        if (a) await api("/gateway/agents/" + encodeURIComponent(a.id), body, "PATCH");
+        else { if (!v.id) throw new Error("에이전트 ID가 필요합니다"); const r = await api("/gateway/agents", { id: v.id, ...body }); setTimeout(() => showToken(`새 키: ${v.id}`, r), 50); }
+      }]]);
+    };
+    return [
+      grid(
+        card("", "API (업스트림)", "게이트웨이가 요청을 보내는 곳. 실제 키는 게이트웨이만 갖고 있고 에이전트에게는 아래의 게이트웨이 키만 나갑니다. 한도와 주소는 설정 파일에서 바꿉니다.", table(ups.upstreams, [
+          { key: "name", label: "이름" }, { key: "kind", label: "종류" }, { key: "cluster", label: "클러스터" }, { key: "base_url", label: "주소" },
+          { key: "key_alias", label: "키", fmt: (v, r) => v || (r.has_key ? "(이름 없음)" : "키 없음") },
+          { key: "max_concurrency", label: "동시 한도", num: 1 }, { key: "rpm", label: "분당 요청", num: 1, fmt: (v) => v ?? "무제한" }, { key: "input_tpm", label: "분당 입력 토큰", num: 1, fmt: (v) => v == null ? "무제한" : fmt.compact(v) },
+          { key: "a", label: "처리 중", num: 1, fmt: (_, r) => r.scheduler.inflight }, { key: "b", label: "대기", num: 1, fmt: (_, r) => r.scheduler.queued },
+          { key: "c", label: "요청", num: 1, fmt: (_, r) => fmt.int(P[r.name]?.count) }, { key: "d", label: "오류율", num: 1, fmt: (_, r) => fmt.pct(P[r.name]?.["rate:is_error"]) },
+          { key: "e", label: "응답 헤더 p50", num: 1, fmt: (_, r) => fmt.ms(P[r.name]?.["p50:upstream_ttfb_ms"]) }, { key: "f", label: "p95", num: 1, fmt: (_, r) => fmt.ms(P[r.name]?.["p95:upstream_ttfb_ms"]) }, { key: "g", label: "p99", num: 1, fmt: (_, r) => fmt.ms(P[r.name]?.["p99:upstream_ttfb_ms"]) },
+          { key: "h", label: "429 (누적)", num: 1, fmt: (_, r) => fmt.int(r.counters.rate_limited) }, { key: "i", label: "재시도 (누적)", num: 1, fmt: (_, r) => fmt.int(r.counters.retries) },
+        ])),
+        card("", el("span", {}, "게이트웨이 키 (에이전트) ", el("button", { class: "btn small primary", style: "margin-left:8px", onclick: () => form(null) }, "새 키")), "에이전트마다 하나씩 발급하는 키입니다. 비용과 사용량이 이 키에 묶인 프로젝트와 팀으로 귀속됩니다. 사용량은 조회 기간, 예산 소진은 게이트웨이 시작 이후 누적입니다.", table(rows, [
+          { key: "id", label: "에이전트" }, { key: "key_id", label: "키 ID", cls: () => "mono" }, { key: "project_id", label: "프로젝트" }, { key: "team_id", label: "팀" },
+          { key: "weight", label: "가중치", num: 1 }, { key: "max_concurrency", label: "동시 한도", num: 1, fmt: (v) => v ?? "–" },
+          { key: "token_budget", label: "토큰 예산 소진", node: (v, r) => v == null ? "예산 없음" : el("span", {}, el("span", { class: "meter" + (used(r.s) >= v ? " over" : "") }, el("i", { style: `width:${Math.min(100, used(r.s) / v * 100)}%` })), `${fmt.compact(used(r.s))} / ${fmt.compact(v)}`) },
+          { key: "n", label: "요청", num: 1, fmt: (_, r) => fmt.int(r.u.count) }, { key: "t", label: "토큰", num: 1, fmt: (_, r) => fmt.compact(r.u["sum:total_tokens"]) }, { key: "c", label: "비용", num: 1, fmt: (_, r) => fmt.usd(r.u["sum:cost_usd"]) },
+          { key: "e", label: "오류율", num: 1, fmt: (_, r) => fmt.pct(r.u["rate:is_error"]), cls: (_, r) => r.u["rate:is_error"] ? "neg" : "" }, { key: "l", label: "마지막 요청", num: 1, fmt: (_, r) => fmt.time(r.u["max:ts"]) },
+          { key: "x", label: "", node: (_, r) => el("span", { style: "display:inline-flex;gap:4px" },
+            el("button", { class: "btn small", onclick: () => form(r) }, "수정"),
+            el("button", { class: "btn small", onclick: async () => { if (confirm(`${r.id}의 토큰을 교체할까요? 기존 토큰은 바로 쓸 수 없게 됩니다.`)) { try { showToken(`교체된 키: ${r.id}`, await api(`/gateway/agents/${encodeURIComponent(r.id)}/rotate`, {})); } catch (e) { showErr(e.message); } } } }, "토큰 교체"),
+            el("button", { class: "btn small danger", onclick: act(async () => { if (confirm(`${r.id}의 키를 폐기할까요?`)) await api("/gateway/agents/" + encodeURIComponent(r.id), null, "DELETE"); }) }, "폐기")) },
+        ], { empty: "등록된 에이전트가 없습니다" }))),
+    ];
+  } },
+
+  // ------------------------------------------------------------------ models
+  models: { label: "모델", async render() {
+    const w = win(), b = bucketFor(w.span);
+    const M = ["count", "sum:input_tokens", "sum:output_tokens", "sum:cost_usd", "rate:is_error", "p50:model_ttft_ms", "p95:model_ttft_ms", "p99:model_ttft_ms", "p50:output_tps", "p50:total_ms", "p95:total_ms", "p99:total_ms"];
+    const [cat, use, speed, ttft, prices] = await Promise.all([
+      api("/gateway/models"), q({ group_by: ["model"], metrics: M, order_by: "count" }),
+      q({ bucket_ms: b, group_by: ["model"], metrics: ["p50:output_tps"] }), q({ bucket_ms: b, group_by: ["model"], metrics: ["p95:model_ttft_ms"] }),
+      api("/gateway/obs/meta/price"),
+    ]);
+    const where = {}; for (const m of cat.models) (where[m.id] ||= []).push(m.upstream);
+    const U = Object.fromEntries(use.map((r) => [r.model, r])), PR = Object.fromEntries(prices.items.map((p) => [p.id, p.value]));
+    const names = [...new Set([...Object.keys(where), ...use.map((r) => r.model)])].filter(Boolean);
+    const rows = names.map((id) => ({ id, ups: (where[id] || []).join(", "), ...(U[id] || {}), price: PR[id] })).sort((a, b) => (b.count || 0) - (a.count || 0));
+    const per1m = (r) => { const t = (r["sum:input_tokens"] || 0) + (r["sum:output_tokens"] || 0); return t ? r["sum:cost_usd"] / t * 1e6 : null; };
+    const editPrice = (r) => {
+      const v = { input: r.price?.input ?? "", output: r.price?.output ?? "", cache_read: r.price?.cache_read ?? "" };
+      const inp = (k) => el("input", { type: "number", step: "0.01", min: 0, value: v[k], style: "width:120px", oninput: (e) => { v[k] = e.target.value; } });
+      dialog(`가격: ${r.id}`, el("div", {}, el("div", { class: "row" }, field("입력 ($/100만 토큰)", inp("input")), field("출력", inp("output")), field("캐시 읽기 (비우면 입력과 같음)", inp("cache_read"))),
+        el("p", { class: "note" }, "LiteLLM이 비용을 알려주지 않는 호출에만 이 가격이 쓰입니다. 설정 파일의 가격보다 우선하고, 저장한 뒤의 요청부터 적용됩니다.")),
+      [["취소", ""], ...(r.price ? [["삭제", "danger", () => api("/gateway/obs/meta/price/" + encodeURIComponent(r.id), null, "DELETE")]] : []), ["저장", "primary", () => api("/gateway/obs/meta/price", { id: r.id, input: +v.input || 0, output: +v.output || 0, ...(v.cache_read === "" ? {} : { cache_read: +v.cache_read }) })]]);
+    };
+    const errs = Object.entries(cat.errors);
+    return [
+      errs.length ? el("div", { class: "err", style: "display:block" }, "모델 목록을 못 가져온 API: " + errs.map(([n, e]) => `${n} (${e})`).join(", ")) : null,
+      grid(
+        card("", "모델 카탈로그와 실측 성능", "각 API가 제공한다고 답한 모델과, 조회 기간에 게이트웨이를 지나간 실제 호출의 결과입니다. TTFT는 게이트웨이 대기 시간을 뺀 값이라 모델끼리 비교할 수 있습니다.", table(rows, [
+          { key: "id", label: "모델" }, { key: "ups", label: "제공 API", fmt: (v) => v || "(목록에 없음)" }, { key: "count", label: "요청", num: 1, fmt: fmt.int, bar: 1 }, { key: "rate:is_error", label: "오류율", num: 1, fmt: fmt.pct, cls: (v) => v ? "neg" : "" },
+          { key: "p50:model_ttft_ms", label: "TTFT p50", num: 1, fmt: fmt.ms }, { key: "p95:model_ttft_ms", label: "p95", num: 1, fmt: fmt.ms }, { key: "p99:model_ttft_ms", label: "p99", num: 1, fmt: fmt.ms },
+          { key: "p50:output_tps", label: "출력 속도", num: 1, fmt: fmt.tps }, { key: "p50:total_ms", label: "전체 p50", num: 1, fmt: fmt.ms }, { key: "p95:total_ms", label: "p95", num: 1, fmt: fmt.ms }, { key: "p99:total_ms", label: "p99", num: 1, fmt: fmt.ms },
+          { key: "sum:output_tokens", label: "출력 토큰", num: 1, fmt: fmt.compact }, { key: "sum:cost_usd", label: "비용", num: 1, fmt: fmt.usd }, { key: "x", label: "실측 $/100만 토큰", num: 1, fmt: (_, r) => fmt.usd(per1m(r)) },
+          { key: "price", label: "가격표", node: (v, r) => el("button", { class: "btn small", onclick: () => editPrice(r) }, v ? `$${v.input} / $${v.output}` : "설정") },
+        ])),
+        card("c6", "모델별 출력 속도 (p50)", "초당 출력 토큰. 높을수록 빠릅니다.", lineChart(splitSeries(speed, "model", "p50:output_tps"), { yfmt: fmt.num, span: w.span })),
+        card("c6", "모델별 TTFT (p95)", "게이트웨이 대기 제외", lineChart(splitSeries(ttft, "model", "p95:model_ttft_ms"), { yfmt: fmt.ms, span: w.span }))),
+    ];
+  } },
+
+  // ------------------------------------------------------------------ tokens
+  tokens: { label: "토큰", async render() {
+    const w = win(), b = bucketFor(w.span), perMin = 60000 / b, g = state.tokGroup;
+    const [tot, series, byModel, groups, ag, st] = await Promise.all([
+      q({ metrics: ["count", "sum:input_tokens", "sum:output_tokens", "sum:cache_read_tokens", "sum:cost_usd", "sum:cache_saved_usd", "avg:input_tokens", "avg:output_tokens", "p95:output_tokens"] }),
+      q({ bucket_ms: b, metrics: ["sum:input_tokens", "sum:output_tokens", "sum:cache_read_tokens", "sum:cost_usd"] }),
+      q({ bucket_ms: b, group_by: ["model"], metrics: ["sum:output_tokens"] }),
+      q({ group_by: [g], metrics: ["count", "sum:input_tokens", "sum:output_tokens", "sum:cache_read_tokens", "sum:cost_usd", "avg:output_tokens", "p50:output_tps"], order_by: "sum:output_tokens", limit: 300 }),
+      api("/gateway/agents"), api("/gateway/stats"),
+    ]);
+    const t = tot[0] || {}, all = (t["sum:input_tokens"] || 0) + (t["sum:output_tokens"] || 0);
+    const peak = Math.max(0, ...series.map((r) => (r["sum:output_tokens"] || 0) * perMin));
+    const used = (s = {}) => (s.input_tokens || 0) + (s.output_tokens || 0) + (s.cache_read_tokens || 0) + (s.cache_write_tokens || 0);
+    const budgets = ag.agents.filter((a) => a.token_budget != null).map((a) => ({ ...a, used: used(st.agents[a.id]) })).sort((a, b) => b.used / b.token_budget - a.used / a.token_budget);
+    return [
+      tiles([
+        { k: "전체 토큰", v: fmt.compact(all), n: `입력 ${fmt.compact(t["sum:input_tokens"])} · 출력 ${fmt.compact(t["sum:output_tokens"])}` },
+        { k: "분당 출력 토큰 (최고)", v: fmt.compact(peak), n: `${fmt.dur(b)} 구간 기준` },
+        { k: "요청당 토큰", v: fmt.int(t["avg:input_tokens"] + t["avg:output_tokens"] || null), n: `입력 ${fmt.int(t["avg:input_tokens"])} · 출력 ${fmt.int(t["avg:output_tokens"])} (출력 p95 ${fmt.int(t["p95:output_tokens"])})` },
+        { k: "캐시에서 읽은 입력", v: fmt.pct(t["sum:input_tokens"] ? t["sum:cache_read_tokens"] / t["sum:input_tokens"] : null), n: `절감 ${fmt.usd(t["sum:cache_saved_usd"])}` },
+        { k: "비용", v: fmt.usd(t["sum:cost_usd"]), n: `100만 토큰당 ${fmt.usd(all ? t["sum:cost_usd"] / all * 1e6 : null)}` },
+      ]),
+      grid(
+        card("c6", "분당 토큰", "입력과 출력", lineChart([seriesOf(series, "sum:input_tokens", "입력", null, perMin), seriesOf(series, "sum:output_tokens", "출력", null, perMin)], { yfmt: fmt.compact, span: w.span })),
+        card("c6", "모델별 분당 출력 토큰", "", lineChart(splitSeries(byModel, "model", "sum:output_tokens", 8, perMin), { yfmt: fmt.compact, span: w.span })),
+        card("", el("span", {}, "누가 토큰을 쓰나 ", selectOf(Object.entries(DIMS).slice(0, 9).map(([k, v]) => [k, v + "별"]), g, (v) => { state.tokGroup = v; refresh(); })), "출력 토큰이 많은 순서", table(groups, [
+          { key: g, label: DIMS[g] }, { key: "count", label: "요청", num: 1, fmt: fmt.int }, { key: "sum:input_tokens", label: "입력", num: 1, fmt: fmt.compact }, { key: "sum:output_tokens", label: "출력", num: 1, fmt: fmt.compact, bar: 1 },
+          { key: "sum:cache_read_tokens", label: "캐시 읽기", num: 1, fmt: fmt.compact }, { key: "avg:output_tokens", label: "요청당 출력", num: 1, fmt: fmt.int }, { key: "p50:output_tps", label: "출력 속도", num: 1, fmt: fmt.tps },
+          { key: "sum:cost_usd", label: "비용", num: 1, fmt: fmt.usd }, { key: "x", label: "$/100만 토큰", num: 1, fmt: (_, r) => { const n = (r["sum:input_tokens"] || 0) + (r["sum:output_tokens"] || 0); return fmt.usd(n ? r["sum:cost_usd"] / n * 1e6 : null); } }])),
+        card("", "토큰 예산", "예산이 걸린 키만, 많이 쓴 순서. 게이트웨이 시작 이후 누적입니다. 예산은 API·키 탭에서 바꿉니다.", table(budgets, [
+          { key: "id", label: "에이전트" }, { key: "team_id", label: "팀" }, { key: "used", label: "소진", node: (v, r) => el("span", {}, el("span", { class: "meter" + (v >= r.token_budget ? " over" : "") }, el("i", { style: `width:${Math.min(100, v / r.token_budget * 100)}%` })), fmt.pct(v / r.token_budget)) },
+          { key: "used", label: "사용", num: 1, fmt: fmt.compact }, { key: "token_budget", label: "예산", num: 1, fmt: fmt.compact },
+          { key: "s", label: "상태", node: (_, r) => r.used >= r.token_budget ? el("span", { class: "state bad" }, "초과, 요청 차단 중") : r.used >= r.token_budget * 0.8 ? el("span", { class: "state warn" }, "80% 넘음") : el("span", { class: "state ok" }, "여유") }], { empty: "예산이 걸린 키가 없습니다" }))),
+    ];
+  } },
+
+  // ------------------------------------------------------------------ latency
+  latency: { label: "지연 분석", async render() {
+    const w = win(), b = bucketFor(w.span), L = state.lat, m = L.metric, filter = L.model ? { model: [L.model] } : {};
+    const hb = [5e3, 1e4, 3e4, 6e4, 3e5, 9e5, 36e5, 216e5, 864e5].find((x) => w.span / x <= 120) || 864e5;
+    const P = ["p50", "p90", "p95", "p99"].map((p) => `${p}:${m}`);
+    const [tot, series, byDim, slow, modelVals, heat] = await Promise.all([
+      qraw({ filter, metrics: ["count", ...P, `max:${m}`, `avg:${m}`, `hist:${m}`] }),
+      q({ filter, bucket_ms: b, metrics: [`p50:${m}`, `p95:${m}`, `p99:${m}`, "count"] }),
+      q({ filter, group_by: [L.dim], metrics: ["count", `avg:${m}`, ...P, `max:${m}`], order_by: `p95:${m}`, limit: 200 }),
+      api("/gateway/obs/rows", { from: w.from, to: w.to, filter, order_by: m, limit: 25 }).then((r) => r.rows),
+      api(`/gateway/obs/values?col=model&from=${w.from}&to=${w.to}`),
+      qraw({ filter, bucket_ms: hb, metrics: [`hist:${m}`] }),
+    ]);
+    const t = tot.rows[0] || {}, tail = t[`p50:${m}`] ? t[`p99:${m}`] / t[`p50:${m}`] : null;
+    const controls = el("div", { class: "row", style: "grid-column:span 12" },
+      field("지표", selectOf(Object.entries(LAT), m, (v) => { L.metric = v; refresh(); })),
+      field("모델", selectOf([["", "모든 모델"], ...modelVals.map((v) => [v.value, v.value])], L.model, (v) => { L.model = v; refresh(); })),
+      field("나눠 보기", selectOf(Object.entries(DIMS).map(([k, v]) => [k, v + "별"]), L.dim, (v) => { L.dim = v; refresh(); })));
+    return [
+      controls,
+      el("div", { style: "height:12px" }),
+      tiles([
+        { k: "p50", v: fmt.ms(t[`p50:${m}`]), n: `평균 ${fmt.ms(t[`avg:${m}`])}` }, { k: "p90", v: fmt.ms(t[`p90:${m}`]) }, { k: "p95", v: fmt.ms(t[`p95:${m}`]) }, { k: "p99", v: fmt.ms(t[`p99:${m}`]), n: `최대 ${fmt.ms(t[`max:${m}`])}` },
+        { k: "꼬리 비율 (p99 ÷ p50)", v: tail == null ? "–" : nf(1).format(tail) + "배", n: "클수록 느린 요청이 유독 느림" }, { k: "요청", v: fmt.int(t.count), n: LAT[m] + " 기준" },
+      ]),
+      grid(
+        card("c6", `${LAT[m]} 추이`, `${fmt.dur(b)} 단위 분위수`, lineChart([seriesOf(series, `p50:${m}`, "p50"), seriesOf(series, `p95:${m}`, "p95"), seriesOf(series, `p99:${m}`, "p99")], { yfmt: fmt.ms, span: w.span })),
+        card("c6", "분포", "가로축은 로그 눈금. 점선은 분위수 위치입니다.", histogram(t[`hist:${m}`] || [], tot.hist_bounds || [], [{ label: "p50", v: t[`p50:${m}`] }, { label: "p95", v: t[`p95:${m}`] }, { label: "p99", v: t[`p99:${m}`] }])),
+        card("", "시간에 따른 분포 (히트맵)", "분위수 선으로는 안 보이는 두 봉우리나 갑자기 생긴 느린 무리를 찾을 때 봅니다.", heatmap(heat.rows, `hist:${m}`, heat.hist_bounds || [], w.span, hb)),
+        card("c6", `${DIMS[L.dim]}별 분위수`, "p95가 큰 순서", table(byDim, [
+          { key: L.dim, label: DIMS[L.dim] }, { key: "count", label: "요청", num: 1, fmt: fmt.int }, { key: `avg:${m}`, label: "평균", num: 1, fmt: fmt.ms }, { key: `p50:${m}`, label: "p50", num: 1, fmt: fmt.ms }, { key: `p90:${m}`, label: "p90", num: 1, fmt: fmt.ms },
+          { key: `p95:${m}`, label: "p95", num: 1, fmt: fmt.ms, bar: 1 }, { key: `p99:${m}`, label: "p99", num: 1, fmt: fmt.ms }, { key: `max:${m}`, label: "최대", num: 1, fmt: fmt.ms }])),
+        card("c6", "가장 느린 요청", "이 지표가 큰 순서 25건. 트레이스 ID로 대시보드의 트레이스 탭에서 구간별 시간을 볼 수 있습니다.", table(slow.filter((r) => r[m] != null), [
+          { key: "ts", label: "시각", fmt: fmt.time }, { key: "agent_id", label: "에이전트" }, { key: "model", label: "모델" }, { key: m, label: LAT[m], num: 1, fmt: fmt.ms, bar: 1 },
+          { key: "queue_ms", label: "대기", num: 1, fmt: fmt.ms }, { key: "status", label: "상태", num: 1, cls: (v) => v >= 400 || !v ? "neg" : "" }, { key: "output_tokens", label: "출력", num: 1, fmt: fmt.int }, { key: "trace_id", label: "트레이스", cls: () => "mono" }]))),
+    ];
+  } },
+
+  // ------------------------------------------------------------------ explorer
+  explore: { label: "시계열 탐색", async render() {
+    const w = win(), X = state.ex, b = X.bucket || bucketFor(w.span);
+    const metric = X.op === "count" ? "count" : `${X.op}:${X.col}`, yf = fmtFor(X.col, X.op);
+    const filter = X.fcol && X.fval ? { [X.fcol]: [isNaN(X.fval) || X.fval === "" ? X.fval : +X.fval] } : {};
+    const prevW = { from: w.from - w.span, to: w.from, span: w.span };
+    const [series, totals, fvals, prev] = await Promise.all([
+      q({ filter, bucket_ms: b, group_by: X.dim ? [X.dim] : [], metrics: [metric] }),
+      q({ filter, group_by: X.dim ? [X.dim] : [], metrics: [...new Set([metric, "count"])], order_by: metric, limit: 100 }),
+      X.fcol ? api(`/gateway/obs/values?col=${X.fcol}&from=${w.from}&to=${w.to}`) : [],
+      X.compare && !X.dim ? q({ filter, bucket_ms: b, metrics: [metric] }, prevW) : null,
+    ]);
+    const lines = X.dim ? splitSeries(series, X.dim, metric) : [seriesOf(series, metric, "이번 기간")];
+    if (prev) lines.push({ name: "직전 같은 길이 기간", color: "var(--muted)", dash: "5 4", points: prev.map((r) => [r.bucket + w.span, r[metric]]) });
+    const set = (k) => (v) => { X[k] = k === "bucket" ? +v : v; refresh(); };
+    const OPS = [["count", "건수"], ["sum", "합계"], ["avg", "평균"], ["p50", "p50"], ["p90", "p90"], ["p95", "p95"], ["p99", "p99"], ["max", "최대"], ["rate", "비율 (참인 요청)"], ["uniq", "고유 개수"]];
+    const cols = X.op === "uniq" ? Object.entries(DIMS) : Object.entries(NUMS);
+    if (X.op !== "count" && !cols.some(([k]) => k === X.col)) { X.col = cols[0][0]; return TABS.explore.render(); }
+    return [
+      el("div", { class: "row" },
+        field("계산", selectOf(OPS, X.op, set("op"))),
+        X.op === "count" ? null : field("대상", selectOf(cols, X.col, set("col"))),
+        field("나눠 보기", selectOf([["", "나누지 않음"], ...Object.entries(DIMS).map(([k, v]) => [k, v + "별"])], X.dim, set("dim"))),
+        field("시간 간격", selectOf([[0, "자동"], [1000, "1초"], [5000, "5초"], [10000, "10초"], [60000, "1분"], [300000, "5분"], [3600000, "1시간"]], X.bucket, set("bucket"))),
+        field("조건", selectOf([["", "없음"], ...Object.entries(DIMS)], X.fcol, (v) => { X.fcol = v; X.fval = ""; refresh(); })),
+        X.fcol ? field("값", selectOf([["", "선택"], ...fvals.map((v) => [v.value, `${v.value} (${fmt.int(v.count)})`])], X.fval, set("fval"))) : null,
+        X.dim ? null : el("label", { style: "font-size:12px;color:var(--text2);padding-bottom:6px" }, el("input", { type: "checkbox", checked: X.compare, onchange: (e) => { X.compare = e.target.checked; refresh(); } }), " 직전 기간과 겹쳐 보기")),
+      grid(
+        card("", `${OPS.find((o) => o[0] === X.op)[1]}${X.op === "count" ? "" : " · " + (NUMS[X.col] || DIMS[X.col])}${X.dim ? " · " + DIMS[X.dim] + "별" : ""}`, `${fmt.dur(b)} 간격${X.dim ? ", 합이 큰 8개까지" : ""}`, lineChart(lines, { yfmt: yf, span: w.span, height: 280, wide: true })),
+        card("", "기간 전체 값", X.dim ? `${DIMS[X.dim]}별, 큰 순서` : "", table(totals, [
+          ...(X.dim ? [{ key: X.dim, label: DIMS[X.dim] }] : []), { key: metric, label: OPS.find((o) => o[0] === X.op)[1], num: 1, fmt: yf, bar: 1 }, ...(metric === "count" ? [] : [{ key: "count", label: "요청", num: 1, fmt: fmt.int }])]))),
+    ];
+  } },
+};
+
+// ---- shell
+let seq = 0, busy = false;
+async function refresh() {
+  const mine = ++seq, tab = TABS[state.tab] || TABS.live;
+  busy = true;
+  try {
+    const kids = await tab.render();
+    if (mine !== seq) return;
+    const y = scrollY; $("#view").replaceChildren(...kids.filter(Boolean)); scrollTo(0, y);
+    showErr("");
+  } catch (e) { if (mine === seq) showErr("데이터를 불러오지 못했습니다: " + e.message); }
+  finally { if (mine === seq) busy = false; }
+}
+if (!TABS[state.tab]) state.tab = "live";
+$("#tabs").append(...Object.entries(TABS).map(([k, t]) => el("button", { "data-tab": k, onclick: () => { state.tab = k; location.hash = k; mark(); refresh(); } }, t.label)));
+function mark() { for (const b of $("#tabs").children) b.setAttribute("aria-selected", b.dataset.tab === state.tab); }
+$("#range").addEventListener("change", refresh);
+$("#reload").addEventListener("click", refresh);
+// Leave the page alone while someone is typing, choosing or reading a dialog.
+const editing = () => document.querySelector("dialog[open]") || ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName) && document.activeElement.type !== "checkbox";
+let lastAuto = 0;
+setInterval(() => {
+  const every = TABS[state.tab]?.every || 15000;
+  if (!$("#auto").checked || document.hidden || busy || editing() || Date.now() - lastAuto < every) return;
+  lastAuto = Date.now(); refresh();
+}, 500);
+mark(); refresh();
+</script>
+</body>
+</html>

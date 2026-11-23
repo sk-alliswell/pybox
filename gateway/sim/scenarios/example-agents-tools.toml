@@ -1,0 +1,50 @@
+# Not a measured replay: every number here is an assumption. It shows the
+# parts the lab has not measured yet working together: multi-turn agents that
+# call an MCP tool before each turn, a hosted API with a rate limit, and the
+# log store.
+name = "example-agents-tools"
+description = "Forty agents, twelve turns each with growing context and a tool call before every turn, against a hosted API limited to 150 requests a minute."
+description_ko = "에이전트 40개가 턴마다 MCP 도구를 호출하고 문맥이 늘어나는 12턴 세션을 반복합니다. 호스티드 API는 분당 150건으로 제한됩니다."
+max_s = 600
+
+[[phase]]
+name = "run"
+from_s = 0
+to_s = 180
+
+[gateway]
+[[gateway.upstream]]
+name = "cloud"
+targets = ["provider"]
+max_concurrency = 20
+
+[[hosted_api]]
+name = "provider"
+models = ["sonnet"]
+ttft_ms = { median = 700, sigma = 0.4 }
+ttft_ms_per_prompt_token = 0.02
+tokens_per_s = { median = 60, sigma = 0.3 }
+rpm = 150
+
+[[mcp_server]]
+name = "repo-tools"
+concurrency = 4
+latency_ms = { median = 400, sigma = 0.8 }
+
+[db]
+name = "tdb"
+rows_per_request = 5
+
+[[client]]
+name = "agents"
+class = "agent-turn"
+entry = "gateway"
+models = ["sonnet"]
+arrival = { kind = "closed", agents = 40, think_s = 1.5 }
+to_s = 180
+prompt_tokens = 3000
+output_tokens = 250
+output_sigma = 0.5
+timeout_s = 120
+retry = true
+session = { turns = 12, prompt_growth_tokens = 900, tool = "repo-tools", tool_call_probability = 0.8 }

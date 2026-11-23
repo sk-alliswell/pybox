@@ -1,0 +1,56 @@
+[package]
+name = "pybox-sandbox"
+version = "0.2.0"
+edition = "2021"
+rust-version = "1.85"
+description = "Native Windows and Linux controller for a pinned Hyperlight Python sandbox"
+repository = "https://github.com/MichaelAlbertIhm/pybox"
+readme = "README.md"
+publish = false
+default-run = "pybox"
+autobins = false
+
+[lib]
+name = "python_sandbox_controller"
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10.9"
+fs2 = "0.4.3"
+ctrlc = "3"
+getrandom = "0.3.4"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_ProcessStatus", "Win32_System_LibraryLoader"] }
+
+[features]
+dev-tools = []
+
+[[bin]]
+name = "pybox"
+path = "src/main.rs"
+
+[[bin]]
+name = "guard-fixture"
+path = "tools/guard_fixture.rs"
+required-features = ["dev-tools"]
+
+[[bin]]
+name = "guard-probe"
+path = "tools/guard_probe.rs"
+required-features = ["dev-tools"]
+
+[[bin]]
+name = "fd-probe"
+path = "tools/fd_probe.rs"
+required-features = ["dev-tools"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

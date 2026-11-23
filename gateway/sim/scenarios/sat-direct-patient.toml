@@ -1,0 +1,12 @@
+extends = "lab-round2.toml"
+name = "sat-direct-patient"
+description = "No gateway, patient batch callers (10 min)."
+description_ko = "게이트웨이 없음. 배치 호출자는 10분까지 기다립니다."
+
+[[client]]
+name = "interactive"
+entry = "litellm"
+
+[[client]]
+name = "batch"
+entry = "litellm"

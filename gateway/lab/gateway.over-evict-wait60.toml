@@ -1,0 +1,51 @@
+# Overload test (overload_drive.py), local models only: one upstream, three
+# llama.cpp servers, one request at a time each. A full queue (30) pushes out the least important waiter.
+# Plus admit_by_wait (60 s, or the caller's own x-gateway-max-wait-ms).
+listen = "127.0.0.1:8787"
+admin_token = "lab-agent-admin"
+
+[obs]
+backend = "memory"
+memory_rows = 100000
+
+[[upstreams]]
+name = "local"
+base_url = "http://127.0.0.1:9211"
+kind = "none"
+affinity = "off"
+max_queue = 30
+overflow = "evict"
+admit_by_wait = true
+queue_timeout_secs = 60
+
+[[upstreams.backends]]
+name = "s1"
+base_url = "http://127.0.0.1:9211"
+max_concurrency = 1
+
+[[upstreams.backends]]
+name = "s2"
+base_url = "http://127.0.0.1:9212"
+max_concurrency = 1
+
+[[upstreams.backends]]
+name = "s3"
+base_url = "http://127.0.0.1:9213"
+max_concurrency = 1
+
+[[agents]]
+id = "ide"
+token = "lab-agent-ide"
+weight = 4
+priority = "interactive"
+
+[[agents]]
+id = "chat"
+token = "lab-agent-chat"
+weight = 2
+
+[[agents]]
+id = "batch"
+token = "lab-agent-batch"
+weight = 1
+priority = "batch"

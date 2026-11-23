@@ -1,0 +1,46 @@
+# Demo: agents -> pybox-gateway-tdb -> two LiteLLM proxies -> mock model server.
+listen = "127.0.0.1:8787"
+admin_token = "demo-admin"
+
+[retry]
+max_retries = 2
+base_ms = 100
+max_ms = 1000
+
+[cache]
+ttl_secs = 0
+
+[obs]
+backend = "tdb"
+dir = "demo/data"
+otlp_token = "demo-otlp"
+
+# Same prices as demo/litellm.yaml, in USD per million tokens. LiteLLM reports the
+# cost of each call; this table is what lets the gateway work out cache savings.
+[obs.prices."gpt-fast"]
+input = 5.0
+output = 15.0
+cache_read = 0.5
+
+[obs.prices."gpt-smart"]
+input = 30.0
+output = 150.0
+cache_read = 3.0
+
+[[upstreams]]
+name = "seoul"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-demo-master"
+key_alias = "master-seoul"
+cluster = "kr"
+max_concurrency = 16
+
+[[upstreams]]
+name = "tokyo"
+base_url = "http://127.0.0.1:4001"
+kind = "litellm"
+api_key = "sk-demo-master"
+key_alias = "master-tokyo"
+cluster = "jp"
+max_concurrency = 16

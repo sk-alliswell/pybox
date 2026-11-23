@@ -1,0 +1,30 @@
+# Saturation test (saturate.py): local models only. Short queue (4 waiting, 4 s) plus fair policy with priority classes and adaptive concurrency.
+listen = "127.0.0.1:8787"
+admin_token = "lab-admin"
+
+[obs]
+backend = "memory"
+memory_rows = 100000
+otlp_token = "lab-otlp"
+
+[[upstreams]]
+name = "qwen"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-lab-master"
+max_concurrency = 2
+max_queue = 4
+queue_timeout_secs = 4
+policy = "fair"
+adaptive = true
+
+[[upstreams]]
+name = "smol"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-lab-master"
+max_concurrency = 2
+max_queue = 4
+queue_timeout_secs = 4
+policy = "fair"
+adaptive = true

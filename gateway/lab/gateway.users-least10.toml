@@ -1,0 +1,63 @@
+# Overload test (overload_drive.py), local models only: one upstream, three
+# llama.cpp servers, one request at a time each. Least used first, half-life 10 s.
+listen = "127.0.0.1:8787"
+admin_token = "lab-agent-admin"
+
+[obs]
+backend = "memory"
+memory_rows = 100000
+
+[[upstreams]]
+name = "local"
+base_url = "http://127.0.0.1:9211"
+kind = "none"
+affinity = "off"
+max_queue = 200
+least_used_half_life_secs = 10
+
+[[upstreams.backends]]
+name = "s1"
+base_url = "http://127.0.0.1:9211"
+max_concurrency = 1
+
+[[upstreams.backends]]
+name = "s2"
+base_url = "http://127.0.0.1:9212"
+max_concurrency = 1
+
+[[upstreams.backends]]
+name = "s3"
+base_url = "http://127.0.0.1:9213"
+max_concurrency = 1
+
+[[agents]]
+id = "u1"
+token = "lab-agent-u1"
+
+[[agents]]
+id = "u2"
+token = "lab-agent-u2"
+
+[[agents]]
+id = "u3"
+token = "lab-agent-u3"
+
+[[agents]]
+id = "u4"
+token = "lab-agent-u4"
+
+[[agents]]
+id = "u5"
+token = "lab-agent-u5"
+
+[[agents]]
+id = "u6"
+token = "lab-agent-u6"
+
+[[agents]]
+id = "u7"
+token = "lab-agent-u7"
+
+[[agents]]
+id = "u8"
+token = "lab-agent-u8"

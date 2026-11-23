@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pybox-gateway 부하 테스트 타임라인</title>
+<style>
+.viz-root{color-scheme:light;--surface-1:#fcfcfb;--surface-2:#f3f2ef;--text-primary:#0b0b0b;--text-secondary:#52514e;--text-muted:#8a8984;--grid:#e6e5e1;--axis:#c9c8c2;
+--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#6250d6;--bad:#d03b3b;}
+@media (prefers-color-scheme: dark){.viz-root{color-scheme:dark;--surface-1:#1a1a19;--surface-2:#242422;--text-primary:#f0efec;--text-secondary:#c3c2b7;--text-muted:#8f8e86;--grid:#2e2e2b;--axis:#4a4a46;
+--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#9085e9;--bad:#e66767;}}
+html,body{margin:0;background:var(--surface-1)}
+.viz-root{font-family:system-ui,-apple-system,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--text-primary);background:var(--surface-1);max-width:1180px;margin:0 auto;padding:24px 20px 60px;line-height:1.5}
+h1{font-size:26px;font-weight:600;margin:0 0 4px}
+h2{font-size:18px;font-weight:600;margin:36px 0 4px}
+.sub{color:var(--text-secondary);margin:0 0 4px;font-size:14px}
+.lede{font-size:16px;margin:12px 0 20px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
+.tile{background:var(--surface-2);border-radius:8px;padding:12px 14px}
+.tile .k{font-size:12px;color:var(--text-secondary)}
+.tile .v{font-size:24px;font-variant-numeric:tabular-nums;font-weight:600}
+.tile .n{font-size:12px;color:var(--text-muted)}
+.desc{color:var(--text-secondary);font-size:13px;margin:0 0 8px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--text-secondary);margin:4px 0 6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px}
+.legend i.dash{background:none!important;border-top:2px dashed}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart text{fill:var(--text-secondary);font-size:11px}
+.tip{position:absolute;pointer-events:none;background:var(--surface-1);border:1px solid var(--axis);border-radius:6px;padding:6px 9px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,.15);white-space:nowrap;display:none;z-index:5;color:var(--text-primary)}
+.tip b{font-weight:600}
+.tip .sw{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.phase{fill:var(--text-muted);font-size:11px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--grid)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--text-secondary);font-weight:500}
+.tw{overflow-x:auto}
+.note{font-size:13px;color:var(--text-secondary)}
+.runs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.runs button{font:inherit;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--axis);background:var(--surface-1);color:var(--text-primary);cursor:pointer}
+.runs button[aria-pressed=true]{background:var(--text-primary);color:var(--surface-1);border-color:var(--text-primary)}
+.find li{margin:4px 0}
+code{font-size:12px;background:var(--surface-2);padding:1px 4px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="viz-root" id="root">
+<h1>pybox-gateway 부하 테스트 타임라인</h1>
+<div class="runs" id="runs"></div>
+<p class="sub" id="meta"></p>
+<p class="lede" id="lede"></p>
+<div class="tiles" id="tiles"></div>
+
+<h2 id="h-agents">언제 몇 개의 에이전트가 통신 중이었나</h2>
+<p class="desc">에이전트가 게이트웨이에 열어 둔 요청 수(클라이언트 측, 0.5초 간격). 점선은 전체 합계.</p>
+<div class="legend" data-legend="prov-total"></div>
+<div class="chart" id="c-active"></div>
+
+<h2 id="h-queue">게이트웨이 내부: 업스트림 슬롯 사용과 대기열</h2>
+<p class="desc">프로바이더별 업스트림 동시 실행 상한은 <b id="capv">–</b>. 실선은 실제로 업스트림에 나가 있는 요청, 점선은 슬롯을 기다리는 요청.</p>
+<div class="legend" data-legend="prov-q"></div>
+<div class="chart" id="c-sched"></div>
+
+<h2 id="h-gantt">요청 하나하나의 타임라인</h2>
+<p class="desc">한 줄이 에이전트 하나, 막대 하나가 요청 하나. 옅은 부분은 첫 바이트 전(게이트웨이 대기 + 업스트림 처리), 진한 부분은 스트리밍 수신. 빨간 막대는 실패.</p>
+<div class="legend" data-legend="prov"></div>
+<div class="chart" id="c-gantt"></div>
+
+<h2 id="h-ttfb">지연 시간 변화: 첫 바이트까지 (TTFB)</h2>
+<p class="desc">요청 시작 시각 기준 10초 구간별 중앙값(실선)과 p95(점선). 스트리밍 요청만.</p>
+<div class="legend" data-legend="prov-p95"></div>
+<div class="chart" id="c-ttfb"></div>
+
+<h2 id="h-qwait">게이트웨이 큐 대기 시간</h2>
+<p class="desc">응답 헤더 <code>x-gateway-queue-ms</code>로 측정한, 요청이 업스트림 슬롯을 기다린 시간. 10초 구간별 p95.</p>
+<div class="legend" data-legend="prov"></div>
+<div class="chart" id="c-qwait"></div>
+
+<h2 id="h-total">지연 시간 변화: 전체 응답 완료</h2>
+<p class="desc">요청 시작부터 스트림 끝까지. 10초 구간별 중앙값.</p>
+<div class="legend" data-legend="prov"></div>
+<div class="chart" id="c-total"></div>
+
+<h2 id="h-cpu">게이트웨이 CPU 사용률</h2>
+<p class="desc">게이트웨이 프로세스의 CPU 사용률, 0.5초 간격 (100% = 코어 1개, 측정 머신 4코어).</p>
+<div class="chart" id="c-cpu"></div>
+
+<h2 id="h-mem">게이트웨이 메모리 (RSS)</h2>
+<div class="chart" id="c-rss"></div>
+
+<h2 id="h-sock">게이트웨이 TCP 소켓</h2>
+<p class="desc">들어오는 연결(에이전트 → 게이트웨이)과 나가는 연결(게이트웨이 → 프로바이더, 커넥션 풀). 나가는 연결이 적게 유지되는 것이 풀링/HTTP2 효과.</p>
+<div class="legend" data-legend="sock"></div>
+<div class="chart" id="c-sock"></div>
+
+<h2 id="h-io">게이트웨이를 지나간 트래픽</h2>
+<p class="desc">에이전트 쪽에서 본 초당 바이트, 2초 구간. 업로드는 요청 본문(프롬프트), 다운로드는 응답 스트림을 수신 구간에 고르게 나눠 계산. 같은 바이트가 프로바이더 쪽으로도 한 번 더 오갑니다.</p>
+<div class="legend" data-legend="io"></div>
+<div class="chart" id="c-io"></div>
+
+<h2 id="h-table">프로바이더별 요약</h2>
+<div class="tw"><table id="t-prov"></table></div>
+
+<h2 id="h-find">관찰</h2>
+<ul class="find" id="findings"></ul>
+<p class="note" id="method"></p>
+</div>
+<script>
+const RUNS=/*DATA_RUNS*/[];let R,S,C,N,D,PH;
+const PROV=["anthropic","gemini","openai"],LBL={anthropic:"Anthropic (claude-haiku-5-5)",gemini:"Gemini (gemini-2.5-flash-lite)",openai:"OpenAI (gpt-4o-mini)"};
+const COL=["var(--s1)","var(--s2)","var(--s3)"];
+const fmt=(v,d=0)=>v==null||isNaN(v)?"–":Number(v).toLocaleString("ko-KR",{maximumFractionDigits:d,minimumFractionDigits:d});
+const el=(t,a={},...k)=>{const e=document.createElementNS("http://www.w3.org/2000/svg",t);for(const x in a)e.setAttribute(x,a[x]);k.forEach(c=>e.appendChild(c));return e};
+function legend(){const L={
+ "prov":PROV.map((p,i)=>[COL[i],LBL[p]]),
+ "prov-total":[...PROV.map((p,i)=>[COL[i],LBL[p]]),["var(--text-secondary)","전체","dash"]],
+ "prov-q":[...PROV.map((p,i)=>[COL[i],LBL[p]]),["var(--text-secondary)","실선: 업스트림 실행 중 · 점선: 대기"]],
+ "prov-p95":[...PROV.map((p,i)=>[COL[i],LBL[p]]),["var(--text-secondary)","점선: p95","dash"]],
+ "sock":[[COL[0],"들어오는 연결 (에이전트)"],[COL[1],"나가는 연결 (프로바이더)"]],
+ "io":[[COL[0],"업로드 (에이전트 → 게이트웨이)"],[COL[1],"다운로드 (게이트웨이 → 에이전트)"]]};
+ document.querySelectorAll("[data-legend]").forEach(d=>{L[d.dataset.legend].forEach(([c,t,s])=>{const sp=document.createElement("span");const i=document.createElement("i");i.style.background=c;if(s){i.className="dash";i.style.borderColor=c}sp.append(i,t);d.append(sp)})})}
+
+// generic line chart: series=[{name,color,dash,pts:[[t,v]]}]
+function line(id,series,{h=220,yfmt=null,unit="",ymax=null}={}){
+ const box=document.getElementById(id);const W=box.clientWidth||800;const m={l:52,r:12,t:16,b:26};
+ const all=series.flatMap(s=>s.pts.map(p=>p[1])).filter(v=>v!=null&&!isNaN(v));
+ let Y=ymax??Math.max(1,...all)*1.08;const nice=niceTicks(Y);Y=nice[nice.length-1];if(!yfmt){const dp=Y<=5?1:0;yfmt=v=>fmt(v,dp)}
+ const x=t=>m.l+(W-m.l-m.r)*t/D, y=v=>m.t+(h-m.t-m.b)*(1-v/Y);
+ const svg=el("svg",{viewBox:`0 0 ${W} ${h}`,role:"img","aria-label":box.previousElementSibling?.textContent||id});
+ PH.forEach(([a,b,n],i)=>{if(i%2)svg.append(el("rect",{x:x(a),y:m.t,width:x(b)-x(a),height:h-m.t-m.b,fill:"var(--surface-2)"}));const tx=el("text",{x:x(a)+4,y:m.t-4,class:"phase"});tx.textContent=n;svg.append(tx)});
+ nice.forEach(v=>{svg.append(el("line",{x1:m.l,x2:W-m.r,y1:y(v),y2:y(v),stroke:"var(--grid)"}));const t=el("text",{x:m.l-6,y:y(v)+4,"text-anchor":"end"});t.textContent=yfmt(v)+unit;svg.append(t)});
+ for(let t=0;t<=D;t+=60){const tx=el("text",{x:x(t),y:h-8,"text-anchor":"middle"});tx.textContent=t+"s";svg.append(tx);svg.append(el("line",{x1:x(t),x2:x(t),y1:h-m.b,y2:h-m.b+4,stroke:"var(--axis)"}))}
+ svg.append(el("line",{x1:m.l,x2:W-m.r,y1:h-m.b,y2:h-m.b,stroke:"var(--axis)"}));
+ series.forEach(s=>{let d="",pen=false;s.pts.forEach(([t,v])=>{if(v==null||isNaN(v)){pen=false;return}d+=(pen?"L":"M")+x(t).toFixed(1)+","+y(v).toFixed(1);pen=true});
+  svg.append(el("path",{d,fill:"none",stroke:s.color,"stroke-width":2,"stroke-dasharray":s.dash?"5 4":"","stroke-linejoin":"round"}))});
+ const cross=el("line",{y1:m.t,y2:h-m.b,stroke:"var(--axis)",visibility:"hidden"});svg.append(cross);
+ const dots=series.map(s=>{const c=el("circle",{r:4,fill:s.color,stroke:"var(--surface-1)","stroke-width":2,visibility:"hidden"});svg.append(c);return c});
+ const hit=el("rect",{x:m.l,y:m.t,width:W-m.l-m.r,height:h-m.t-m.b,fill:"transparent"});svg.append(hit);
+ const tip=document.createElement("div");tip.className="tip";box.replaceChildren(svg,tip);
+ const move=ev=>{const r=svg.getBoundingClientRect();const px=(ev.clientX-r.left)*W/r.width;const t=Math.max(0,Math.min(D,(px-m.l)/(W-m.l-m.r)*D));
+  cross.setAttribute("x1",x(t));cross.setAttribute("x2",x(t));cross.setAttribute("visibility","visible");
+  let html=`<b>${fmt(t,1)}초</b>`;series.forEach((s,i)=>{let best=null,bd=1e9;for(const p of s.pts){const dd=Math.abs(p[0]-t);if(dd<bd&&p[1]!=null&&!isNaN(p[1])){bd=dd;best=p}}
+   if(best&&bd<Math.max(6,D/60)){dots[i].setAttribute("cx",x(best[0]));dots[i].setAttribute("cy",y(best[1]));dots[i].setAttribute("visibility","visible");html+=`<br><span class="sw" style="background:${s.color}"></span>${s.name}: <b>${yfmt(best[1])}${unit}</b>`}else dots[i].setAttribute("visibility","hidden")});
+  tip.innerHTML=html;tip.style.display="block";const bx=box.getBoundingClientRect();let lx=ev.clientX-bx.left+14;if(lx+tip.offsetWidth>bx.width)lx=ev.clientX-bx.left-tip.offsetWidth-14;tip.style.left=lx+"px";tip.style.top=(ev.clientY-bx.top-10)+"px"};
+ hit.addEventListener("pointermove",move);hit.addEventListener("pointerleave",()=>{tip.style.display="none";cross.setAttribute("visibility","hidden");dots.forEach(d=>d.setAttribute("visibility","hidden"))});
+}
+function niceTicks(max){const raw=max/4,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p,st=(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p;const out=[];for(let v=0;v<=max+st*0.999;v+=st)out.push(+v.toFixed(6));return out}
+
+function bins(rows,key,fn,step=10){const out=[];for(let t=0;t<D;t+=step){const vs=rows.filter(r=>r.t>=t&&r.t<t+step).map(key).filter(v=>v!=null&&!isNaN(v));out.push([t+step/2,vs.length?fn(vs):null])}return out}
+const q=(vs,p)=>{vs=[...vs].sort((a,b)=>a-b);const k=(vs.length-1)*p,f=Math.floor(k),c=Math.min(f+1,vs.length-1);return vs[f]+(vs[c]-vs[f])*(k-f)};
+
+function gantt(){const box=document.getElementById("c-gantt");const W=box.clientWidth||800;
+ const agents=[...new Set(R.map(r=>r[1]))].sort((a,b)=>{const pa=PROV.indexOf(a.split("-")[0]),pb=PROV.indexOf(b.split("-")[0]);return pa-pb||(+a.split("-")[1])-(+b.split("-")[1])});
+ const rowH=Math.max(3,Math.min(6,520/agents.length)),m={l:52,r:12,t:16,b:26},h=m.t+m.b+agents.length*rowH;
+ const x=t=>m.l+(W-m.l-m.r)*t/D;const idx=Object.fromEntries(agents.map((a,i)=>[a,i]));
+ const svg=el("svg",{viewBox:`0 0 ${W} ${h}`,role:"img","aria-label":"에이전트별 요청 타임라인"});
+ PH.forEach(([a,b,n],i)=>{if(i%2)svg.append(el("rect",{x:x(a),y:m.t,width:x(b)-x(a),height:h-m.t-m.b,fill:"var(--surface-2)"}));const tx=el("text",{x:x(a)+4,y:m.t-4,class:"phase"});tx.textContent=n;svg.append(tx)});
+ PROV.forEach((p,i)=>{const rs=agents.filter(a=>a.startsWith(p));if(!rs.length)return;const y0=m.t+idx[rs[0]]*rowH,y1=m.t+(idx[rs[rs.length-1]]+1)*rowH;const t=el("text",{x:m.l-6,y:(y0+y1)/2+4,"text-anchor":"end"});t.textContent=p;svg.append(t);if(i)svg.append(el("line",{x1:m.l,x2:W-m.r,y1:y0,y2:y0,stroke:"var(--axis)"}))});
+ for(let t=0;t<=D;t+=60){const tx=el("text",{x:x(t),y:h-8,"text-anchor":"middle"});tx.textContent=t+"s";svg.append(tx)}
+ const g=el("g");R.forEach((r,k)=>{const y=m.t+idx[r[1]]*rowH+0.5,c=r[6]===200?COL[r[0]]:"var(--bad)",fb=r[4]??r[5];
+  g.append(el("rect",{x:x(r[2]),y,width:Math.max(0.5,x(fb)-x(r[2])),height:rowH-1,fill:c,opacity:.35,"data-k":k}));
+  g.append(el("rect",{x:x(fb),y,width:Math.max(0.5,x(r[5])-x(fb)),height:rowH-1,fill:c,"data-k":k}))});svg.append(g);
+ const tip=document.createElement("div");tip.className="tip";box.replaceChildren(svg,tip);
+ svg.addEventListener("pointermove",ev=>{const r=svg.getBoundingClientRect();const px=(ev.clientX-r.left)*W/r.width,py=(ev.clientY-r.top)*h/r.height;const ai=Math.floor((py-m.t)/rowH),t=(px-m.l)/(W-m.l-m.r)*D;
+  const a=agents[ai];const hit=a&&R.find(z=>z[1]===a&&z[2]<=t+0.3&&z[5]>=t-0.3);if(!hit){tip.style.display="none";return}
+  tip.innerHTML=`<b>${hit[1]}</b> · ${hit[7]?"stream":"json"} · ${hit[6]}<br>시작 ${fmt(hit[2],1)}s · 큐 ${fmt(hit[8])}ms<br>TTFB ${fmt(((hit[4]??hit[5])-hit[2])*1000)}ms · 총 ${fmt((hit[5]-hit[2])*1000)}ms<br>출력 ${fmt(hit[9])} tok · ↑${fmt(hit[10]/1024,1)}KB ↓${fmt(hit[11]/1024,1)}KB`;
+  tip.style.display="block";const bx=box.getBoundingClientRect();let lx=ev.clientX-bx.left+14;if(lx+tip.offsetWidth>bx.width)lx=ev.clientX-bx.left-tip.offsetWidth-14;tip.style.left=lx+"px";tip.style.top=(ev.clientY-bx.top+12)+"px"});
+ svg.addEventListener("pointerleave",()=>tip.style.display="none");}
+
+function draw(){
+ const reqs=R.map(r=>({p:r[0],t:r[2],ok:r[6]===200,stream:r[7],ttfb:r[4]!=null?(r[4]-r[2])*1000:null,total:(r[5]-r[2])*1000,queue:r[8]}));
+ line("c-active",[...PROV.map((p,i)=>({name:p,color:COL[i],pts:S.map(s=>[s[0],s[2+i]])})),{name:"전체",color:"var(--text-secondary)",dash:1,pts:S.map(s=>[s[0],s[1]])}],{unit:"개"});
+ line("c-sched",[...PROV.map((p,i)=>({name:p+" 실행",color:COL[i],pts:S.map(s=>[s[0],s[5+i]])})),...PROV.map((p,i)=>({name:p+" 대기",color:COL[i],dash:1,pts:S.map(s=>[s[0],s[8+i]])}))],{unit:"개"});
+ gantt();
+ const sOK=reqs.filter(r=>r.ok&&r.stream);
+ line("c-ttfb",[...PROV.map((p,i)=>({name:p+" p50",color:COL[i],pts:bins(sOK.filter(r=>r.p===i),r=>r.ttfb,v=>q(v,.5))})),...PROV.map((p,i)=>({name:p+" p95",color:COL[i],dash:1,pts:bins(sOK.filter(r=>r.p===i),r=>r.ttfb,v=>q(v,.95))}))],{unit:"ms"});
+ line("c-qwait",PROV.map((p,i)=>({name:p+" p95",color:COL[i],pts:bins(reqs.filter(r=>r.ok&&r.p===i),r=>r.queue,v=>q(v,.95))})),{unit:"ms"});
+ line("c-total",PROV.map((p,i)=>({name:p+" p50",color:COL[i],pts:bins(sOK.filter(r=>r.p===i),r=>r.total/1000,v=>q(v,.5))})),{unit:"s",yfmt:v=>fmt(v,1)});
+ line("c-cpu",[{name:"CPU",color:COL[0],pts:C.map(c=>[c[0],c[1]])}],{unit:"%",h:180});
+ line("c-rss",[{name:"RSS",color:COL[0],pts:S.map(s=>[s[0],s[11]])}],{unit:"MB",h:180,yfmt:v=>fmt(v,1)});
+ line("c-sock",[{name:"들어오는",color:COL[0],pts:S.map(s=>[s[0],s[14]])},{name:"나가는",color:COL[1],pts:S.map(s=>[s[0],s[15]])}],{unit:"개",h:200});
+ const st=2,nb=Math.ceil(D/st)+1,up=new Array(nb).fill(0),dn=new Array(nb).fill(0);
+ R.forEach(r=>{const a=Math.floor(r[2]/st);if(a<nb)up[a]+=r[10];const f=r[4]??r[5],e=r[5],len=Math.max(e-f,1e-3);for(let b=Math.floor(f/st);b<=Math.floor(e/st)&&b<nb;b++){const ov=Math.min(e,(b+1)*st)-Math.max(f,b*st);if(ov>0)dn[b]+=r[11]*ov/len}});
+ line("c-io",[{name:"업로드",color:COL[0],pts:up.map((v,i)=>[i*st+st/2,v/st/1e6])},{name:"다운로드",color:COL[1],pts:dn.map((v,i)=>[i*st+st/2,v/st/1e6])}],{unit:"MB/s",h:200,yfmt:v=>fmt(v,2)});
+}
+function text(){const P=N.per_provider,A=P.all,Rz=N.resources;
+ const cf=N.config;document.getElementById("capv").textContent=cf.max_concurrency;document.getElementById("meta").textContent=`${D}초 · 에이전트 ${N.agents}개 (프로바이더당 정상 ${cf.base} + 스파이크 ${cf.spike}) · 프로바이더별 업스트림 동시 실행 상한 ${cf.max_concurrency} · 스트리밍 ${Math.round(cf.stream_ratio*100)}% · 프롬프트 ${cf.in_min/1000}–${cf.in_max/1000}KB · max_tokens ${cf.max_tokens}`;
+ const tiles=[["총 요청",fmt(A.requests),`성공 ${fmt(A.ok)} (${fmt(100*A.ok/A.requests,1)}%)`],["최대 동시 에이전트",fmt(N.peak_active)+"개","클라이언트 측 열린 요청"],["게이트웨이 CPU 최대",fmt(Rz.peak_cpu)+"%",`평균 ${fmt(Rz.avg_cpu,1)}% (코어 1개=100%)`],["메모리 최대",fmt(Rz.peak_rss_mb,1)+" MB",`유휴 ${fmt(Rz.idle_rss_mb,1)} MB → 종료 ${fmt(Rz.end_rss_mb,1)} MB`],["나가는 소켓 최대",fmt(Rz.peak_sock_out)+"개",`들어오는 소켓 최대 ${fmt(Rz.peak_sock_in)}개`],["토큰",fmt((A.in_tok+A.out_tok)/1e6,2)+"M",`입력 ${fmt(A.in_tok/1e6,2)}M · 출력 ${fmt(A.out_tok/1e6,2)}M`],["처리량",fmt(A.rps,1)+" req/s",`업로드 ${fmt(A.mb_up)}MB · 다운로드 ${fmt(A.mb_down)}MB`],["예상 비용","$"+fmt(A.cost,2),"공시 단가 기준 추정"]];
+ document.getElementById("tiles").replaceChildren(...tiles.map(([k,v,n])=>{const d=document.createElement("div");d.className="tile";d.innerHTML=`<div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div>`;return d}));
+ const t=document.getElementById("t-prov");const cols=[["프로바이더",p=>p==="all"?"전체":LBL[p]],["요청",r=>fmt(r.requests)],["성공",r=>fmt(r.ok)],["재시도",r=>fmt(r.retried)],["큐 p50",r=>fmt(r.queue_p50)+"ms"],["큐 p95",r=>fmt(r.queue_p95)+"ms"],["큐 최대",r=>fmt(r.queue_max)+"ms"],["TTFB p50",r=>fmt(r.ttfb_p50)+"ms"],["TTFB p95",r=>fmt(r.ttfb_p95)+"ms"],["완료 p50",r=>fmt(r.total_p50/1000,1)+"s"],["완료 p95",r=>fmt(r.total_p95/1000,1)+"s"],["tok/s p50",r=>fmt(r.tok_s_p50)],["↑MB",r=>fmt(r.mb_up,1)],["↓MB",r=>fmt(r.mb_down,1)],["비용",r=>"$"+fmt(r.cost,2)]];
+ t.innerHTML="<tr>"+cols.map(c=>`<th>${c[0]}</th>`).join("")+"</tr>"+[...PROV,"all"].map(p=>"<tr>"+cols.map((c,i)=>`<td>${i?c[1](P[p]):c[1](p)}</td>`).join("")+"</tr>").join("");
+ const ul=document.getElementById("findings");ul.replaceChildren();(N.findings||[]).forEach(f=>{const li=document.createElement("li");li.innerHTML=f;ul.append(li)});
+ document.getElementById("lede").innerHTML=N.lede||"";
+ document.getElementById("method").innerHTML=N.method||"";
+}
+function pick(i){({R,S,C,N}=RUNS[i]);D=N.duration;PH=[[0,.2*D,"램프업"],[.2*D,.5*D,"정상 부하"],[.5*D,.75*D,"스파이크"],[.75*D,D,"램프다운"]];
+ document.querySelectorAll("#runs button").forEach((b,j)=>b.setAttribute("aria-pressed",i===j));text();draw();try{history.replaceState(null,"","#run"+(i+1))}catch(e){}}
+RUNS.forEach((r,i)=>{const b=document.createElement("button");b.textContent=r.N.label;b.onclick=()=>pick(i);document.getElementById("runs").append(b)});
+legend();pick(Math.max(0,(+(location.hash.match(/run(\d)/)||[])[1]||1)-1));let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(draw,150)});
+</script>
+</body>
+</html>

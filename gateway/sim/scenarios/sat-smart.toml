@@ -1,0 +1,21 @@
+extends = "lab-round2.toml"
+name = "sat-smart"
+description = "Everything is admitted and held: strict priority, eviction of batch when full, refusal by expected wait."
+description_ko = "모두 받아서 보관: 엄격 우선순위, 대기열이 차면 배치부터 밀어내기, 예상 대기 시간에 따른 즉시 거절."
+
+[[client]]
+name = "interactive"
+weight = 4
+[[gateway.upstream]]
+name = "qwen"
+max_queue = 1000
+overflow = "evict"
+admit_by_wait = true
+strict_priority = true
+
+[[gateway.upstream]]
+name = "smol"
+max_queue = 1000
+overflow = "evict"
+admit_by_wait = true
+strict_priority = true

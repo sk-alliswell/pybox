@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pybox · Sandbox Console</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/" aria-label="Pybox 홈"><span class="brand-icon">▣</span><span>pybox<small>SANDBOX CONSOLE</small></span></a>
+  <div class="workspace"><span class="status-dot"></span><div>Local workspace<small>이 컴퓨터 · 현재 사용자</small></div></div>
+  <nav aria-label="주 메뉴">
+    <button class="nav active" data-view="overview"><span>◫</span> 전체 현황</button>
+    <button class="nav" data-view="history"><span>≡</span> 실행 이력</button>
+    <button class="nav" data-view="image"><span>▧</span> 이미지 · 스냅샷</button>
+    <button class="nav" data-view="settings"><span>⚙</span> 실행 설정</button>
+  </nav>
+  <div class="sidebar-bottom"><span class="chip">EXPERIMENTAL</span><p>고정된 Python 워크로드<br>네트워크 비활성 · 호스트 실행 없음</p><small id="version">Pybox</small></div>
+</aside>
+<main>
+  <header><div class="breadcrumb">WORKSPACE <span>/</span> <b id="page-name">전체 현황</b></div><div id="connection" class="connection" role="status"><span class="status-dot"></span> 연결 중</div></header>
+  <div id="auth" class="notice hidden">관리 콘솔 인증이 필요합니다. 터미널에서 <code>pybox console</code>을 실행해 이 화면을 열어주세요.</div>
+  <div id="warning" class="notice danger hidden" role="alert"></div>
+  <div id="toast" class="toast hidden" role="status"></div>
+  <section id="overview-view" class="view">
+    <div class="heading"><div><p class="eyebrow">YOUR SANDBOXES, IN ONE PLACE</p><h1>샌드박스 현황</h1><p class="sub">실행 중인 작업부터 종료 후 자원 회수까지 확인하세요.</p></div><button class="primary launch-button">＋ 새 실행</button></div>
+    <div class="metrics">
+      <article><span>실행 중인 VM</span><div><strong id="live-count">—</strong><small id="slot-label">/ — 슬롯</small></div><p>생성 확인 후 회수 전까지</p></article>
+      <article><span>준비 · 실행 작업</span><div><strong id="active-count">—</strong><small>작업</small></div><p>검증·준비·실행·중지 포함</p></article>
+      <article><span>대기 중</span><div><strong id="queued-count">—</strong><small>작업</small></div><p>사용 가능한 슬롯을 기다립니다</p></article>
+      <article><span>완료 / 실패·중단</span><div><strong id="done-count">—</strong><small id="failed-count">/ —</small></div><p id="history-count">보관된 실행 이력</p></article>
+    </div>
+    <div class="overview-strip"><div><span class="status-dot" id="cap-dot"></span><b id="capability">가상화 환경 확인 중</b></div><span>Python 3.12.15</span><span>512 MiB / VM</span><span>Network off</span><button class="text-button" data-goto="image">이미지 상세 ↗</button></div>
+    <section class="panel"><div class="panel-head"><div><h2>인스턴스</h2><p>현재 관리 서비스가 접수한 작업</p></div><div class="tools"><select id="filter" aria-label="인스턴스 상태 필터"><option value="all">전체 상태</option><option value="active">진행 중</option><option value="queued">대기 중</option><option value="failed">실패 · 중단</option><option value="completed">완료</option></select><button class="secondary" id="stop-all">전체 중지</button></div></div>
+      <div class="table-wrap"><table><thead><tr><th>프로젝트 / 인스턴스</th><th>상태</th><th>실행 방식</th><th>시작 시각</th><th>경과</th><th>회수</th><th></th></tr></thead><tbody id="jobs"></tbody></table></div>
+      <div class="empty hidden" id="empty"><div class="empty-icon">▣</div><h3>아직 실행한 샌드박스가 없습니다</h3><p>프로젝트 이름을 지정하고 첫 번째 작업을 시작하세요.<br>실제 VM에서 Python 에이전트 검증 워크로드를 실행합니다.</p><button class="primary launch-button">첫 실행 만들기</button></div>
+      <footer class="panel-footer"><span id="list-count">0개 작업</span><span>기존 버전의 개별 실행과 다른 사용자의 VM은 집계하지 않습니다.</span></footer>
+    </section>
+  </section>
+  <section id="history-view" class="view hidden"><div class="heading"><div><p class="eyebrow">RUN HISTORY</p><h1>실행 이력</h1><p class="sub">종료 결과와 실행 당시의 설정을 보관합니다.</p></div></div><section class="panel"><div class="panel-head"><h2>종료된 작업</h2><span class="muted">최대 500개 보관 · 자동 재실행 없음</span></div><div class="table-wrap"><table><thead><tr><th>프로젝트 / 인스턴스</th><th>상태</th><th>실행 방식</th><th>시작 시각</th><th>경과</th><th>회수</th><th></th></tr></thead><tbody id="history-jobs"></tbody></table></div><p class="empty-note hidden" id="history-empty">종료된 작업이 없습니다.</p></section></section>
+  <section id="image-view" class="view hidden"><div class="heading"><div><p class="eyebrow">RUNTIME ARTIFACTS</p><h1>이미지 · 스냅샷</h1><p class="sub">현재 관리 서비스에 등록된 하나의 검증 대상 이미지입니다.</p></div><button class="secondary" id="verify-image">무결성 다시 검사</button></div><div class="two-columns"><section class="panel padded"><div class="section-icon">▧</div><h2>Python agent runtime</h2><p class="sub">LangGraph 1.2.19 · deepagents 0.7.32</p><dl id="image-details"></dl><p class="footnote">임의 스크립트·이미지 업로드는 지원하지 않습니다. 다른 번들은 관리 서비스를 종료한 뒤 <code>--root</code>로 선택하세요.</p></section><section class="panel padded"><div class="section-icon">◷</div><h2>준비된 스냅샷</h2><p class="sub">프레임워크를 미리 준비하고, 매번 새 VM으로 복원합니다.</p><dl id="snapshot-details"></dl><button class="primary" id="prepare-image">스냅샷 준비 · 검증</button><p class="footnote">사용자 요청·인증정보·도구 실행 결과는 준비 스냅샷에 넣지 않습니다. 존재 여부와 무결성 검증 결과는 서로 다릅니다.</p></section></div></section>
+  <section id="settings-view" class="view hidden"><div class="heading"><div><p class="eyebrow">EXECUTION POLICY</p><h1>실행 설정</h1><p class="sub">새 요청의 기본값입니다. 접수된 작업은 당시 설정을 유지합니다.</p></div></div><div class="two-columns"><form id="settings-form" class="panel padded"><h2>다음 실행의 기본값</h2><label>최대 동시 작업<select id="setting-concurrency"><option value="1">1개</option><option value="2">2개</option></select><small>준비·검증 작업도 슬롯을 사용합니다. 한도를 줄여도 기존 작업은 강제 종료하지 않습니다.</small></label><label>실행 제한 시간 (ms)<input id="setting-timeout" type="number" min="1" max="15000" required><small>1–15,000 ms · 스냅샷 준비는 별도 45초 제한입니다.</small></label><label>기본 실행 방식<select id="setting-mode"><option value="warm">스냅샷 복원</option><option value="cold">Cold boot</option></select></label><button class="primary" type="submit">기본값 저장</button></form><section class="panel padded"><h2>검증된 고정 정책</h2><p class="sub">이 버전에서는 다음 정책을 변경할 수 없습니다.</p><dl><dt>게스트 메모리</dt><dd>512 MiB</dd><dt>출력 한도</dt><dd>stdout / stderr 각각 8 KiB</dd><dt>네트워크</dt><dd>비활성</dd><dt>호스트 파일 마운트</dt><dd>없음</dd><dt>실행 대상</dt><dd>고정 Python 에이전트 검증</dd><dt>자원 회수 불확실</dt><dd>새 실행 차단</dd></dl><p class="footnote">호스트 프로세스 메모리 수치는 전체 VM 메모리와 다릅니다. 실행 후 상세 화면에서 OS 정책과 측정 범위를 확인할 수 있습니다.</p></section></div></section>
+</main>
+<dialog id="launch-dialog"><form id="launch-form"><div class="dialog-head"><div><p class="eyebrow">NEW SANDBOX</p><h2>새 실행</h2></div><button class="icon-button" type="button" id="close-launch" aria-label="새 실행 닫기">×</button></div><p class="sub">새 VM에서 고정된 Python 검증 워크로드를 실행합니다.</p><label>프로젝트 이름<input id="project" name="project" maxlength="80" placeholder="예: research-agent" required></label><div class="form-grid"><label>실행 방식<select id="run-mode"><option value="warm">스냅샷 복원</option><option value="cold">Cold boot</option></select></label><label>제한 시간 (ms)<input id="run-timeout" type="number" min="1" max="15000" required></label></div><div class="policy-note">512 MiB · 네트워크 비활성 · 출력 각 8 KiB</div><p id="launch-error" class="error" role="alert"></p><div class="dialog-actions"><button class="secondary" type="button" id="cancel-launch">취소</button><button class="primary" type="submit">실행 요청</button></div></form></dialog>
+<dialog id="detail-dialog" class="detail"><div class="dialog-head"><div><p class="eyebrow">INSTANCE DETAILS</p><h2 id="detail-project"></h2><code id="detail-id"></code></div><button class="icon-button" id="close-detail" aria-label="상세 닫기">×</button></div><div class="detail-status"><span id="detail-state"></span><button class="danger-button" id="stop-job">실행 중지</button></div><dl id="detail-config"></dl><p id="detail-error" class="error"></p><nav class="tabs" aria-label="인스턴스 상세 탭"><button class="tab active" data-tab="stdout">stdout</button><button class="tab" data-tab="stderr">stderr</button><button class="tab" data-tab="events">이벤트</button><button class="tab" data-tab="result">결과 · 회수 근거</button></nav><pre id="detail-log" tabindex="0"></pre><p class="footnote" id="detail-note"></p></dialog>
+</body></html>

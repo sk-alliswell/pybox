@@ -1,0 +1,533 @@
+{
+  "seeds": 10,
+  "entries": [
+    {
+      "scenario": "sat-direct",
+      "metric": "interactive answered, flood",
+      "unit": "share",
+      "error": -2.17
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "interactive TTFT p50, flood",
+      "unit": "seconds",
+      "error": -8.81
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "interactive TTFT p95, flood",
+      "unit": "seconds",
+      "error": -3.01
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "interactive answered, whole run",
+      "unit": "share",
+      "error": -1.43
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "interactive TTFT p50, whole run",
+      "unit": "seconds",
+      "error": 9.89
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "interactive total p50, whole run",
+      "unit": "seconds",
+      "error": 6.96
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "batch answered",
+      "unit": "share",
+      "error": 1.73
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "batch TTFT p50",
+      "unit": "seconds",
+      "error": 7.14
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "batch TTFT p95",
+      "unit": "seconds",
+      "error": 4.48
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "completed per minute, flood",
+      "unit": "rate",
+      "error": 0.48
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "gave up at own timeout",
+      "unit": "count",
+      "error": -0.08
+    },
+    {
+      "scenario": "sat-direct",
+      "metric": "last answer at",
+      "unit": "seconds",
+      "error": 6.7
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "interactive answered, flood",
+      "unit": "share",
+      "error": -0.5
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "interactive TTFT p50, flood",
+      "unit": "seconds",
+      "error": -1.65
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "interactive TTFT p95, flood",
+      "unit": "seconds",
+      "error": -1.08
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "interactive answered, whole run",
+      "unit": "share",
+      "error": 0.63
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "interactive TTFT p50, whole run",
+      "unit": "seconds",
+      "error": -29.9
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "interactive total p50, whole run",
+      "unit": "seconds",
+      "error": -28.28
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "batch answered",
+      "unit": "share",
+      "error": 0.48
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "batch TTFT p50",
+      "unit": "seconds",
+      "error": -0.06
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "batch TTFT p95",
+      "unit": "seconds",
+      "error": -0.96
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "completed per minute, flood",
+      "unit": "rate",
+      "error": 0.55
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "gave up at own timeout",
+      "unit": "count",
+      "error": -0.77
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "last answer at",
+      "unit": "seconds",
+      "error": -0.08
+    },
+    {
+      "scenario": "sat-plain",
+      "metric": "longest gateway queue",
+      "unit": "count",
+      "error": -0.81
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "interactive answered, flood",
+      "unit": "share",
+      "error": -1.6
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "interactive TTFT p50, flood",
+      "unit": "seconds",
+      "error": -2.0
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "interactive TTFT p95, flood",
+      "unit": "seconds",
+      "error": -0.31
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "interactive answered, whole run",
+      "unit": "share",
+      "error": -2.06
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "interactive TTFT p50, whole run",
+      "unit": "seconds",
+      "error": 1.1
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "interactive total p50, whole run",
+      "unit": "seconds",
+      "error": 2.04
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "batch answered",
+      "unit": "share",
+      "error": -0.07
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "batch TTFT p50",
+      "unit": "seconds",
+      "error": 2.99
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "batch TTFT p95",
+      "unit": "seconds",
+      "error": -1.01
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "completed per minute, flood",
+      "unit": "rate",
+      "error": -2.13
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "refused (503)",
+      "unit": "count",
+      "error": 1.07
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "last answer at",
+      "unit": "seconds",
+      "error": 0.4
+    },
+    {
+      "scenario": "sat-bounded",
+      "metric": "longest gateway queue",
+      "unit": "count",
+      "error": 3.57
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "interactive answered, flood",
+      "unit": "share",
+      "error": 0.64
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "interactive TTFT p50, flood",
+      "unit": "seconds",
+      "error": -8.83
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "interactive TTFT p95, flood",
+      "unit": "seconds",
+      "error": -7.99
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "interactive answered, whole run",
+      "unit": "share",
+      "error": 0.16
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "interactive TTFT p50, whole run",
+      "unit": "seconds",
+      "error": -4.14
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "interactive total p50, whole run",
+      "unit": "seconds",
+      "error": 0.68
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "batch answered",
+      "unit": "share",
+      "error": -1.78
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "batch TTFT p50",
+      "unit": "seconds",
+      "error": -4.23
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "batch TTFT p95",
+      "unit": "seconds",
+      "error": -0.5
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "completed per minute, flood",
+      "unit": "rate",
+      "error": -3.28
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "refused (503)",
+      "unit": "count",
+      "error": 1.34
+    },
+    {
+      "scenario": "sat-tight",
+      "metric": "last answer at",
+      "unit": "seconds",
+      "error": 0.8
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "interactive answered, flood",
+      "unit": "share",
+      "error": 0.0
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "interactive TTFT p50, flood",
+      "unit": "seconds",
+      "error": -3.0
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "interactive TTFT p95, flood",
+      "unit": "seconds",
+      "error": -0.46
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "interactive answered, whole run",
+      "unit": "share",
+      "error": 0.0
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "interactive TTFT p50, whole run",
+      "unit": "seconds",
+      "error": 4.93
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "interactive total p50, whole run",
+      "unit": "seconds",
+      "error": 3.77
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "batch answered",
+      "unit": "share",
+      "error": 0.0
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "batch TTFT p50",
+      "unit": "seconds",
+      "error": 1.24
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "batch TTFT p95",
+      "unit": "seconds",
+      "error": 1.6
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "completed per minute, flood",
+      "unit": "rate",
+      "error": 0.0
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "gave up at own timeout",
+      "unit": "count",
+      "error": 0.0
+    },
+    {
+      "scenario": "sat-direct-patient",
+      "metric": "last answer at",
+      "unit": "seconds",
+      "error": 1.68
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "interactive answered, flood",
+      "unit": "share",
+      "error": 2.64
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "interactive TTFT p50, flood",
+      "unit": "seconds",
+      "error": -2.6
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "interactive TTFT p95, flood",
+      "unit": "seconds",
+      "error": -2.28
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "interactive answered, whole run",
+      "unit": "share",
+      "error": 4.63
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "interactive TTFT p50, whole run",
+      "unit": "seconds",
+      "error": -5.86
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "interactive total p50, whole run",
+      "unit": "seconds",
+      "error": -5.97
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "batch answered",
+      "unit": "share",
+      "error": 0.0
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "batch TTFT p50",
+      "unit": "seconds",
+      "error": -8.93
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "batch TTFT p95",
+      "unit": "seconds",
+      "error": -3.35
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "completed per minute, flood",
+      "unit": "rate",
+      "error": 1.54
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "gave up at own timeout",
+      "unit": "count",
+      "error": -8.82
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "requests that retried",
+      "unit": "count",
+      "error": -0.56
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "last answer at",
+      "unit": "seconds",
+      "error": -1.31
+    },
+    {
+      "scenario": "sat-bounded-patient",
+      "metric": "longest gateway queue",
+      "unit": "count",
+      "error": 0.0
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "interactive answered, flood",
+      "unit": "share",
+      "error": 1.28
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "interactive TTFT p50, flood",
+      "unit": "seconds",
+      "error": -17.26
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "interactive TTFT p95, flood",
+      "unit": "seconds",
+      "error": -11.49
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "interactive answered, whole run",
+      "unit": "share",
+      "error": 0.78
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "interactive TTFT p50, whole run",
+      "unit": "seconds",
+      "error": -13.31
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "interactive total p50, whole run",
+      "unit": "seconds",
+      "error": -11.73
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "batch answered",
+      "unit": "share",
+      "error": 0.0
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "batch TTFT p50",
+      "unit": "seconds",
+      "error": -2.57
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "batch TTFT p95",
+      "unit": "seconds",
+      "error": 0.77
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "completed per minute, flood",
+      "unit": "rate",
+      "error": 0.49
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "last answer at",
+      "unit": "seconds",
+      "error": 1.06
+    },
+    {
+      "scenario": "sat-smart",
+      "metric": "longest gateway queue",
+      "unit": "count",
+      "error": -2.01
+    }
+  ]
+}

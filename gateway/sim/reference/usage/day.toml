@@ -1,0 +1,322 @@
+name = "3개 팀 400명, 하루"
+seed = 11
+max_s = 14700
+description = "400 callers, 2 LiteLLM, 40 model replicas on 56 GPUs. Model and GPU speeds are assumed."
+description_ko = "3개 팀의 호출자 400명, LiteLLM 2대, GPU 56장에 모델 복제본 40개입니다. 하루(14,400초로 줄임)에 집중 시간대가 한 번 있습니다. 모델과 GPU의 속도는 가정값이며 측정으로 검증하지 않았습니다."
+[[proxy]]
+name = "litellm"
+count = 2
+workers = 4
+routing = "least_loaded"
+
+[[model_server]]
+name = "gpu-small"
+count = 24
+models = [ "small",]
+slots = 8
+tokens_per_s = 90
+batch_scaling = 0.85
+prefill_ms = 120
+prefill_tokens_per_s = 2700
+prompt_cache_saving = 0.93
+
+[[model_server]]
+name = "gpu-large"
+count = 16
+models = [ "large",]
+slots = 8
+tokens_per_s = 45
+batch_scaling = 0.85
+prefill_ms = 250
+prefill_tokens_per_s = 1350
+prompt_cache_saving = 0.93
+
+[[client]]
+name = "platform~ide"
+class = "platform · ide"
+count = 160
+weight = 4
+entry = "gateway"
+models = [ "small",]
+to_s = 14400
+prompt_tokens = 5700
+output_tokens = 470
+output_sigma = 0.4
+timeout_s = 120
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.1
+[client.prefix]
+share = 0.69
+sigma = 0.3
+scope = "caller"
+group = "ide"
+group_share = 0.42
+follow_up = 0.39
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+[[client]]
+name = "platform~chat"
+class = "platform · chat"
+count = 160
+weight = 4
+entry = "gateway"
+models = [ "large",]
+to_s = 14400
+prompt_tokens = 2300
+output_tokens = 380
+output_sigma = 0.4
+timeout_s = 120
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.016666666666666666
+[client.prefix]
+share = 0.67
+sigma = 0.3
+scope = "caller"
+group = "chat"
+group_share = 0.52
+follow_up = 0.46
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+[[client]]
+name = "platform~batch"
+class = "platform · batch"
+count = 160
+weight = 1
+entry = "gateway"
+models = [ "large",]
+to_s = 14400
+prompt_tokens = 900
+output_tokens = 40
+output_sigma = 0.4
+timeout_s = 300
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.0033333333333333335
+[client.prefix]
+share = 0.57
+sigma = 0.3
+scope = "group"
+group = "batch"
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+[[client]]
+name = "research~ide"
+class = "research · ide"
+count = 120
+weight = 4
+entry = "gateway"
+models = [ "small",]
+to_s = 14400
+prompt_tokens = 5700
+output_tokens = 470
+output_sigma = 0.4
+timeout_s = 120
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.03333333333333333
+[client.prefix]
+share = 0.69
+sigma = 0.3
+scope = "caller"
+group = "ide"
+group_share = 0.42
+follow_up = 0.39
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+[[client]]
+name = "research~chat"
+class = "research · chat"
+count = 120
+weight = 4
+entry = "gateway"
+models = [ "large",]
+to_s = 14400
+prompt_tokens = 2300
+output_tokens = 380
+output_sigma = 0.4
+timeout_s = 120
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.025
+[client.prefix]
+share = 0.67
+sigma = 0.3
+scope = "caller"
+group = "chat"
+group_share = 0.52
+follow_up = 0.46
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+[[client]]
+name = "research~batch"
+class = "research · batch"
+count = 120
+weight = 1
+entry = "gateway"
+models = [ "large",]
+to_s = 14400
+prompt_tokens = 900
+output_tokens = 40
+output_sigma = 0.4
+timeout_s = 300
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.03333333333333333
+[client.prefix]
+share = 0.57
+sigma = 0.3
+scope = "group"
+group = "batch"
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+[[client]]
+name = "product~ide"
+class = "product · ide"
+count = 120
+weight = 4
+entry = "gateway"
+models = [ "small",]
+to_s = 14400
+prompt_tokens = 5700
+output_tokens = 470
+output_sigma = 0.4
+timeout_s = 120
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.06666666666666667
+[client.prefix]
+share = 0.69
+sigma = 0.3
+scope = "caller"
+group = "ide"
+group_share = 0.42
+follow_up = 0.39
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+[[client]]
+name = "product~chat"
+class = "product · chat"
+count = 120
+weight = 4
+entry = "gateway"
+models = [ "large",]
+to_s = 14400
+prompt_tokens = 2300
+output_tokens = 380
+output_sigma = 0.4
+timeout_s = 120
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.025
+[client.prefix]
+share = 0.67
+sigma = 0.3
+scope = "caller"
+group = "chat"
+group_share = 0.52
+follow_up = 0.46
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+[[client]]
+name = "product~batch"
+class = "product · batch"
+count = 120
+weight = 1
+entry = "gateway"
+models = [ "large",]
+to_s = 14400
+prompt_tokens = 900
+output_tokens = 40
+output_sigma = 0.4
+timeout_s = 300
+
+[client.arrival]
+kind = "poisson"
+rate_per_s = 0.005
+[client.prefix]
+share = 0.57
+sigma = 0.3
+scope = "group"
+group = "batch"
+[client.rhythm]
+period_s = 14400
+busy_at_s = 7800
+busy_width_s = 5400
+quiet = 0.1
+shift_s = 0
+
+[db]
+name = "tdb"
+rows_per_s = 96000
+rows_per_request = 4
+
+[gateway]
+cores = 4
+cpu_ms_per_request = 0.05
+max_retries = 2
+[[gateway.upstream]]
+name = "small"
+models = [ "small",]
+targets = [ "litellm",]
+routing = "least_loaded"
+max_concurrency = 192
+max_queue = 384
+strict_priority = false
+overflow = "refuse"
+admit_by_wait = false
+headroom = 1
+
+[[gateway.upstream]]
+name = "large"
+models = [ "large",]
+targets = [ "litellm",]
+routing = "least_loaded"
+max_concurrency = 128
+max_queue = 256
+strict_priority = false
+overflow = "refuse"
+admit_by_wait = false
+headroom = 1
+

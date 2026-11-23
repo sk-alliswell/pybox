@@ -1,0 +1,12 @@
+extends = "lab-round1.toml"
+name = "sat-direct"
+description = "No gateway: callers send straight to LiteLLM, about 4x what the two model servers can serve."
+description_ko = "게이트웨이 없음: 호출자가 LiteLLM으로 바로 보냅니다. 모델 서버 두 대가 감당할 수 있는 양의 약 4배입니다."
+
+[[client]]
+name = "interactive"
+entry = "litellm"
+
+[[client]]
+name = "batch"
+entry = "litellm"

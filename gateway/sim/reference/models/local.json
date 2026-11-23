@@ -1,0 +1,416 @@
+{
+ "host": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+  "cores": 4,
+  "ram_gb": 16.9
+ },
+ "date": "2026-11-18",
+ "models": {
+  "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf": {
+   "file_bytes": 4920739232,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 5.51,
+    "rss_loaded": 5381337088,
+    "meta": {
+     "general.file_type": "15",
+     "general.architecture": "llama",
+     "llama.attention.head_count": "32",
+     "general.name": "Meta Llama 3.1 8B Instruct",
+     "general.size_label": "8B",
+     "llama.embedding_length": "4096",
+     "llama.block_count": "32",
+     "llama.attention.head_count_kv": "8"
+    },
+    "read_tokens": 1024,
+    "read_tps": 52.7,
+    "write_tokens": 128,
+    "write_tps": 4.32,
+    "rss_after": 5511782400
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 2.93,
+    "rss_loaded": 7261593600,
+    "meta": {
+     "general.file_type": "15",
+     "general.architecture": "llama",
+     "llama.attention.head_count": "32",
+     "general.name": "Meta Llama 3.1 8B Instruct",
+     "general.size_label": "8B",
+     "llama.embedding_length": "4096",
+     "llama.block_count": "32",
+     "llama.attention.head_count_kv": "8"
+    }
+   },
+   "bytes_per_context_token": 131156
+  },
+  "Ministral-3-8B-Instruct-2512-Q4_K_M.gguf": {
+   "file_bytes": 5198911904,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 5.14,
+    "rss_loaded": 5682569216,
+    "meta": {
+     "general.architecture": "mistral3",
+     "mistral3.attention.head_count_kv": "8",
+     "general.file_type": "15",
+     "general.name": "ministral-8B-Instruct-2512",
+     "mistral3.block_count": "34",
+     "mistral3.embedding_length": "4096",
+     "mistral3.attention.head_count": "32",
+     "general.size_label": "8B",
+     "mistral3.attention.key_length": "128"
+    },
+    "read_tokens": 1024,
+    "read_tps": 49.8,
+    "write_tokens": 128,
+    "write_tps": 4.07,
+    "rss_after": 5812953088
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 4.77,
+    "rss_loaded": 7678509056,
+    "meta": {
+     "general.architecture": "mistral3",
+     "mistral3.attention.head_count_kv": "8",
+     "general.file_type": "15",
+     "general.name": "ministral-8B-Instruct-2512",
+     "mistral3.block_count": "34",
+     "mistral3.embedding_length": "4096",
+     "mistral3.attention.head_count": "32",
+     "general.size_label": "8B",
+     "mistral3.attention.key_length": "128"
+    }
+   },
+   "bytes_per_context_token": 139226
+  },
+  "Qwen3.5-0.8B-Q4_K_M.gguf": {
+   "file_bytes": 532517120,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 1.06,
+    "rss_loaded": 919244800,
+    "meta": {
+     "general.file_type": "15",
+     "qwen35.attention.head_count_kv": "2",
+     "general.name": "Qwen3.5-0.8B",
+     "general.architecture": "qwen35",
+     "qwen35.attention.head_count": "8",
+     "qwen35.block_count": "24",
+     "qwen35.embedding_length": "1024",
+     "qwen35.attention.key_length": "256",
+     "general.size_label": "0.8B"
+    },
+    "read_tokens": 1024,
+    "read_tps": 482.7,
+    "write_tokens": 128,
+    "write_tps": 25.06,
+    "rss_after": 967974912
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 0.86,
+    "rss_loaded": 1096683520,
+    "meta": {
+     "general.file_type": "15",
+     "qwen35.attention.head_count_kv": "2",
+     "general.name": "Qwen3.5-0.8B",
+     "general.architecture": "qwen35",
+     "qwen35.attention.head_count": "8",
+     "qwen35.block_count": "24",
+     "qwen35.embedding_length": "1024",
+     "qwen35.attention.key_length": "256",
+     "general.size_label": "0.8B"
+    }
+   },
+   "bytes_per_context_token": 12377
+  },
+  "Qwen3.5-2B-Q4_K_M.gguf": {
+   "file_bytes": 1280835840,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 1.77,
+    "rss_loaded": 1888440320,
+    "meta": {
+     "general.file_type": "15",
+     "qwen35.attention.head_count_kv": "2",
+     "general.name": "Qwen3.5-2B",
+     "general.architecture": "qwen35",
+     "qwen35.attention.head_count": "8",
+     "qwen35.block_count": "24",
+     "qwen35.embedding_length": "2048",
+     "qwen35.attention.key_length": "256",
+     "general.size_label": "2B"
+    },
+    "read_tokens": 1024,
+    "read_tps": 225.7,
+    "write_tokens": 128,
+    "write_tps": 12.44,
+    "rss_after": 1951035392
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 1.15,
+    "rss_loaded": 2065895424,
+    "meta": {
+     "general.file_type": "15",
+     "qwen35.attention.head_count_kv": "2",
+     "general.name": "Qwen3.5-2B",
+     "general.architecture": "qwen35",
+     "qwen35.attention.head_count": "8",
+     "qwen35.block_count": "24",
+     "qwen35.embedding_length": "2048",
+     "qwen35.attention.key_length": "256",
+     "general.size_label": "2B"
+    }
+   },
+   "bytes_per_context_token": 12378
+  },
+  "Qwen3.5-4B-Q4_K_M.gguf": {
+   "file_bytes": 2740937888,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 3.3,
+    "rss_loaded": 3560595456,
+    "meta": {
+     "general.file_type": "15",
+     "qwen35.attention.head_count_kv": "4",
+     "general.name": "Qwen3.5-4B",
+     "general.architecture": "qwen35",
+     "qwen35.attention.head_count": "16",
+     "qwen35.block_count": "32",
+     "qwen35.embedding_length": "2560",
+     "qwen35.attention.key_length": "256",
+     "general.size_label": "4B"
+    },
+    "read_tokens": 1024,
+    "read_tps": 92.4,
+    "write_tokens": 128,
+    "write_tps": 6.68,
+    "rss_after": 3650453504
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 1.98,
+    "rss_loaded": 4031995904,
+    "meta": {
+     "general.file_type": "15",
+     "qwen35.attention.head_count_kv": "4",
+     "general.name": "Qwen3.5-4B",
+     "general.architecture": "qwen35",
+     "qwen35.attention.head_count": "16",
+     "qwen35.block_count": "32",
+     "qwen35.embedding_length": "2560",
+     "qwen35.attention.key_length": "256",
+     "general.size_label": "4B"
+    }
+   },
+   "bytes_per_context_token": 32882
+  },
+  "Qwen3.5-9B-Q4_K_M.gguf": {
+   "file_bytes": 5680522464,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 4.06,
+    "rss_loaded": 6018752512,
+    "meta": {
+     "general.file_type": "15",
+     "qwen35.attention.head_count_kv": "4",
+     "general.name": "Qwen3.5-9B",
+     "general.architecture": "qwen35",
+     "qwen35.attention.head_count": "16",
+     "qwen35.block_count": "32",
+     "qwen35.embedding_length": "4096",
+     "qwen35.attention.key_length": "256",
+     "general.size_label": "9B"
+    },
+    "read_tokens": 1024,
+    "read_tps": 53.7,
+    "write_tokens": 128,
+    "write_tps": 4.1,
+    "rss_after": 6137729024
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 3.4,
+    "rss_loaded": 6492127232,
+    "meta": {
+     "general.file_type": "15",
+     "qwen35.attention.head_count_kv": "4",
+     "general.name": "Qwen3.5-9B",
+     "general.architecture": "qwen35",
+     "qwen35.attention.head_count": "16",
+     "qwen35.block_count": "32",
+     "qwen35.embedding_length": "4096",
+     "qwen35.attention.key_length": "256",
+     "general.size_label": "9B"
+    }
+   },
+   "bytes_per_context_token": 33020
+  },
+  "gemma-4-12b-it-qat-q4_0.gguf": {
+   "file_bytes": 6975879296,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 6.08,
+    "rss_loaded": 8703098880,
+    "meta": {
+     "general.file_type": "2",
+     "general.name": "Hf",
+     "general.architecture": "gemma4",
+     "gemma4.embedding_length": "3840",
+     "general.size_label": "12B",
+     "gemma4.attention.head_count": "16",
+     "gemma4.attention.key_length": "512",
+     "gemma4.block_count": "48"
+    },
+    "read_tokens": 1024,
+    "read_tps": 35.9,
+    "write_tokens": 128,
+    "write_tps": 4.5,
+    "rss_after": 8854175744
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 7.79,
+    "rss_loaded": 13985329152,
+    "meta": {
+     "general.file_type": "2",
+     "general.name": "Hf",
+     "general.architecture": "gemma4",
+     "gemma4.embedding_length": "3840",
+     "general.size_label": "12B",
+     "gemma4.attention.head_count": "16",
+     "gemma4.attention.key_length": "512",
+     "gemma4.block_count": "48"
+    }
+   },
+   "bytes_per_context_token": 368459
+  },
+  "gemma-4-E2B_q4_0-it.gguf": {
+   "file_bytes": 3349516256,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 3.87,
+    "rss_loaded": 3871817728,
+    "meta": {
+     "general.file_type": "2",
+     "general.name": "Hf",
+     "general.architecture": "gemma4",
+     "gemma4.attention.head_count_kv": "1",
+     "gemma4.embedding_length": "1536",
+     "general.size_label": "4.6B",
+     "gemma4.attention.head_count": "8",
+     "gemma4.attention.key_length": "512",
+     "gemma4.block_count": "35"
+    },
+    "read_tokens": 1024,
+    "read_tps": 415.4,
+    "write_tokens": 128,
+    "write_tps": 17.96,
+    "rss_after": 3968700416
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 2.17,
+    "rss_loaded": 4229570560,
+    "meta": {
+     "general.file_type": "2",
+     "general.name": "Hf",
+     "general.architecture": "gemma4",
+     "gemma4.attention.head_count_kv": "1",
+     "gemma4.embedding_length": "1536",
+     "general.size_label": "4.6B",
+     "gemma4.attention.head_count": "8",
+     "gemma4.attention.key_length": "512",
+     "gemma4.block_count": "35"
+    }
+   },
+   "bytes_per_context_token": 24955
+  },
+  "gemma-4-E4B_q4_0-it.gguf": {
+   "file_bytes": 5154941280,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 5.21,
+    "rss_loaded": 6014353408,
+    "meta": {
+     "general.file_type": "2",
+     "general.name": "Hf",
+     "general.architecture": "gemma4",
+     "gemma4.attention.head_count_kv": "2",
+     "gemma4.embedding_length": "2560",
+     "general.size_label": "7.5B",
+     "gemma4.attention.head_count": "8",
+     "gemma4.attention.key_length": "512",
+     "gemma4.block_count": "42"
+    },
+    "read_tokens": 1024,
+    "read_tps": 152.6,
+    "write_tokens": 128,
+    "write_tps": 9.32,
+    "rss_after": 6160056320
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 3.79,
+    "rss_loaded": 7129858048,
+    "meta": {
+     "general.file_type": "2",
+     "general.name": "Hf",
+     "general.architecture": "gemma4",
+     "gemma4.attention.head_count_kv": "2",
+     "gemma4.embedding_length": "2560",
+     "general.size_label": "7.5B",
+     "gemma4.attention.head_count": "8",
+     "gemma4.attention.key_length": "512",
+     "gemma4.block_count": "42"
+    }
+   },
+   "bytes_per_context_token": 77811
+  },
+  "gpt-oss-20b-Q4_K_M.gguf": {
+   "file_bytes": 11624759488,
+   "ctx_2048": {
+    "n_ctx": 2048,
+    "load_s": 15.92,
+    "rss_loaded": 11934052352,
+    "meta": {
+     "general.file_type": "15",
+     "gpt-oss.attention.head_count": "64",
+     "general.size_label": "20B",
+     "gpt-oss.embedding_length": "2880",
+     "gpt-oss.block_count": "24",
+     "general.architecture": "gpt-oss",
+     "gpt-oss.attention.head_count_kv": "8",
+     "gpt-oss.attention.key_length": "64",
+     "general.name": "Gpt-Oss-20B"
+    },
+    "read_tokens": 1024,
+    "read_tps": 36.1,
+    "write_tokens": 128,
+    "write_tps": 7.59,
+    "rss_after": 12120932352
+   },
+   "ctx_16384": {
+    "n_ctx": 16384,
+    "load_s": 16.29,
+    "rss_loaded": 12637855744,
+    "meta": {
+     "general.file_type": "15",
+     "gpt-oss.attention.head_count": "64",
+     "general.size_label": "20B",
+     "gpt-oss.embedding_length": "2880",
+     "gpt-oss.block_count": "24",
+     "general.architecture": "gpt-oss",
+     "gpt-oss.attention.head_count_kv": "8",
+     "gpt-oss.attention.key_length": "64",
+     "general.name": "Gpt-Oss-20B"
+    }
+   },
+   "bytes_per_context_token": 49093
+  }
+ }
+}

@@ -1,0 +1,67 @@
+# Lab: agents -> gateway -> one LiteLLM proxy -> local small models + hosted cheap models.
+# The same LiteLLM is entered once per backend so each gets its own cap: a local
+# model server answers one request at a time, hosted APIs take many. (Caps are per
+# upstream, not per model, so one shared entry would let both slots land on one
+# local server while the other idles.) The local cap is 2, not 1: one request
+# running and the next already waiting at the server, so the server never sits
+# idle while a request is still on its way through LiteLLM.
+listen = "127.0.0.1:8787"
+admin_token = "lab-admin"
+
+[retry]
+max_retries = 3
+base_ms = 300
+max_ms = 10000
+
+[cache]
+ttl_secs = 0
+
+[obs]
+backend = "memory"
+memory_rows = 400000
+otlp_token = "lab-otlp"
+
+# USD per million tokens. Local models cost electricity only; a nominal price keeps
+# the cost columns meaningful.
+[obs.prices."qwen-0.5b"]
+input = 0.01
+output = 0.02
+[obs.prices."smollm2-360m"]
+input = 0.01
+output = 0.02
+[obs.prices."gemini-flash-lite"]
+input = 0.10
+output = 0.40
+[obs.prices."gpt-4o-mini"]
+input = 0.15
+output = 0.60
+[obs.prices."claude-haiku"]
+input = 1.00
+output = 5.00
+
+[[upstreams]]
+name = "qwen"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-lab-master"
+key_alias = "lab-master"
+cluster = "local-cpu"
+max_concurrency = 2
+
+[[upstreams]]
+name = "smol"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-lab-master"
+key_alias = "lab-master"
+cluster = "local-cpu"
+max_concurrency = 2
+
+[[upstreams]]
+name = "cloud"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-lab-master"
+key_alias = "lab-master"
+cluster = "hosted"
+max_concurrency = 100

@@ -1,0 +1,91 @@
+# The lab stack of gateway/lab (PR #3), first measurement session:
+#   callers -> gateway -> LiteLLM (one Python process) -> two single-slot
+#   llama-cpp-python servers, everything on one 4-vCPU machine.
+# Model-server numbers are fitted from sat-direct.jsonl with
+#   gwsim calibrate sat-direct.jsonl --tokens interactive=24,batch=64
+# Proxy CPU costs come from the "realistic day" run (LiteLLM used 227 CPU-s for
+# 3,365 requests and 244k streamed chunks; 21 ms overhead per request when idle).
+# This file is a base: the sat-*.toml scenarios extend it.
+name = "lab-round1"
+max_s = 1200
+
+[[phase]]
+name = "before"
+from_s = 0
+to_s = 20
+
+[[phase]]
+name = "flood"
+from_s = 20
+to_s = 140
+
+[[phase]]
+name = "after"
+from_s = 140
+to_s = 200
+
+[gateway]
+overhead_ms = 0.03          # measured: 0.02 to 0.03 ms per request
+
+[[gateway.upstream]]
+name = "qwen"
+models = ["qwen-0.5b"]
+targets = ["litellm"]
+max_concurrency = 2
+
+[[gateway.upstream]]
+name = "smol"
+models = ["smollm2-360m"]
+targets = ["litellm"]
+max_concurrency = 2
+
+[[proxy]]
+name = "litellm"
+workers = 1
+cpu_ms_per_request = 18
+cpu_ms_per_chunk = 0.6
+
+[[model_server]]
+name = "qwen-srv"
+models = ["qwen-0.5b"]
+slots = 1
+tokens_per_s = 19.93
+jitter = 0.038
+prefill_ms = 294
+on_disconnect = "first_token"
+abandon_extra_ms = 5
+
+[[model_server]]
+name = "smol-srv"
+models = ["smollm2-360m"]
+slots = 1
+tokens_per_s = 28.24
+jitter = 0.122
+prefill_ms = 164
+on_disconnect = "first_token"
+abandon_extra_ms = 50
+
+# lab/saturate.py: open-loop arrivals per model. Interactive for the whole
+# run, a batch flood from 20 s to 140 s (about 4x capacity in total).
+[[client]]
+name = "interactive"
+class = "interactive"
+agent = "sat-interactive"
+entry = "gateway"
+models = ["qwen-0.5b", "smollm2-360m"]
+arrival = { kind = "poisson", rate_per_s = 0.8 }
+to_s = 200
+output_tokens = 24
+timeout_s = 15
+
+[[client]]
+name = "batch"
+class = "batch"
+agent = "sat-batch"
+entry = "gateway"
+models = ["qwen-0.5b", "smollm2-360m"]
+arrival = { kind = "poisson", rate_per_s = 1.2 }
+from_s = 20
+to_s = 140
+output_tokens = 64
+timeout_s = 90

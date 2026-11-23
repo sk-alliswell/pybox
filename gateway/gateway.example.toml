@@ -1,0 +1,214 @@
+# pybox-gateway example configuration.
+# Run: ANTHROPIC_API_KEY=... pybox-gateway --config gateway.toml
+
+listen = "127.0.0.1:8787"          # keep on loopback: this process holds real keys
+admin_token = "change-me"          # protects /gateway/stats and /gateway/agents
+allow_anonymous = false
+max_body_bytes = 33554432          # 32 MiB
+
+[retry]
+max_retries = 3                    # 408/429/5xx/529 and connect errors, before any byte reaches the agent
+base_ms = 500                      # exponential backoff with jitter; retry-after(-ms) wins when present
+max_ms = 30000
+
+[cache]
+ttl_secs = 300                     # 0 disables caching and request coalescing
+max_entries = 1024
+max_body_bytes = 8388608
+default_on = false                 # otherwise only requests with `x-gateway-cache: on`
+
+[[upstreams]]
+name = "anthropic"                 # agents use base_url = http://127.0.0.1:8787/anthropic
+base_url = "https://api.anthropic.com"
+kind = "anthropic"                 # injects x-api-key
+api_key_env = "ANTHROPIC_API_KEY"
+max_concurrency = 8                # in-flight requests across all agents
+rpm = 50                           # set to your tier's limits
+input_tpm = 40000
+idle_timeout_secs = 300
+max_queue = 200                    # more waiting than this: answer 503 + retry-after at once
+queue_timeout_secs = 60            # longest a request may wait for a slot
+# overflow = "evict"              # full queue: push out the newest low-weight waiter for a heavier agent
+# strict_priority = true          # heaviest agents first; lighter ones wait for what is left
+# admit_by_wait = true            # 503 at once when the expected wait exceeds the timeout or x-gateway-max-wait-ms
+# provider = "anthropic"           # gen_ai.provider.name in telemetry; guessed when unset
+# health_probe_secs = 5           # ask every server whether it is alive; see "Server health" in the README
+# refuse_when_down = true         # 503 at once while every server for the model is out
+
+[[upstreams]]
+name = "openai"
+base_url = "https://api.openai.com"
+kind = "openai"                    # injects Authorization: Bearer
+api_key_env = "OPENAI_API_KEY"
+max_concurrency = 8
+
+# A LiteLLM Proxy behind the gateway: agents -> gateway -> LiteLLM -> providers.
+# [[upstreams]]
+# name = "llm"
+# base_url = "http://10.0.0.11:4000"
+# kind = "litellm"                 # Bearer auth, traceparent + x-litellm-trace-id/tags, reads x-litellm-* response headers
+# api_key_env = "LITELLM_KEY"      # a LiteLLM virtual key
+# key_alias = "team-growth"        # name shown in per-key reports (never the key itself)
+# cluster = "seoul"                # label for per-cluster reports
+# max_concurrency = 32
+
+# Request log, traces and ROI. Dashboard: http://127.0.0.1:8787/gateway/dashboard
+[obs]
+enabled = true
+backend = "memory"                 # "tdb" persists to Super Shotgun TDB (pybox-gateway-tdb binary)
+dir = "obs"                        # tdb only: where segments and metadata live
+memory_rows = 200000
+retention_days = 90                # request rows
+span_retention_days = 14           # spans (gateway + LiteLLM)
+# otlp_token = "..."               # LiteLLM exports spans to /gateway/otlp/v1/traces with this bearer token
+
+# Push the gateway's spans (OpenTelemetry GenAI conventions) to any OTLP/HTTP backend.
+# [obs.otlp_export]
+# endpoint = "http://127.0.0.1:4318/v1/traces"
+# headers = { authorization = "Bearer ..." }
+
+# USD per million tokens, by model name or prefix. Used when the upstream reports
+# no cost, and to work out what prompt caching saved.
+# [obs.prices."claude-sonnet"]
+# input = 3.0
+# output = 15.0
+# cache_read = 0.3
+# cache_write = 3.75
+
+# Limits: a scope (global | agent | key | user | team | project | session), a
+# window ("30s", "1m", "1h", "7d" slide; "day" and "month" reset on the UTC
+# boundary) and caps. Each scope value gets its own counter. Also manageable
+# at runtime: PUT/DELETE /gateway/limits/<name>, GET /gateway/limits.
+# [[limits]]
+# name = "team-monthly-budget"
+# scope = "team"
+# window = "month"
+# usd = 500.0
+# strict = true                    # also reserve max_tokens up front: the cap is never passed
+#
+# [[limits]]
+# scope = "agent"
+# window = "1m"
+# tokens = 200000                  # input (cached included) + output
+# requests = 60
+#
+# [[limits]]
+# scope = "project"
+# match = "apollo"                 # only this project
+# model = "claude-opus*"           # only these models
+# window = "day"
+# usd = 50.0
+#
+# [[limits]]
+# scope = "agent"
+# window = "1m"
+# tool = "github/create_*"         # MCP tool calls, as server/tool
+# tool_calls = 10
+
+# MCP servers behind the gateway: agents use http://127.0.0.1:8787/mcp/<name>
+# with their gateway token; the real credential stays here.
+# [[mcp_servers]]
+# name = "github"
+# url = "https://api.githubcopilot.com/mcp/"
+# api_key_env = "GITHUB_MCP_TOKEN"  # sent as Authorization: Bearer
+# max_concurrency = 8               # tools/call in flight, fair across agents
+# rpm = 120
+# call_timeout_secs = 120
+# max_result_bytes = 262144         # larger results become a tool error the model can read
+# allow_tools = ["search_*", "get_*", "create_issue"]
+# deny_tools = ["delete_*"]
+
+# Fair scheduling and several servers behind one upstream. Add to an
+# [[upstreams]] entry:
+#   policy = "fair"     # share by tokens per team, shortest-served run first,
+#                       # keep a run's prompt cache from expiring in the queue
+#   adaptive = true     # find each server's best concurrency from throughput,
+#                       # between 1 and its max_concurrency
+# and list the servers (LiteLLM instances, model servers). Requests go to the
+# least loaded one that serves the model, preferring the one whose prefix (KV)
+# cache holds the longest start of the prompt. That works under either policy:
+#   affinity = "prefix" # "prefix" (default), "run" (only a run's next turn returns
+#                       # to its server; needs [lead]) or "off" (load only)
+#   spill = 0.5         # how much busier the warm server may be, times the share
+#                       # of the prompt it holds, before the request goes by load
+#   affinity_min_tokens = 64   # ignore shared starts shorter than this
+#   affinity_wait_ms = 0       # wait this long for a full server that holds most of
+#                              # the prompt rather than read it all again elsewhere
+#   prefix_ttl_secs = 0        # assume a prompt unused this long is gone (0 = never)
+#   route_by = "load"          # or "cost": least prompt tokens to read + load_weight x tokens in flight
+#   load_weight = 1.0
+#   slot_hold_ms = 0           # a prompt no server holds waits rather than push out one used this recently
+#   slot_max_wait_ms = 10000   # ...at most this long
+#   batch_group_ms = 0         # batch requests of one caller go kind by kind; a cold one yields this long
+#   stale_after_secs = 0       # requests in flight and none finished for this long: no more work for that server
+# [[upstreams.backends]]
+# name = "litellm-a"
+# base_url = "http://127.0.0.1:4000"
+# max_concurrency = 16
+# prefix_slots = 16                # prompts the server keeps cached (default: max_concurrency)
+# [[upstreams.backends]]
+# name = "litellm-b"
+# base_url = "http://127.0.0.1:4001"
+# max_concurrency = 16
+# models = ["gpt-*"]               # empty = all models
+
+# Overload, health and stand-in models work under both policies (one
+# scheduler serves round robin and fair). Add to an [[upstreams]] entry:
+#   min_share = 0.15          # with strict_priority: less important work still gets
+#                             # this share of grants, so it is slowed, never starved
+#   reserve_slots = 1         # slots kept from less important work while more
+#                             # important requests have arrived in the last 30 s
+#   max_queue_bytes = 268435456   # cap on request bodies held in the queue
+#   hold_batch = true         # priority = "batch" requests are held beside the queue
+#                             # and sent when nothing else waits, not refused
+#   hold_max = 10000          # most requests held (each is an open connection)
+#   hold_max_bytes = 268435456    # most request-body bytes held
+#   hold_timeout_secs = 900   # a request held this long gets a 503
+#   queue_notice = "sse"      # tell streaming callers while they wait: how many go
+#                             # before them and the expected wait (off | sse | event)
+#   first_byte_timeout_secs = 30  # give up on a server that sends nothing back
+#   adaptive_slowdown = 2.0   # with adaptive: also back off when time to first
+#                             # token grows past this multiple of its best (0 = off)
+#   model_groups = [["gpt-4o-mini", "gemini-flash-lite"]]
+#                             # models that may answer for each other, for agents
+#                             # registered with model_swap = true: a queued request
+#                             # goes to a server of a group member that has room
+# A server that fails three times in a row is left out for 10 s (doubling to
+# 120 s) and then tried with one request. A 429 pauses that model on that
+# server only. A retry goes to a different server when there is one.
+
+# Run tracking, prompt-cache diagnosis and the cost ledger (on by default).
+# [lead]
+# cache_points = "shadow"          # off | shadow (measure only) | on | experiment
+# experiment_fraction = 0.5        # share of runs that get cache points in experiment mode
+# min_cache_tokens = 1024
+# tool_results = "shadow"          # off | shadow | on | experiment. "on" replaces old tool
+#                                  # results in long runs with a one-line note: fewer tokens,
+#                                  # but the model no longer sees them
+# keep_tool_results = 3            # most recent results always sent in full
+# min_tool_result_bytes = 512
+# [lead.value_defaults.pr]         # worth of an accepted deliverable of this kind
+# hours_low = 0.5                  # when nobody stated one, times the team's hourly rate
+# hours_high = 4.0
+
+# Static agents. pybox can also register agents at runtime:
+#   POST /gateway/agents {"id":"box-3","weight":1,"max_concurrency":2,"token_budget":200000}
+[[agents]]
+id = "planner"
+token = "replace-with-a-long-random-token"
+weight = 2                         # two turns per round-robin cycle
+max_concurrency = 4
+# project_id = "apollo"            # attribution for cost and ROI reports
+# team_id = "growth"
+# user_id = "dana"
+# session_id = "sess-1"
+# priority = "interactive"        # or "batch"; orders work within the team (fair policy)
+# mcp_allow = ["github/*"]         # MCP tools this agent may use, as server/tool
+# mcp_deny = ["github/create_*"]
+
+# Reports the gateway writes by itself: the ROI and productivity report over
+# the day before, every day at `at`, as a page and as JSON.
+# [reports]
+# dir = "reports"
+# at = "07:00"
+# tz_hours = 9

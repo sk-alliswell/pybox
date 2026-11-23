@@ -1,0 +1,39 @@
+# Saturation test (saturate.py --topology group --swap), local models only.
+# One upstream, two model servers behind it, each with its own model. The two
+# models are declared interchangeable for agents that allow it (`model_swap`,
+# here the batch agent), so a queued batch request goes to whichever server
+# has room instead of waiting for "its" server while the other one idles.
+# Both servers are reached through the same LiteLLM in the lab; in production
+# each backend would be its own LiteLLM or model server.
+listen = "127.0.0.1:8787"
+admin_token = "lab-admin"
+
+[obs]
+backend = "memory"
+memory_rows = 100000
+otlp_token = "lab-otlp"
+
+[[upstreams]]
+name = "local"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-lab-master"
+max_queue = 2000
+overflow = "evict"
+admit_by_wait = true
+strict_priority = true
+min_share = 0.15
+reserve_slots = 1
+model_groups = [["qwen-0.5b", "smollm2-360m"]]
+
+[[upstreams.backends]]
+name = "qwen-server"
+base_url = "http://127.0.0.1:4000"
+max_concurrency = 2
+models = ["qwen-0.5b"]
+
+[[upstreams.backends]]
+name = "smol-server"
+base_url = "http://127.0.0.1:4000"
+max_concurrency = 2
+models = ["smollm2-360m"]

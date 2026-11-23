@@ -1,0 +1,17 @@
+extends = "lab-round1.toml"
+name = "sat-bounded"
+description = "Gateway queue capped at 30 with a 12 s wait limit; interactive agent weight 4."
+description_ko = "게이트웨이 대기열 30건, 대기 한도 12초, 대화형 에이전트 가중치 4."
+
+[[client]]
+name = "interactive"
+weight = 4
+[[gateway.upstream]]
+name = "qwen"
+max_queue = 30
+queue_timeout_s = 12
+
+[[gateway.upstream]]
+name = "smol"
+max_queue = 30
+queue_timeout_s = 12

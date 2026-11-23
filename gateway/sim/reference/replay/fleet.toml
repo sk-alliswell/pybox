@@ -1,0 +1,64 @@
+# The system of `cargo run --example fleet` (gateway/examples/fleet.rs) with
+# its defaults, for `gwsim replay`: 16 stand-in servers that run four
+# requests at once and keep one prompt per slot, behind one gateway upstream
+# with prefix routing and staged refusal. The clients are templates by kind
+# of work; the replay puts the log's agents and requests in their place.
+name = "stand-in fleet"
+seed = 1
+max_s = 3600
+
+[net]
+default_ms = 0
+
+[gateway]
+[[gateway.upstream]]
+name = "fleet"
+models = ["fleet-small"]
+targets = ["s"]
+max_concurrency = 64
+max_queue = 192
+routing = "prefix"
+prefix_slots = 4
+shed = { from = 0.25, low_ceiling = 0.75, floor = 0.1 }
+
+[[model_server]]
+name = "s"
+count = 16
+models = ["fleet-small"]
+slots = 4
+tokens_per_s = 40
+batch_scaling = 0.85
+prefill_ms = 80
+prefill_tokens_per_s = 3000
+prompt_cache_saving = 1.0
+jitter = 0.05
+
+[[client]]
+name = "ide"
+weight = 4
+entry = "gateway"
+models = ["fleet-small"]
+arrival = { kind = "trace", rows = [] }
+to_s = 0
+output_tokens = 60
+timeout_s = 30
+
+[[client]]
+name = "chat"
+weight = 2
+entry = "gateway"
+models = ["fleet-small"]
+arrival = { kind = "trace", rows = [] }
+to_s = 0
+output_tokens = 80
+timeout_s = 60
+
+[[client]]
+name = "batch"
+weight = 1
+entry = "gateway"
+models = ["fleet-small"]
+arrival = { kind = "trace", rows = [] }
+to_s = 0
+output_tokens = 40
+timeout_s = 120

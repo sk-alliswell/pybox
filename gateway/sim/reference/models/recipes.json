@@ -1,0 +1,331 @@
+{
+ "source": "https://recipes.vllm.ai",
+ "fetched": "2026-11-18",
+ "recipes": {
+  "Qwen/Qwen3.8-27B": {
+   "url": "https://recipes.vllm.ai/Qwen/Qwen3.8-27B",
+   "variants": [
+    {
+     "model_id": "Qwen/Qwen3.8-27B",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 67.0
+    }
+   ]
+  },
+  "Qwen/Qwen3.6-35B-A3B": {
+   "url": "https://recipes.vllm.ai/Qwen/Qwen3.6-35B-A3B",
+   "variants": [
+    {
+     "model_id": "Qwen/Qwen3.6-35B-A3B",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 84.0
+    }
+   ]
+  },
+  "Qwen/Qwen3.5-9B": {
+   "url": "https://recipes.vllm.ai/Qwen/Qwen3.5-9B",
+   "variants": [
+    {
+     "model_id": "Qwen/Qwen3.5-9B",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 22.0
+    }
+   ]
+  },
+  "Qwen/Qwen3.5-4B": {
+   "url": "https://recipes.vllm.ai/Qwen/Qwen3.5-4B",
+   "variants": [
+    {
+     "model_id": "Qwen/Qwen3.5-4B",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 10.0
+    }
+   ]
+  },
+  "Qwen/Qwen3.5-397B-A17B": {
+   "url": "https://recipes.vllm.ai/Qwen/Qwen3.5-397B-A17B",
+   "variants": [
+    {
+     "model_id": "Qwen/Qwen3.5-397B-A17B",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 953.0
+    }
+   ]
+  },
+  "Qwen/Qwen3.8-Flash-Next": {
+   "url": "https://recipes.vllm.ai/Qwen/Qwen3.8-Flash-Next",
+   "variants": []
+  },
+  "Google/gemma-4-31B-it": {
+   "url": "https://recipes.vllm.ai/Google/gemma-4-31B-it",
+   "variants": [
+    {
+     "model_id": "Google/gemma-4-31B-it",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 75.0
+    }
+   ]
+  },
+  "Google/gemma-4-26B-A4B-it": {
+   "url": "https://recipes.vllm.ai/Google/gemma-4-26B-A4B-it",
+   "variants": [
+    {
+     "model_id": "Google/gemma-4-26B-A4B-it",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 64.0
+    }
+   ]
+  },
+  "Google/gemma-4-12B-it": {
+   "url": "https://recipes.vllm.ai/Google/gemma-4-12B-it",
+   "variants": [
+    {
+     "model_id": "Google/gemma-4-12B-it",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 29.0
+    }
+   ]
+  },
+  "Google/gemma-4-E4B-it": {
+   "url": "https://recipes.vllm.ai/Google/gemma-4-E4B-it",
+   "variants": [
+    {
+     "model_id": "Google/gemma-4-E4B-it",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 20.0
+    }
+   ]
+  },
+  "openai/gpt-oss-20b": {
+   "url": "https://recipes.vllm.ai/openai/gpt-oss-20b",
+   "variants": [
+    {
+     "model_id": "openai/gpt-oss-20b",
+     "label": null,
+     "precision": "mxfp4",
+     "vram_minimum_gb": 16.0
+    }
+   ]
+  },
+  "openai/gpt-oss-120b": {
+   "url": "https://recipes.vllm.ai/openai/gpt-oss-120b",
+   "variants": [
+    {
+     "model_id": "openai/gpt-oss-120b",
+     "label": null,
+     "precision": "mxfp4",
+     "vram_minimum_gb": 96.0
+    }
+   ]
+  },
+  "meta-llama/Llama-3.3-70B-Instruct": {
+   "url": "https://recipes.vllm.ai/meta-llama/Llama-3.3-70B-Instruct",
+   "variants": [
+    {
+     "model_id": "meta-llama/Llama-3.3-70B-Instruct",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 170.0
+    }
+   ]
+  },
+  "meta-llama/Llama-3.1-8B-Instruct": {
+   "url": "https://recipes.vllm.ai/meta-llama/Llama-3.1-8B-Instruct",
+   "variants": [
+    {
+     "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 20.0
+    }
+   ]
+  },
+  "mistralai/Ministral-3-14B-Instruct-2512": {
+   "url": "https://recipes.vllm.ai/mistralai/Ministral-3-14B-Instruct-2512",
+   "variants": [
+    {
+     "model_id": "mistralai/Ministral-3-14B-Instruct-2512",
+     "label": null,
+     "precision": "fp8",
+     "vram_minimum_gb": 17.0
+    }
+   ]
+  },
+  "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16": {
+   "url": "https://recipes.vllm.ai/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+   "variants": []
+  },
+  "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16": {
+   "url": "https://recipes.vllm.ai/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16",
+   "variants": [
+    {
+     "model_id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 298.0
+    }
+   ]
+  },
+  "deepseek-ai/DeepSeek-V4.1-Flash": {
+   "url": "https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4.1-Flash",
+   "variants": [
+    {
+     "model_id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+     "label": "FP8 (1017)",
+     "precision": "fp8",
+     "vram_minimum_gb": 614.0
+    },
+    {
+     "model_id": "deepseek-ai/DeepSeek-V4.1-Flash",
+     "label": "FP8 (0909)",
+     "precision": "fp8",
+     "vram_minimum_gb": 614.0
+    }
+   ]
+  },
+  "deepseek-ai/DeepSeek-V4-Pro": {
+   "url": "https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Pro",
+   "variants": [
+    {
+     "model_id": "deepseek-ai/DeepSeek-V4-Pro-0813",
+     "label": "FP8 (0813)",
+     "precision": "fp8",
+     "vram_minimum_gb": 960.0
+    },
+    {
+     "model_id": "deepseek-ai/DeepSeek-V4-Pro",
+     "label": "FP8 (Preview)",
+     "precision": "fp8",
+     "vram_minimum_gb": 960.0
+    },
+    {
+     "model_id": "deepseek-ai/DeepSeek-V4-Pro-DSpark",
+     "label": "DSpark",
+     "precision": "fp8",
+     "vram_minimum_gb": 960.0
+    }
+   ]
+  },
+  "zai-org/GLM-5.3-Flash": {
+   "url": "https://recipes.vllm.ai/zai-org/GLM-5.3-Flash",
+   "variants": [
+    {
+     "model_id": "zai-org/GLM-5.3-Flash",
+     "label": null,
+     "precision": "fp8",
+     "vram_minimum_gb": 386.0
+    }
+   ]
+  },
+  "zai-org/GLM-5.3": {
+   "url": "https://recipes.vllm.ai/zai-org/GLM-5.3",
+   "variants": [
+    {
+     "model_id": "zai-org/GLM-5.3",
+     "label": null,
+     "precision": "fp8",
+     "vram_minimum_gb": 893.0
+    }
+   ]
+  },
+  "MiniMaxAI/MiniMax-M3": {
+   "url": "https://recipes.vllm.ai/MiniMaxAI/MiniMax-M3",
+   "variants": [
+    {
+     "model_id": "MiniMaxAI/MiniMax-M3",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 1025.0
+    },
+    {
+     "model_id": "MiniMax/MiniMax-M3",
+     "label": "BF16 (Ascend A3)",
+     "precision": "bf16",
+     "vram_minimum_gb": 854.0
+    },
+    {
+     "model_id": "Eco-Tech/MiniMax-M3-w8a8-0626",
+     "label": "W8A8 (Ascend A3)",
+     "precision": "int8",
+     "vram_minimum_gb": 513.0
+    },
+    {
+     "model_id": "MiniMax/MiniMax-M3-MXFP8",
+     "label": "MXFP8 (Ascend A5)",
+     "precision": "mxfp8",
+     "vram_minimum_gb": 513.0
+    },
+    {
+     "model_id": "Eco-Tech/MiniMax-M3-w8a8-0626",
+     "label": "W8A8 1M (Ascend A3)",
+     "precision": "int8",
+     "vram_minimum_gb": 513.0
+    },
+    {
+     "model_id": "MiniMax/MiniMax-M3-MXFP8",
+     "label": "MXFP8 1M TP8 (Ascend A5)",
+     "precision": "mxfp8",
+     "vram_minimum_gb": 513.0
+    },
+    {
+     "model_id": "MiniMax/MiniMax-M3-MXFP8",
+     "label": "MXFP8 1M TP4/PP2 (Ascend A5)",
+     "precision": "mxfp8",
+     "vram_minimum_gb": 513.0
+    }
+   ]
+  },
+  "MiniMaxAI/MiniMax-M3.1-Flash": {
+   "url": "https://recipes.vllm.ai/MiniMaxAI/MiniMax-M3.1-Flash",
+   "variants": []
+  },
+  "moonshotai/Kimi-K3": {
+   "url": "https://recipes.vllm.ai/moonshotai/Kimi-K3",
+   "variants": [
+    {
+     "model_id": "moonshotai/Kimi-K3",
+     "label": null,
+     "precision": "mxfp4",
+     "vram_minimum_gb": 1680.0
+    },
+    {
+     "model_id": "moonshotai/Kimi-K3",
+     "label": null,
+     "precision": "nvfp4",
+     "vram_minimum_gb": 1650.0
+    }
+   ]
+  },
+  "moonshotai/Kimi-K3.1-Pro": {
+   "url": "https://recipes.vllm.ai/moonshotai/Kimi-K3.1-Pro",
+   "variants": [
+    {
+     "model_id": "moonshotai/Kimi-K3.1-Pro",
+     "label": null,
+     "precision": "mxfp4",
+     "vram_minimum_gb": 1874.0
+    }
+   ]
+  },
+  "tencent/Hy3": {
+   "url": "https://recipes.vllm.ai/tencent/Hy3",
+   "variants": [
+    {
+     "model_id": "tencent/Hy3",
+     "label": null,
+     "precision": "bf16",
+     "vram_minimum_gb": 708.0
+    }
+   ]
+  }
+ }
+}

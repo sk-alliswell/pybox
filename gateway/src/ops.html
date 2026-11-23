@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>운영 현황</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --raise: #222220; --border: rgba(255,255,255,.10); --grid: #2c2c2a; --axis: #383835;
+  --text: #f0efec; --text2: #c3c2b7; --muted: #898781;
+  --s1: #3987e5; --s2: #d95926; --none: #6b6a65;
+  --good: #0ca30c; --warn: #fab219; --serious: #ec835a; --crit: #d03b3b; --tint: #1d2836;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+header { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+h1 { font-size: 15px; margin: 0; font-weight: 650; }
+.src { font-size: 12px; color: var(--text2); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; }
+.src.made { color: var(--warn); border-color: var(--warn); }
+nav { display: flex; gap: 2px; flex-wrap: wrap; }
+nav button { border: 0; background: none; color: var(--text2); padding: 6px 10px; border-radius: 6px; font: inherit; cursor: pointer; }
+nav button[aria-selected=true] { background: var(--tint); color: var(--text); font-weight: 600; }
+.controls { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--text2); }
+select, input, button.btn { font: inherit; color: var(--text); background: var(--raise); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; }
+input.n { width: 76px; }
+button.btn { cursor: pointer; }
+main { padding: 14px 16px 48px; max-width: 1400px; margin: 0 auto; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(12, 1fr); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; grid-column: span 12; min-width: 0; }
+.c6 { grid-column: span 6; } .c4 { grid-column: span 4; } .c8 { grid-column: span 8; }
+@media (max-width: 900px) { .c6, .c4, .c8 { grid-column: span 12; } }
+.card h2 { font-size: 13.5px; font-weight: 650; margin: 0 0 2px; }
+.card .sub { color: var(--text2); font-size: 12px; margin: 0 0 10px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; grid-column: span 12; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile .k { color: var(--text2); font-size: 12px; }
+.tile .v { font-size: 24px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .n { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { color: var(--text2); font-weight: 550; font-size: 12px; position: sticky; top: 0; background: var(--surface); cursor: pointer; user-select: none; }
+th[aria-sort]::after { content: " ▾"; color: var(--muted); } th[aria-sort=ascending]::after { content: " ▴"; }
+td.num, th.num { text-align: right; }
+tr.click { cursor: pointer; } tr.click:hover td, tr.sel td { background: var(--tint); }
+.scroll { overflow: auto; max-height: 460px; }
+.cellbar { display: inline-block; height: 8px; border-radius: 0 4px 4px 0; background: var(--s1); vertical-align: middle; margin-right: 6px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text2); margin: 4px 0 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+svg { display: block; width: 100%; }
+svg text { fill: var(--muted); font-size: 11px; }
+.tip { position: fixed; pointer-events: none; background: var(--text); color: #0d0d0d; padding: 6px 9px; border-radius: 6px; font-size: 12px; z-index: 20; white-space: pre; display: none; }
+.sg { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-top: 8px; background: var(--raise); }
+.sg .h { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.sg .t { font-weight: 650; }
+.sg p { margin: 4px 0 0; color: var(--text2); }
+.sg p.a { color: var(--text); }
+.chip { font-size: 11px; border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; color: var(--text2); white-space: nowrap; }
+.save { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.save small { color: var(--muted); font-weight: 400; }
+.stack { display: flex; height: 14px; gap: 2px; min-width: 160px; }
+.stack span { display: block; height: 100%; border-radius: 3px; }
+.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 16px; margin: 8px 0 4px; }
+.kv div { border-left: 2px solid var(--axis); padding-left: 8px; }
+.kv b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
+.kv span { color: var(--text2); font-size: 12px; } .kv em { color: var(--muted); font-style: normal; font-size: 11.5px; display: block; }
+.note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+dl { margin: 0; display: grid; grid-template-columns: minmax(120px, 200px) 1fr; gap: 6px 14px; }
+dt { color: var(--text); font-weight: 600; } dd { margin: 0; color: var(--text2); }
+.empty { color: var(--muted); padding: 24px 0; text-align: center; }
+.gate { max-width: 420px; margin: 80px auto; }
+</style>
+<style>
+.st { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.st i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.st.up i { background: var(--good); } .st.down i { background: var(--crit); } .st.trial i { background: var(--warn); }
+td.wrap { white-space: normal; max-width: 360px; color: var(--text2); }
+a { color: var(--s1); }
+</style>
+</head>
+<body>
+<header>
+  <h1>운영 현황</h1>
+  <span class="src" id="src"></span>
+  <div class="controls" id="controls"></div>
+</header>
+<main id="main"></main>
+<script>
+const EMBED = /*__OPS__*/null;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const nf = (d) => new Intl.NumberFormat("ko-KR", { maximumFractionDigits: d, minimumFractionDigits: d });
+const int = (v) => v == null ? "–" : nf(0).format(v);
+const sec = (ms) => ms == null ? "–" : Math.abs(ms) < 1000 ? nf(Math.abs(ms) < 10 ? 1 : 0).format(ms) + "ms" : nf(ms >= 10000 ? 0 : 1).format(ms / 1000) + "초";
+const span = (ms) => { if (ms == null) return "–"; const s = ms / 1000; return s < 90 ? nf(s < 10 ? 1 : 0).format(s) + "초" : s < 5400 ? nf(1).format(s / 60) + "분" : nf(1).format(s / 3600) + "시간"; };
+const at = (ms) => ms ? new Date(ms).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }) : "–";
+const NAMES = { up: "정상", down: "내려감", trial: "확인 중" };
+const WHY = [[/^probe failed: (.*)$/, "상태 확인 실패: $1"], [/^probe answered$/, "상태 확인에 응답"], [/^could not connect$/, "연결 안 됨"], [/^requests failed$/, "요청이 연달아 실패"]];
+const why = (s) => { let t = String(s || ""); for (const [re, to] of WHY) t = t.replace(re, to); return t.replace("could not connect", "연결 안 됨").replace(/no answer within (\d+) ms/, "$1ms 안에 응답 없음").replace(/^status /, "응답 코드 "); };
+let token = "";
+try { token = sessionStorage.getItem("gw-admin") || ""; } catch (e) {}
+
+function table(cols, rows, empty) {
+  if (!rows.length) return `<div class="empty">${empty}</div>`;
+  return `<div class="scroll"><table><thead><tr>${cols.map((c) => `<th class="${c.num ? "num" : ""}">${c.label}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${cols.map((c) => `<td class="${c.num ? "num" : ""}${c.wrap ? " wrap" : ""}">${c.html(r)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+
+function render(d) {
+  const servers = [];
+  for (const [up, u] of Object.entries(d.servers.upstreams || {})) for (const s of u.servers) servers.push({ up, probe: u.probe_secs, refuse: u.refuse_when_down, ...s });
+  servers.sort((a, b) => a.up.localeCompare(b.up) || a.name.localeCompare(b.name));
+  const events = d.servers.events || [];
+  const now = d.servers.now;
+  const dayAgo = now - 86400000;
+  const downs = events.filter((e) => e.state === "down" && e.ts >= dayAgo).length;
+  const outMs = events.filter((e) => e.state === "up" && e.ts >= dayAgo).reduce((a, e) => a + (e.down_ms || 0), 0);
+  const down = servers.filter((s) => s.health === "down").length;
+  const reports = (d.reports && d.reports.reports) || [];
+  const cl = d.client || { all: { reports: 0 }, agents: [], models: [] };
+  const probing = servers.some((s) => s.probe > 0);
+  const tiles = [
+    ["내려간 서버", `${int(down)} / ${int(servers.length)}`, down ? "지금 요청을 받지 않는 서버" : "모든 서버가 요청을 받는 중"],
+    ["최근 24시간 중단", int(downs) + "회", downs ? "복구된 것만 합쳐 " + span(outMs) : "기록된 중단 없음"],
+    ["상태 확인", probing ? "켜짐" : "꺼짐", probing ? "게이트웨이가 서버에 직접 물어봄" : "요청이 실패해야 알 수 있음"],
+    ["최근 보고서", reports.length ? esc(reports[0].first_day) : "없음", reports.length ? `요청 ${int(reports[0].requests)}건` : (d.reports ? "아직 쓰인 보고서 없음" : "[reports] 설정이 꺼져 있음")],
+    ["호출 쪽 측정", int(cl.all.reports) + "건", cl.all.reports ? "돌아가는 길 중앙값 " + sec(cl.all.net_ttft_p50_ms) : "최근 24시간에 받은 보고 없음"],
+  ];
+  const tok = token ? "?token=" + encodeURIComponent(token) : "";
+  $("main").innerHTML = `<div class="grid">
+  <div class="tiles">${tiles.map(([k, v, n]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("")}</div>
+  <div class="card"><h2>모델 서버</h2><p class="sub">서버마다 지금 상태와, 내려가 있다면 무엇이 보였는지. "확인 중"은 내려갔다가 요청 하나로 살아났는지 시험하는 상태입니다.</p>${table([
+    { label: "묶음", html: (s) => esc(s.up) }, { label: "서버", html: (s) => esc(s.name) },
+    { label: "상태", html: (s) => `<span class="st ${s.health}"><i></i>${NAMES[s.health] || esc(s.health)}</span>` },
+    { label: "처리 중 / 한도", num: 1, html: (s) => `${int(s.inflight)} / ${int(s.limit)}` },
+    { label: "내려간 시각", html: (s) => at(s.down_since_ms) },
+    { label: "다시 확인까지", num: 1, html: (s) => s.health === "down" ? sec(s.retry_in_ms) : "–" },
+    { label: "지금 보이는 문제", wrap: 1, html: (s) => s.health === "up" ? "–" : esc(why(s.last_error)) || "–" },
+    { label: "상태 확인 (실패)", num: 1, html: (s) => s.probe ? `${int(s.probes)} (${int(s.probe_fails)})` : "꺼짐" },
+    { label: "전부 내려가면", html: (s) => s.refuse ? "바로 거절" : "대기열에서 기다림" },
+  ], servers, "서버가 없습니다.")}</div>
+  <div class="card c6"><h2>내려감과 복구 기록</h2><p class="sub">최근 것부터. 복구 줄에는 내려가 있던 시간이 붙습니다.</p>${table([
+    { label: "시각", html: (e) => at(e.ts) }, { label: "묶음", html: (e) => esc(e.upstream) }, { label: "서버", html: (e) => esc(e.server) },
+    { label: "무슨 일", html: (e) => `<span class="st ${e.state}"><i></i>${e.state === "down" ? "내려감" : "복구"}</span>` },
+    { label: "내려가 있던 시간", num: 1, html: (e) => e.state === "up" ? span(e.down_ms) : "–" },
+    { label: "본 것", wrap: 1, html: (e) => esc(why(e.reason)) },
+  ], events.slice(0, 60), "기록된 중단이 없습니다.")}</div>
+  <div class="card c6"><h2>게이트웨이가 쓴 보고서</h2><p class="sub">${d.reports ? `매일 ${esc(d.reports.at)}에 전날 하루를 정리합니다${d.reports.weekly ? ". 월요일에는 지난 7일도 씁니다" : ""}.` : "설정에 [reports] dir 를 넣으면 매일 보고서를 씁니다."}</p>${table([
+    { label: "보고서", html: (r) => EMBED ? esc(r.file) : `<a href="/gateway/reports/${esc(r.file)}${tok}" target="_blank" rel="noopener">${esc(r.file)}</a>` },
+    { label: "기간", html: (r) => r.span === "week" ? "7일" : "하루" },
+    { label: "요청", num: 1, html: (r) => int(r.requests) },
+    { label: "제안", num: 1, html: (r) => int((r.suggestions || []).length) + "건" },
+    { label: "서버 중단 기록", num: 1, html: (r) => int(r.outages) + "줄" },
+    { label: "쓴 시각", html: (r) => at(r.written_ms) },
+  ], reports, "아직 보고서가 없습니다.")}</div>
+  <div class="card"><h2>호출하는 쪽에서 잰 시간 (최근 24시간)</h2><p class="sub">에이전트가 직접 잰 첫 토큰 시간과 게이트웨이가 잰 시간의 차이가 "돌아가는 길"입니다. 게이트웨이를 떠난 뒤 호출하는 쪽에 닿기까지 걸린 시간입니다.</p>${table([
+    { label: "에이전트", html: (r) => esc(r.agent_id) || "(알 수 없음)" }, { label: "보고", num: 1, html: (r) => int(r.reports) },
+    { label: "호출 쪽 첫 토큰 중앙값", num: 1, html: (r) => sec(r.client_ttft_p50_ms) }, { label: "95%", num: 1, html: (r) => sec(r.client_ttft_p95_ms) },
+    { label: "게이트웨이 첫 토큰 중앙값", num: 1, html: (r) => sec(r.gateway_ttft_p50_ms) },
+    { label: "돌아가는 길 중앙값", num: 1, html: (r) => sec(r.net_ttft_p50_ms) }, { label: "95%", num: 1, html: (r) => sec(r.net_ttft_p95_ms) },
+    { label: "호출 쪽 오류", num: 1, html: (r) => int(r.errors) },
+  ], cl.agents, "받은 보고가 없습니다. 에이전트가 POST /gateway/obs/client 로 보내면 여기에 나옵니다.")}</div>
+</div>`;
+  $("src").textContent = EMBED ? "저장된 화면 · " + at(now) : "실시간 · " + at(now);
+}
+
+function gate(msg) {
+  $("main").innerHTML = `<div class="card gate"><h2>${msg}</h2><p class="sub">게이트웨이 설정의 admin_token 값을 넣으세요. 이 브라우저 탭에만 보관합니다.</p><form id="gate"><input id="tok" type="password" style="width:70%" autocomplete="off"> <button class="btn">확인</button></form></div>`;
+  $("gate").onsubmit = (e) => { e.preventDefault(); token = $("tok").value.trim(); try { sessionStorage.setItem("gw-admin", token); } catch (e) {} load(); };
+}
+
+let timer = null;
+async function load() {
+  clearTimeout(timer);
+  try {
+    const res = await fetch("/gateway/ops/data", { headers: token ? { authorization: "Bearer " + token } : {} });
+    if (res.status === 401) return gate("관리자 토큰이 필요합니다");
+    if (!res.ok) throw new Error("응답 코드 " + res.status);
+    render(await res.json());
+  } catch (e) {
+    $("src").textContent = "불러오지 못함: " + e.message;
+  }
+  timer = setTimeout(load, 5000);
+}
+if (EMBED) render(EMBED); else load();
+</script>
+</body>
+</html>

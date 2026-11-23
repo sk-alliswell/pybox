@@ -1,0 +1,44 @@
+# Measured runs the simulator is checked against (gwsim validate-all).
+# `calibration`: the model-server parameters of the scenario were fitted on
+# this very log. `held-out`: they were fitted on another run of the same
+# session; nothing in the scenario was tuned to this log.
+
+[[experiment]]
+scenario = "sat-direct.toml"
+measured = "sat-direct.jsonl"
+role = "calibration"
+
+[[experiment]]
+scenario = "sat-plain.toml"
+measured = "sat-plain.jsonl"
+samples = "sat-plain.samples.jsonl"
+role = "held-out"
+
+[[experiment]]
+scenario = "sat-bounded.toml"
+measured = "sat-bounded.jsonl"
+samples = "sat-bounded.samples.jsonl"
+role = "held-out"
+
+[[experiment]]
+scenario = "sat-tight.toml"
+measured = "sat-tight.jsonl"
+samples = "sat-tight.samples.jsonl"
+role = "held-out"
+
+[[experiment]]
+scenario = "sat-direct-patient.toml"
+measured = "sat-direct-patient.jsonl"
+role = "calibration"
+
+[[experiment]]
+scenario = "sat-bounded-patient.toml"
+measured = "sat-bounded-patient.jsonl"
+samples = "sat-bounded-patient.samples.jsonl"
+role = "held-out"
+
+[[experiment]]
+scenario = "sat-smart.toml"
+measured = "sat-smart.jsonl"
+samples = "sat-smart.samples.jsonl"
+role = "held-out"

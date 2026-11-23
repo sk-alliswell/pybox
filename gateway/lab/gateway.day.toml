@@ -1,0 +1,107 @@
+# A shortened day for the usage report (day_drive.py), local models only: one
+# upstream, three slot_server.py servers (2 cache slots each), log in TDB.
+# One agent per team and kind, so the log says whose request it was and what
+# sort; people are told apart by `x-gateway-user-id`.
+listen = "127.0.0.1:8787"
+admin_token = "lab-agent-admin"
+
+[obs]
+backend = "tdb"
+dir = "obs-day"
+
+[[upstreams]]
+name = "local"
+base_url = "http://127.0.0.1:9211"
+kind = "none"
+affinity = "prefix"
+max_queue = 30
+shed_from = 0.25
+shed_ceiling = 0.75
+shed_floor = 0.1
+
+[[upstreams.backends]]
+name = "s1"
+base_url = "http://127.0.0.1:9211"
+max_concurrency = 1
+prefix_slots = 2
+
+[[upstreams.backends]]
+name = "s2"
+base_url = "http://127.0.0.1:9212"
+max_concurrency = 1
+prefix_slots = 2
+
+[[upstreams.backends]]
+name = "s3"
+base_url = "http://127.0.0.1:9213"
+max_concurrency = 1
+prefix_slots = 2
+
+[[agents]]
+id = "platform-ide"
+kind = "ide"
+token = "lab-agent-platform-ide"
+team_id = "platform"
+weight = 4
+priority = "interactive"
+
+[[agents]]
+id = "platform-chat"
+kind = "chat"
+token = "lab-agent-platform-chat"
+team_id = "platform"
+weight = 2
+
+[[agents]]
+id = "platform-batch"
+kind = "batch"
+token = "lab-agent-platform-batch"
+team_id = "platform"
+weight = 1
+priority = "batch"
+
+[[agents]]
+id = "research-ide"
+kind = "ide"
+token = "lab-agent-research-ide"
+team_id = "research"
+weight = 4
+priority = "interactive"
+
+[[agents]]
+id = "research-chat"
+kind = "chat"
+token = "lab-agent-research-chat"
+team_id = "research"
+weight = 2
+
+[[agents]]
+id = "research-batch"
+kind = "batch"
+token = "lab-agent-research-batch"
+team_id = "research"
+weight = 1
+priority = "batch"
+
+[[agents]]
+id = "product-ide"
+kind = "ide"
+token = "lab-agent-product-ide"
+team_id = "product"
+weight = 4
+priority = "interactive"
+
+[[agents]]
+id = "product-chat"
+kind = "chat"
+token = "lab-agent-product-chat"
+team_id = "product"
+weight = 2
+
+[[agents]]
+id = "product-batch"
+kind = "batch"
+token = "lab-agent-product-batch"
+team_id = "product"
+weight = 1
+priority = "batch"

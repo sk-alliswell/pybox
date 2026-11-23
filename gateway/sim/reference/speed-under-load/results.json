@@ -1,0 +1,153 @@
+{
+  "what": "qwen2.5-0.5b-instruct q4_k_m, llama-cpp-python 0.3.36, 4 CPU cores, 2026-11-16",
+  "decoded_together": [
+    {
+      "together": 1,
+      "total_tokens_per_s": 44.2,
+      "each_tokens_per_s": 44.21
+    },
+    {
+      "together": 2,
+      "total_tokens_per_s": 71.5,
+      "each_tokens_per_s": 35.75
+    },
+    {
+      "together": 4,
+      "total_tokens_per_s": 129.1,
+      "each_tokens_per_s": 32.27
+    },
+    {
+      "together": 8,
+      "total_tokens_per_s": 164.2,
+      "each_tokens_per_s": 20.52
+    },
+    {
+      "together": 16,
+      "total_tokens_per_s": 206.8,
+      "each_tokens_per_s": 12.92
+    },
+    {
+      "together": 32,
+      "total_tokens_per_s": 244.3,
+      "each_tokens_per_s": 7.63
+    },
+    {
+      "together": 64,
+      "total_tokens_per_s": 259.5,
+      "each_tokens_per_s": 4.05
+    }
+  ],
+  "fit": "each = solo / (1 + (n - 1) / 6.36); within 7% of every row",
+  "waiting_outside_a_server_that_runs_one_at_a_time": [
+    {
+      "callers": 1,
+      "timeout_s": null,
+      "tokens_per_s": 23.8,
+      "answered": 20,
+      "gave_up": 0
+    },
+    {
+      "callers": 4,
+      "timeout_s": null,
+      "tokens_per_s": 22.6,
+      "answered": 19,
+      "gave_up": 0
+    },
+    {
+      "callers": 16,
+      "timeout_s": null,
+      "tokens_per_s": 22.8,
+      "answered": 19,
+      "gave_up": 0
+    },
+    {
+      "callers": 48,
+      "timeout_s": null,
+      "tokens_per_s": 24.0,
+      "answered": 20,
+      "gave_up": 0
+    },
+    {
+      "callers": 16,
+      "timeout_s": 8,
+      "tokens_per_s": 4.8,
+      "answered": 4,
+      "gave_up": 78
+    }
+  ],
+  "prompt_read_beside_answers": [
+    {
+      "writing": 4,
+      "prompt_chunk_tokens": 64,
+      "step_ms_alone": 32.0,
+      "step_ms_with_chunk": 439.1,
+      "each_tokens_per_s_alone": 31.3,
+      "each_tokens_per_s_with_chunk": 2.28
+    },
+    {
+      "writing": 4,
+      "prompt_chunk_tokens": 256,
+      "step_ms_alone": 32.0,
+      "step_ms_with_chunk": 1034.0,
+      "each_tokens_per_s_alone": 31.3,
+      "each_tokens_per_s_with_chunk": 0.97
+    },
+    {
+      "writing": 4,
+      "prompt_chunk_tokens": 512,
+      "step_ms_alone": 32.0,
+      "step_ms_with_chunk": 2492.2,
+      "each_tokens_per_s_alone": 31.3,
+      "each_tokens_per_s_with_chunk": 0.4
+    },
+    {
+      "writing": 8,
+      "prompt_chunk_tokens": 64,
+      "step_ms_alone": 42.2,
+      "step_ms_with_chunk": 442.3,
+      "each_tokens_per_s_alone": 23.7,
+      "each_tokens_per_s_with_chunk": 2.26
+    },
+    {
+      "writing": 8,
+      "prompt_chunk_tokens": 256,
+      "step_ms_alone": 42.2,
+      "step_ms_with_chunk": 1041.2,
+      "each_tokens_per_s_alone": 23.7,
+      "each_tokens_per_s_with_chunk": 0.96
+    },
+    {
+      "writing": 8,
+      "prompt_chunk_tokens": 512,
+      "step_ms_alone": 42.2,
+      "step_ms_with_chunk": 2570.4,
+      "each_tokens_per_s_alone": 23.7,
+      "each_tokens_per_s_with_chunk": 0.39
+    },
+    {
+      "writing": 16,
+      "prompt_chunk_tokens": 64,
+      "step_ms_alone": 71.0,
+      "step_ms_with_chunk": 502.3,
+      "each_tokens_per_s_alone": 14.1,
+      "each_tokens_per_s_with_chunk": 1.99
+    },
+    {
+      "writing": 16,
+      "prompt_chunk_tokens": 256,
+      "step_ms_alone": 71.0,
+      "step_ms_with_chunk": 1121.2,
+      "each_tokens_per_s_alone": 14.1,
+      "each_tokens_per_s_with_chunk": 0.89
+    },
+    {
+      "writing": 16,
+      "prompt_chunk_tokens": 512,
+      "step_ms_alone": 71.0,
+      "step_ms_with_chunk": 2701.9,
+      "each_tokens_per_s_alone": 14.1,
+      "each_tokens_per_s_with_chunk": 0.37
+    }
+  ],
+  "prompt_read_note": "stall.py: a step with a chunk of another sequence's prompt takes the step alone plus the time to read the chunk (150 to 255 prompt tokens a second here)"
+}

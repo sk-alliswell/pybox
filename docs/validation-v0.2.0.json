@@ -1,0 +1,282 @@
+{
+  "date": "2026-11-06",
+  "core": {
+    "windows-whp": {
+      "all_passed": true,
+      "checks": 28,
+      "controller_sha256": "8211d0e8a2b6aca835afc055279a63d8bfd574677198405e6e7271d5aa2ceff8",
+      "source_hashes": {
+        "src/guard.rs": "a265e1916f8b14a22eb07a172f018be5dfc7dd0e7b517b5c2f09103a08fb9167",
+        "src/lib.rs": "c6e842093049cbc199fde42b6ec59f9a7c1054623dbc65f6c4e5407456fdbb6b",
+        "src/main.rs": "2634dfbe3a023e44faf4f6e4018c2e7723cd8184e21834259fc5b793f758d60f",
+        "src/manager.rs": "02cbab1f54a7f6ebbfc96449a81da32cc6447aca744bb0d6815540b614e0178f",
+        "src/platform.rs": "a36b71f14c48757bc7217367f2c3eb915db9e65be2cdc7830fe3346048188e65",
+        "src/platform/unix.rs": "5ab72b12fd313a2b9a8c41f90560017b371c7538edf669201a33d827971a1f75",
+        "src/platform/windows.rs": "1045798797933f1d5eb2be7c5b9276f694769aff619b0798153501c1fce89e06"
+      }
+    },
+    "ubuntu-wsl2-kvm": {
+      "all_passed": true,
+      "checks": 28,
+      "controller_sha256": "a0d4d0e33d849ce7142cd9ea3f08d8ba87a8045293dd491f61a87abaa2fdb3d8",
+      "source_hashes": {
+        "src/guard.rs": "a265e1916f8b14a22eb07a172f018be5dfc7dd0e7b517b5c2f09103a08fb9167",
+        "src/lib.rs": "c6e842093049cbc199fde42b6ec59f9a7c1054623dbc65f6c4e5407456fdbb6b",
+        "src/main.rs": "2634dfbe3a023e44faf4f6e4018c2e7723cd8184e21834259fc5b793f758d60f",
+        "src/manager.rs": "02cbab1f54a7f6ebbfc96449a81da32cc6447aca744bb0d6815540b614e0178f",
+        "src/platform.rs": "a36b71f14c48757bc7217367f2c3eb915db9e65be2cdc7830fe3346048188e65",
+        "src/platform/unix.rs": "5ab72b12fd313a2b9a8c41f90560017b371c7538edf669201a33d827971a1f75",
+        "src/platform/windows.rs": "1045798797933f1d5eb2be7c5b9276f694769aff619b0798153501c1fce89e06"
+      }
+    }
+  },
+  "manager": {
+    "windows-whp": {
+      "all_passed": true,
+      "checks": 26,
+      "platform": "windows-whp",
+      "binary_sha256": "8211d0e8a2b6aca835afc055279a63d8bfd574677198405e6e7271d5aa2ceff8",
+      "results": [
+        {
+          "name": "occupied_default_port_uses_free_loopback",
+          "passed": true
+        },
+        {
+          "name": "loopback_api_auth",
+          "passed": true
+        },
+        {
+          "name": "cross_origin_refused",
+          "passed": true
+        },
+        {
+          "name": "foreign_host_refused",
+          "passed": true
+        },
+        {
+          "name": "static_console_has_no_token",
+          "passed": true
+        },
+        {
+          "name": "initial_empty_inventory",
+          "passed": true
+        },
+        {
+          "name": "unsupported_policy_refused",
+          "passed": true
+        },
+        {
+          "name": "unsupported_guest_option_refused",
+          "passed": true
+        },
+        {
+          "name": "one_manager_per_user_even_different_state",
+          "passed": true
+        },
+        {
+          "name": "standalone_cli_cannot_bypass_manager",
+          "passed": true
+        },
+        {
+          "name": "queued_cancel_never_spawns",
+          "passed": true
+        },
+        {
+          "name": "first_preparation_and_workload",
+          "passed": true
+        },
+        {
+          "name": "real_spawn_reap_and_output",
+          "passed": true
+        },
+        {
+          "name": "effective_policy_and_receipt",
+          "passed": true
+        },
+        {
+          "name": "two_real_vms_and_queued_work",
+          "passed": true
+        },
+        {
+          "name": "stop_all_reclaims_owned_work",
+          "passed": true
+        },
+        {
+          "name": "cancelled_pid_count_returns_to_zero",
+          "passed": true
+        },
+        {
+          "name": "timeout_receipt",
+          "passed": true
+        },
+        {
+          "name": "healthy_after_cancellation_and_timeout",
+          "passed": true
+        },
+        {
+          "name": "historical_config_is_immutable",
+          "passed": true
+        },
+        {
+          "name": "cli_uses_same_api",
+          "passed": true
+        },
+        {
+          "name": "shutdown_removes_own_endpoint",
+          "passed": true
+        },
+        {
+          "name": "restart_preserves_history_and_defaults",
+          "passed": true
+        },
+        {
+          "name": "image_snapshot_verification",
+          "passed": true
+        },
+        {
+          "name": "crash_restart_blocks_unverified_cleanup",
+          "passed": true
+        },
+        {
+          "name": "crash_restart_never_replays_work",
+          "passed": true
+        }
+      ]
+    },
+    "ubuntu-wsl2-kvm": {
+      "all_passed": true,
+      "checks": 26,
+      "platform": "ubuntu-wsl2-kvm",
+      "binary_sha256": "a0d4d0e33d849ce7142cd9ea3f08d8ba87a8045293dd491f61a87abaa2fdb3d8",
+      "results": [
+        {
+          "name": "occupied_default_port_uses_free_loopback",
+          "passed": true
+        },
+        {
+          "name": "loopback_api_auth",
+          "passed": true
+        },
+        {
+          "name": "cross_origin_refused",
+          "passed": true
+        },
+        {
+          "name": "foreign_host_refused",
+          "passed": true
+        },
+        {
+          "name": "static_console_has_no_token",
+          "passed": true
+        },
+        {
+          "name": "initial_empty_inventory",
+          "passed": true
+        },
+        {
+          "name": "unsupported_policy_refused",
+          "passed": true
+        },
+        {
+          "name": "unsupported_guest_option_refused",
+          "passed": true
+        },
+        {
+          "name": "one_manager_per_user_even_different_state",
+          "passed": true
+        },
+        {
+          "name": "standalone_cli_cannot_bypass_manager",
+          "passed": true
+        },
+        {
+          "name": "queued_cancel_never_spawns",
+          "passed": true
+        },
+        {
+          "name": "first_preparation_and_workload",
+          "passed": true
+        },
+        {
+          "name": "real_spawn_reap_and_output",
+          "passed": true
+        },
+        {
+          "name": "effective_policy_and_receipt",
+          "passed": true
+        },
+        {
+          "name": "two_real_vms_and_queued_work",
+          "passed": true
+        },
+        {
+          "name": "stop_all_reclaims_owned_work",
+          "passed": true
+        },
+        {
+          "name": "cancelled_pid_count_returns_to_zero",
+          "passed": true
+        },
+        {
+          "name": "timeout_receipt",
+          "passed": true
+        },
+        {
+          "name": "healthy_after_cancellation_and_timeout",
+          "passed": true
+        },
+        {
+          "name": "historical_config_is_immutable",
+          "passed": true
+        },
+        {
+          "name": "cli_uses_same_api",
+          "passed": true
+        },
+        {
+          "name": "shutdown_removes_own_endpoint",
+          "passed": true
+        },
+        {
+          "name": "restart_preserves_history_and_defaults",
+          "passed": true
+        },
+        {
+          "name": "image_snapshot_verification",
+          "passed": true
+        },
+        {
+          "name": "crash_restart_blocks_unverified_cleanup",
+          "passed": true
+        },
+        {
+          "name": "crash_restart_never_replays_work",
+          "passed": true
+        }
+      ]
+    }
+  },
+  "console_source_sha256": {
+    "console/app.js": "a1a80718fa51033ad445bfee23d91a33e7464c4f064be2901f2991bd9b5d3562",
+    "console/index.html": "65f5b6dbc0f6d2dad86e50e021ede5dd48ac7b2d0cbef1a2dd70342ca5535bc5",
+    "console/run-console.cmd": "cd5976278eb7346d39a411c27c783bf2d623c62f498299d1adf98fff9ec55bcc",
+    "console/run-console.sh": "e85fc53fd9b7cfe83eecaf6c29bdfe41f6694584af6c8922b700dbb916d9978c",
+    "console/style.css": "38b018f1c8a22eb8f07677ff05a1b151b7986c99fa90912ef51da37c0adced75"
+  },
+  "browser": {
+    "create_complete": true,
+    "stop_and_cleanup": true,
+    "settings_reload": true,
+    "image_verification": true,
+    "history": true,
+    "desktop_viewport": [
+      1440,
+      960
+    ],
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "mobile_document_width": 390
+  }
+}

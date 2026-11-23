@@ -1,0 +1,29 @@
+# LiteLLM Proxy config for the demo: two "models" served by mock_provider.py.
+model_list:
+  - model_name: gpt-fast
+    litellm_params:
+      model: openai/mock-fast
+      api_base: http://127.0.0.1:9101/v1
+      api_key: sk-mock
+      input_cost_per_token: 0.000005
+      output_cost_per_token: 0.000015
+      cache_read_input_token_cost: 0.0000005
+  - model_name: gpt-smart
+    litellm_params:
+      model: openai/mock-smart
+      api_base: http://127.0.0.1:9101/v1
+      api_key: sk-mock
+      input_cost_per_token: 0.00003
+      output_cost_per_token: 0.00015
+      cache_read_input_token_cost: 0.000003
+
+litellm_settings:
+  callbacks: ["otel"]          # spans go to the gateway: OTEL_EXPORTER / OTEL_ENDPOINT / OTEL_HEADERS
+  num_retries: 0               # the gateway owns retries
+  cache: true                  # response cache, so x-litellm-cache-key hits show up
+  cache_params:
+    type: local
+    ttl: 60
+
+general_settings:
+  master_key: sk-demo-master

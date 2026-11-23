@@ -1,0 +1,21 @@
+[package]
+name = "pybox-gateway-tdb"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "pybox-gateway with its request logs and traces persisted in Super Shotgun TDB"
+publish = false
+
+# Separate crate and workspace: only this build needs access to the private
+# super-shotgun repository; the plain gateway keeps building without it.
+[workspace]
+
+[dependencies]
+anyhow = "1"
+pybox-gateway = { path = ".." }
+tdb = { git = "https://github.com/MichaelAlbertIhm/super-shotgun", rev = "fcd2d612db619dc1c484efa793b3a89b94a153c4" }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[dev-dependencies]
+tempfile = "3"

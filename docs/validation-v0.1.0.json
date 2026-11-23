@@ -1,0 +1,263 @@
+{
+  "date": "2026-11-06",
+  "results": {
+    "windows-whp": {
+      "passed": true,
+      "checks": [
+        {
+          "name": "no_host_python_scripts",
+          "passed": true
+        },
+        {
+          "name": "status_without_guest_launch",
+          "passed": true
+        },
+        {
+          "name": "first_ready_preparation_no_python_PATH",
+          "passed": true
+        },
+        {
+          "name": "preparation_native_policy_receipt",
+          "passed": true
+        },
+        {
+          "name": "ready_clone_0",
+          "passed": true
+        },
+        {
+          "name": "ready_clone_1",
+          "passed": true
+        },
+        {
+          "name": "ready_clone_2",
+          "passed": true
+        },
+        {
+          "name": "cold_same_docker_identity",
+          "passed": true
+        },
+        {
+          "name": "ready_status_full_hashes",
+          "passed": true
+        },
+        {
+          "name": "native_guard_stdout",
+          "passed": true
+        },
+        {
+          "name": "native_guard_stderr",
+          "passed": true
+        },
+        {
+          "name": "native_guard_loop",
+          "passed": true
+        },
+        {
+          "name": "native_guard_policy",
+          "passed": true
+        },
+        {
+          "name": "native_guard_cancel",
+          "passed": true
+        },
+        {
+          "name": "missing_program_no_fallback",
+          "passed": true
+        },
+        {
+          "name": "real_VM_timeout",
+          "passed": true
+        },
+        {
+          "name": "real_VM_cancel",
+          "passed": true
+        },
+        {
+          "name": "snapshot_inventory_refused",
+          "passed": true
+        },
+        {
+          "name": "uncertain_cleanup_blocks_launch",
+          "passed": true
+        },
+        {
+          "name": "same_size_payload_corruption_refused",
+          "passed": true
+        },
+        {
+          "name": "incomplete_payload_manifest_refused",
+          "passed": true
+        },
+        {
+          "name": "cross_language_file_lock_interoperability",
+          "passed": true
+        },
+        {
+          "name": "two_actual_VMs_third_refused",
+          "passed": true
+        },
+        {
+          "name": "controller_crash_kills_actual_VMM",
+          "passed": true
+        },
+        {
+          "name": "other_concurrent_VM_healthy",
+          "passed": true
+        },
+        {
+          "name": "crash_slot_reclaimed_and_post_failure_health",
+          "passed": true
+        },
+        {
+          "name": "actual_console_cancel_signal",
+          "passed": true
+        },
+        {
+          "name": "final_healthy_ready",
+          "passed": true
+        }
+      ],
+      "controller_sha256": "15b553adae16ef6a32b207c13f2844bea75036d2578810478a38bea86ae32b4b",
+      "cargo_lock_sha256": "b7b92371ef8c159f413224d90ad5d04d24b926d57cf4b2fe49dbbdbececa4b96",
+      "source_hashes": {
+        "src/guard.rs": "d659e3230abfb9e6e7187cfd63d711f2296106fe3241cfd7db13792c93569391",
+        "src/lib.rs": "c6e842093049cbc199fde42b6ec59f9a7c1054623dbc65f6c4e5407456fdbb6b",
+        "src/main.rs": "b36660ad6728973bf2c9288d12f5d1083fc386b47b32a37d3f2a92e419c0e626",
+        "src/platform.rs": "a36b71f14c48757bc7217367f2c3eb915db9e65be2cdc7830fe3346048188e65",
+        "src/platform/unix.rs": "5ab72b12fd313a2b9a8c41f90560017b371c7538edf669201a33d827971a1f75",
+        "src/platform/windows.rs": "1045798797933f1d5eb2be7c5b9276f694769aff619b0798153501c1fce89e06"
+      },
+      "runtime_PATH": ""
+    },
+    "ubuntu-wsl2-kvm": {
+      "passed": true,
+      "checks": [
+        {
+          "name": "no_host_python_scripts",
+          "passed": true
+        },
+        {
+          "name": "status_without_guest_launch",
+          "passed": true
+        },
+        {
+          "name": "first_ready_preparation_no_python_PATH",
+          "passed": true
+        },
+        {
+          "name": "preparation_native_policy_receipt",
+          "passed": true
+        },
+        {
+          "name": "ready_clone_0",
+          "passed": true
+        },
+        {
+          "name": "ready_clone_1",
+          "passed": true
+        },
+        {
+          "name": "ready_clone_2",
+          "passed": true
+        },
+        {
+          "name": "cold_same_docker_identity",
+          "passed": true
+        },
+        {
+          "name": "ready_status_full_hashes",
+          "passed": true
+        },
+        {
+          "name": "native_guard_stdout",
+          "passed": true
+        },
+        {
+          "name": "native_guard_stderr",
+          "passed": true
+        },
+        {
+          "name": "native_guard_loop",
+          "passed": true
+        },
+        {
+          "name": "native_guard_policy",
+          "passed": true
+        },
+        {
+          "name": "native_guard_cancel",
+          "passed": true
+        },
+        {
+          "name": "missing_program_no_fallback",
+          "passed": true
+        },
+        {
+          "name": "real_VM_timeout",
+          "passed": true
+        },
+        {
+          "name": "real_VM_cancel",
+          "passed": true
+        },
+        {
+          "name": "snapshot_inventory_refused",
+          "passed": true
+        },
+        {
+          "name": "uncertain_cleanup_blocks_launch",
+          "passed": true
+        },
+        {
+          "name": "same_size_payload_corruption_refused",
+          "passed": true
+        },
+        {
+          "name": "incomplete_payload_manifest_refused",
+          "passed": true
+        },
+        {
+          "name": "cross_language_file_lock_interoperability",
+          "passed": true
+        },
+        {
+          "name": "two_actual_VMs_third_refused",
+          "passed": true
+        },
+        {
+          "name": "controller_crash_kills_actual_VMM",
+          "passed": true
+        },
+        {
+          "name": "other_concurrent_VM_healthy",
+          "passed": true
+        },
+        {
+          "name": "crash_slot_reclaimed_and_post_failure_health",
+          "passed": true
+        },
+        {
+          "name": "actual_console_cancel_signal",
+          "passed": true
+        },
+        {
+          "name": "final_healthy_ready",
+          "passed": true
+        }
+      ],
+      "controller_sha256": "7613d75f86790ac705909190e292489cffc476dc8464115e8327a4a72bae7d6e",
+      "cargo_lock_sha256": "b7b92371ef8c159f413224d90ad5d04d24b926d57cf4b2fe49dbbdbececa4b96",
+      "source_hashes": {
+        "src/guard.rs": "d659e3230abfb9e6e7187cfd63d711f2296106fe3241cfd7db13792c93569391",
+        "src/lib.rs": "c6e842093049cbc199fde42b6ec59f9a7c1054623dbc65f6c4e5407456fdbb6b",
+        "src/main.rs": "b36660ad6728973bf2c9288d12f5d1083fc386b47b32a37d3f2a92e419c0e626",
+        "src/platform.rs": "a36b71f14c48757bc7217367f2c3eb915db9e65be2cdc7830fe3346048188e65",
+        "src/platform/unix.rs": "5ab72b12fd313a2b9a8c41f90560017b371c7538edf669201a33d827971a1f75",
+        "src/platform/windows.rs": "1045798797933f1d5eb2be7c5b9276f694769aff619b0798153501c1fce89e06"
+      },
+      "runtime_PATH": ""
+    }
+  },
+  "rootfs_license_files": 172,
+  "manual_secret_pattern_findings": []
+}

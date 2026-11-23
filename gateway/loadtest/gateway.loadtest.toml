@@ -1,0 +1,33 @@
+# Config used by loadtest/run.py. Keys come from the environment; never inline them.
+listen = "127.0.0.1:8787"
+admin_token = "loadtest-admin"
+max_body_bytes = 33554432
+
+[retry]
+max_retries = 3
+base_ms = 500
+max_ms = 30000
+
+[cache]
+ttl_secs = 0                       # measure the forwarding path, not the cache
+
+[[upstreams]]
+name = "anthropic"
+base_url = "https://api.anthropic.com"
+kind = "anthropic"
+api_key_env = "GATEWAY_ANTHROPIC_KEY"
+max_concurrency = 20
+
+[[upstreams]]
+name = "gemini"
+base_url = "https://generativelanguage.googleapis.com/v1beta/openai"
+kind = "openai"
+api_key_env = "GEMINI_API_KEY"
+max_concurrency = 20
+
+[[upstreams]]
+name = "openai"
+base_url = "https://api.openai.com"
+kind = "openai"
+api_key_env = "OPENAI_API_KEY"
+max_concurrency = 20

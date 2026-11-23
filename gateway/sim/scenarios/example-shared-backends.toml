@@ -1,0 +1,53 @@
+# Not a measured replay. Two servers that can serve the same model, and a
+# workload that is heavy for one of them: the situation the lab saw when one
+# server sat idle for 175 s while the other still had a backlog.
+name = "example-shared-backends"
+description = "The same load with both servers behind one upstream: the gateway sends each request to the server with fewer requests in flight."
+description_ko = "같은 부하를 두 서버가 한 업스트림 뒤에서 함께 받습니다. 게이트웨이가 진행 중인 요청이 적은 서버로 보냅니다."
+max_s = 900
+
+[[phase]]
+name = "load"
+from_s = 0
+to_s = 120
+
+[gateway]
+[[gateway.upstream]]
+name = "pool"
+targets = ["server-a", "server-b"]
+routing = "least_inflight"
+max_concurrency = 4
+
+[[model_server]]
+name = "server-a"
+models = ["small"]
+slots = 1
+tokens_per_s = 23
+prefill_ms = 220
+
+[[model_server]]
+name = "server-b"
+models = ["small"]
+slots = 1
+tokens_per_s = 33
+prefill_ms = 135
+
+[[client]]
+name = "team-a"
+class = "team-a"
+entry = "gateway"
+models = ["small"]
+arrival = { kind = "poisson", rate_per_s = 1.0 }
+to_s = 120
+output_tokens = 40
+
+
+[[client]]
+name = "team-b"
+class = "team-b"
+entry = "gateway"
+models = ["small"]
+arrival = { kind = "poisson", rate_per_s = 0.15 }
+to_s = 120
+output_tokens = 40
+

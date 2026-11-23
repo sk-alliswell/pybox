@@ -1,0 +1,17 @@
+extends = "lab-round2.toml"
+name = "sat-bounded-patient"
+description = "Queue 30 / 12 s with weights; callers retry on 503 and batch is patient."
+description_ko = "대기열 30건 / 12초, 가중치 적용. 호출자는 503을 받으면 재시도하고 배치는 10분까지 기다립니다."
+
+[[client]]
+name = "interactive"
+weight = 4
+[[gateway.upstream]]
+name = "qwen"
+max_queue = 30
+queue_timeout_s = 12
+
+[[gateway.upstream]]
+name = "smol"
+max_queue = 30
+queue_timeout_s = 12

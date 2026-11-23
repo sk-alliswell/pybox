@@ -1,0 +1,38 @@
+# Saturation test (saturate.py), local models only. gateway.sat-smart.toml plus
+# the two guards that came out of its results: batch keeps a small guaranteed
+# share so it is never starved outright, and one slot is held back from batch
+# while interactive work is arriving so the next interactive request does not
+# wait for a long batch answer to finish.
+listen = "127.0.0.1:8787"
+admin_token = "lab-admin"
+
+[obs]
+backend = "memory"
+memory_rows = 100000
+otlp_token = "lab-otlp"
+
+[[upstreams]]
+name = "qwen"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-lab-master"
+max_concurrency = 2
+max_queue = 1000
+overflow = "evict"
+admit_by_wait = true
+strict_priority = true
+min_share = 0.15
+reserve_slots = 1
+
+[[upstreams]]
+name = "smol"
+base_url = "http://127.0.0.1:4000"
+kind = "litellm"
+api_key = "sk-lab-master"
+max_concurrency = 2
+max_queue = 1000
+overflow = "evict"
+admit_by_wait = true
+strict_priority = true
+min_share = 0.15
+reserve_slots = 1

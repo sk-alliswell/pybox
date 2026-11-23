@@ -1,0 +1,33 @@
+# LiteLLM Proxy for the lab: two small local models (llama-cpp-python servers)
+# and three cheap hosted ones. Keys come from the environment.
+model_list:
+  - model_name: qwen-0.5b
+    litellm_params:
+      model: openai/qwen-0.5b
+      api_base: http://127.0.0.1:9201/v1
+      api_key: sk-local
+  - model_name: smollm2-360m
+    litellm_params:
+      model: openai/smollm2-360m
+      api_base: http://127.0.0.1:9202/v1
+      api_key: sk-local
+  - model_name: gemini-flash-lite
+    litellm_params:
+      model: gemini/gemini-2.5-flash-lite
+      api_key: os.environ/GEMINI_API_KEY
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: claude-haiku
+    litellm_params:
+      model: anthropic/claude-haiku-5-5
+      api_key: os.environ/GATEWAY_ANTHROPIC_KEY
+
+litellm_settings:
+  callbacks: ["otel"]   # spans go to the gateway (OTEL_EXPORTER / OTEL_ENDPOINT / OTEL_HEADERS)
+  num_retries: 0        # the gateway owns retries
+  request_timeout: 120
+
+general_settings:
+  master_key: sk-lab-master

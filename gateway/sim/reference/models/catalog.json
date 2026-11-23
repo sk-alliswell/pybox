@@ -1,0 +1,6693 @@
+{
+ "built_from": [
+  "hf.json",
+  "recipes.json",
+  "inferencex.json",
+  "local.json"
+ ],
+ "ms_per_layer": {
+  "dense": 0.08,
+  "moe": 0.1
+ },
+ "recipe_factor": 1.19,
+ "gpus": {
+  "l40s": {
+   "label": "L40S (48GB)",
+   "mem": 48,
+   "bw": 0.864,
+   "price": 1.62,
+   "k": 0.29
+  },
+  "a100": {
+   "label": "A100 (80GB)",
+   "mem": 80,
+   "bw": 2.039,
+   "price": 2.75,
+   "k": 0.58
+  },
+  "h100": {
+   "label": "H100 (80GB)",
+   "mem": 80,
+   "bw": 3.35,
+   "price": 4.2,
+   "k": 1.0
+  },
+  "h200": {
+   "label": "H200 (141GB)",
+   "mem": 141,
+   "bw": 4.8,
+   "price": 5.7,
+   "k": 1.18
+  },
+  "b200": {
+   "label": "B200 (180GB)",
+   "mem": 180,
+   "bw": 8.0,
+   "price": 8.19,
+   "k": 1.65
+  }
+ },
+ "read_ratio": {
+  "dense": 205,
+  "moe": 172
+ },
+ "carry_on": {
+  "2": -0.175,
+  "4": -0.28,
+  "8": -0.269,
+  "16": -0.375,
+  "32": -0.432,
+  "64": -0.472,
+  "128": -0.596,
+  "256": -0.698,
+  "512": -0.877,
+  "1024": -0.877,
+  "2048": -0.877
+ },
+ "models": [
+  {
+   "id": "qwen3.5-9b",
+   "label": "Qwen3.5 9B",
+   "hf": "Qwen/Qwen3.5-9B",
+   "released": "2026-02-27",
+   "downloads_30d": 6514100,
+   "license": "apache-2.0",
+   "params_b": 9.65,
+   "active_b": 9.65,
+   "kind": "dense",
+   "layers": 32,
+   "context": 262144,
+   "weights_gb": 19.3,
+   "need_gb": 22.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 32.0,
+   "kv_note": "a quarter of the layers keep keys and values (measured here on Qwen3.5 0.8B to 9B)",
+   "on": {
+    "l40s": {
+     "gpus": 1,
+     "tps": 40.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 8240,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 20
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 83.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 17061,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 128
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 120.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 24656,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 216
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 151.9,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 31177,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 201.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 41263,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    }
+   },
+   "local": {
+    "file": "Qwen3.5-9B-Q4_K_M.gguf",
+    "file_gb": 5.68,
+    "ram_gb": 6.02,
+    "write_tps": 4.1,
+    "read_tps": 53.7,
+    "kv_kb_per_token": 32.2
+   }
+  },
+  {
+   "id": "gemma-4-12b",
+   "label": "Gemma 4 12B",
+   "hf": "google/gemma-4-12B-it",
+   "released": "2026-05-23",
+   "downloads_30d": 1618896,
+   "license": "apache-2.0",
+   "params_b": 11.96,
+   "active_b": 11.96,
+   "kind": "dense",
+   "layers": 48,
+   "context": 262144,
+   "weights_gb": 23.9,
+   "need_gb": 29.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 384.0,
+   "kv_note": "upper bound: part of the layers keep a short window",
+   "on": {
+    "l40s": {
+     "gpus": 1,
+     "tps": 31.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 6510,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 4
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 64.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 13179,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 83
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 91.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 18690,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 145
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 113.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 23258,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 199
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 146.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 30046,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    }
+   },
+   "local": {
+    "file": "gemma-4-12b-it-qat-q4_0.gguf",
+    "file_gb": 6.98,
+    "ram_gb": 8.7,
+    "write_tps": 4.5,
+    "read_tps": 35.9,
+    "kv_kb_per_token": 359.8
+   }
+  },
+  {
+   "id": "ministral-3-14b",
+   "label": "Ministral 3 14B",
+   "hf": "mistralai/Ministral-3-14B-Instruct-2512",
+   "released": "2025-10-31",
+   "downloads_30d": 207587,
+   "license": "apache-2.0",
+   "params_b": 13.95,
+   "active_b": 13.95,
+   "kind": "dense",
+   "layers": 40,
+   "context": 262144,
+   "weights_gb": 15.7,
+   "need_gb": 17.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 160.0,
+   "kv_note": null,
+   "on": {
+    "l40s": {
+     "gpus": 1,
+     "tps": 46.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 9588,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 29
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 91.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 18805,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 147
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 126.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 25994,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 233
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 154.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 31686,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 193.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 39725,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    }
+   }
+  },
+  {
+   "id": "llama-3.1-8b",
+   "label": "Llama 3.1 8B",
+   "hf": "meta-llama/Llama-3.1-8B-Instruct",
+   "released": "2024-07-18",
+   "downloads_30d": 4149614,
+   "license": "llama3.1",
+   "params_b": 8.03,
+   "active_b": 8.03,
+   "kind": "dense",
+   "layers": 32,
+   "context": null,
+   "weights_gb": 16.1,
+   "need_gb": 20.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 128.0,
+   "kv_note": null,
+   "on": {
+    "l40s": {
+     "gpus": 1,
+     "tps": 47.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 9703,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 30
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 95.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 19663,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 156
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 136.0,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 27904,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 169.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 34747,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 218.9,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 44928,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    }
+   },
+   "local": {
+    "file": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+    "file_gb": 4.92,
+    "ram_gb": 5.38,
+    "write_tps": 4.32,
+    "read_tps": 52.7,
+    "kv_kb_per_token": 128.1
+   }
+  },
+  {
+   "id": "gpt-oss-20b",
+   "label": "gpt-oss 20B",
+   "hf": "openai/gpt-oss-20b",
+   "released": "2025-08-04",
+   "downloads_30d": 5576861,
+   "license": "apache-2.0",
+   "params_b": 20.91,
+   "active_b": 3.6,
+   "kind": "moe",
+   "layers": 24,
+   "context": 131072,
+   "weights_gb": 13.8,
+   "need_gb": 16.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 48.0,
+   "kv_note": "upper bound: part of the layers keep a short window",
+   "on": {
+    "l40s": {
+     "gpus": 1,
+     "tps": 194.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 33456,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 128
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 280.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 48296,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 217
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 321.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 55363,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 345.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 59450,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 370.9,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 63802,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 256
+    }
+   },
+   "local": {
+    "file": "gpt-oss-20b-Q4_K_M.gguf",
+    "file_gb": 11.62,
+    "ram_gb": 11.93,
+    "write_tps": 7.59,
+    "read_tps": 36.1,
+    "kv_kb_per_token": 47.9
+   }
+  },
+  {
+   "id": "qwen3.8-27b",
+   "label": "Qwen3.8 27B",
+   "hf": "Qwen/Qwen3.8-27B-FP8",
+   "released": "2026-08-05",
+   "downloads_30d": 6888351,
+   "license": "apache-2.0",
+   "params_b": 27.78,
+   "active_b": 27.78,
+   "kind": "dense",
+   "layers": 64,
+   "context": 262144,
+   "weights_gb": 30.9,
+   "need_gb": 36.7,
+   "need_src": "computed",
+   "kv_kb_per_token": 64.0,
+   "kv_note": "a quarter of the layers keep keys and values (measured here on Qwen3.5 0.8B to 9B)",
+   "on": {
+    "l40s": {
+     "gpus": 1,
+     "tps": 52.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       16,
+       0.3421
+      ],
+      [
+       32,
+       0.2473
+      ],
+      [
+       48,
+       0.1683
+      ],
+      [
+       64,
+       0.1281
+      ],
+      [
+       128,
+       0.0664
+      ],
+      [
+       256,
+       0.0344
+      ],
+      [
+       512,
+       0.0178
+      ],
+      [
+       1024,
+       0.0092
+      ],
+      [
+       2048,
+       0.0048
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (Microsoft Tech Community, Qwen3.8-27B on one H100 NVL (vLLM, FP8, 2,000-token prompts))",
+     "read": 10803,
+     "first": 40,
+     "seen": 48,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 4
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 106.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       16,
+       0.3421
+      ],
+      [
+       32,
+       0.2473
+      ],
+      [
+       48,
+       0.1683
+      ],
+      [
+       64,
+       0.1281
+      ],
+      [
+       128,
+       0.0664
+      ],
+      [
+       256,
+       0.0344
+      ],
+      [
+       512,
+       0.0178
+      ],
+      [
+       1024,
+       0.0092
+      ],
+      [
+       2048,
+       0.0048
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (Microsoft Tech Community, Qwen3.8-27B on one H100 NVL (vLLM, FP8, 2,000-token prompts))",
+     "read": 21780,
+     "first": 40,
+     "seen": 48,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 24
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 150.0,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       16,
+       0.3421
+      ],
+      [
+       32,
+       0.2473
+      ],
+      [
+       48,
+       0.1683
+      ],
+      [
+       64,
+       0.1281
+      ],
+      [
+       128,
+       0.0664
+      ],
+      [
+       256,
+       0.0344
+      ],
+      [
+       512,
+       0.0178
+      ],
+      [
+       1024,
+       0.0092
+      ],
+      [
+       2048,
+       0.0048
+      ]
+     ],
+     "full": false,
+     "src": "blog",
+     "ref": "Microsoft Tech Community, Qwen3.8-27B on one H100 NVL (vLLM, FP8, 2,000-token prompts)",
+     "read": 30782,
+     "first": 40,
+     "seen": 48,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 40
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 186.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       16,
+       0.3421
+      ],
+      [
+       32,
+       0.2473
+      ],
+      [
+       48,
+       0.1683
+      ],
+      [
+       64,
+       0.1281
+      ],
+      [
+       128,
+       0.0664
+      ],
+      [
+       256,
+       0.0344
+      ],
+      [
+       512,
+       0.0178
+      ],
+      [
+       1024,
+       0.0092
+      ],
+      [
+       2048,
+       0.0048
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (Microsoft Tech Community, Qwen3.8-27B on one H100 NVL (vLLM, FP8, 2,000-token prompts))",
+     "read": 38199,
+     "first": 40,
+     "seen": 48,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 50
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 239.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       16,
+       0.3421
+      ],
+      [
+       32,
+       0.2473
+      ],
+      [
+       48,
+       0.1683
+      ],
+      [
+       64,
+       0.1281
+      ],
+      [
+       128,
+       0.0664
+      ],
+      [
+       256,
+       0.0344
+      ],
+      [
+       512,
+       0.0178
+      ],
+      [
+       1024,
+       0.0092
+      ],
+      [
+       2048,
+       0.0048
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (Microsoft Tech Community, Qwen3.8-27B on one H100 NVL (vLLM, FP8, 2,000-token prompts))",
+     "read": 49143,
+     "first": 40,
+     "seen": 48,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 65
+    }
+   }
+  },
+  {
+   "id": "qwen3.6-35b-a3b",
+   "label": "Qwen3.6 35B-A3B",
+   "hf": "Qwen/Qwen3.6-35B-A3B-FP8",
+   "released": "2026-04-15",
+   "downloads_30d": 3952623,
+   "license": "apache-2.0",
+   "params_b": 35.95,
+   "active_b": 3.0,
+   "kind": "moe",
+   "layers": 40,
+   "context": 262144,
+   "weights_gb": 37.5,
+   "need_gb": 44.6,
+   "need_src": "computed",
+   "kv_kb_per_token": 20.0,
+   "kv_note": "a quarter of the layers keep keys and values (measured here on Qwen3.5 0.8B to 9B)",
+   "on": {
+    "l40s": {
+     "gpus": 1,
+     "tps": 131.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 22583,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 66
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 180.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 31091,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 113
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 202.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 34872,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 136
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 215.0,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 36985,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 148
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 227.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 39178,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 161
+    }
+   }
+  },
+  {
+   "id": "gemma-4-31b",
+   "label": "Gemma 4 31B",
+   "hf": "google/gemma-4-31B-it",
+   "released": "2026-03-11",
+   "downloads_30d": 6264804,
+   "license": "apache-2.0",
+   "params_b": 31.27,
+   "active_b": 31.27,
+   "kind": "dense",
+   "layers": 60,
+   "context": 262144,
+   "weights_gb": 62.5,
+   "need_gb": 75.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 960.0,
+   "kv_note": "upper bound: part of the layers keep a short window",
+   "on": {
+    "l40s": {
+     "gpus": 2,
+     "tps": 24.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 5006,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 2
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 28.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 5785,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 2
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 42.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 8743,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 23
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 56.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 11509,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 66
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 79.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 16263,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 118
+    }
+   }
+  },
+  {
+   "id": "gemma-4-26b-a4b",
+   "label": "Gemma 4 26B-A4B",
+   "hf": "google/gemma-4-26B-A4B-it",
+   "released": "2026-03-11",
+   "downloads_30d": 5022424,
+   "license": "apache-2.0",
+   "params_b": 25.81,
+   "active_b": 3.8,
+   "kind": "moe",
+   "layers": 30,
+   "context": 262144,
+   "weights_gb": 51.6,
+   "need_gb": 64.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 240.0,
+   "kv_note": "upper bound: part of the layers keep a short window",
+   "on": {
+    "l40s": {
+     "gpus": 2,
+     "tps": 135.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 23251,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 69
+    },
+    "a100": {
+     "gpus": 1,
+     "tps": 148.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 25570,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 81
+    },
+    "h100": {
+     "gpus": 1,
+     "tps": 189.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 32649,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 123
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 218.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 37531,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 151
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 253.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 43549,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 187
+    }
+   }
+  },
+  {
+   "id": "nemotron-3.5-30b-a3b",
+   "label": "Nemotron 3.5 Lightning 30B-A3B",
+   "hf": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+   "released": "2026-08-01",
+   "downloads_30d": 974091,
+   "license": "other",
+   "params_b": 31.58,
+   "active_b": 3.0,
+   "kind": "moe",
+   "layers": 52,
+   "context": 262144,
+   "weights_gb": 65.8,
+   "need_gb": 78.3,
+   "need_src": "computed",
+   "kv_kb_per_token": 52.0,
+   "kv_note": null,
+   "on": {
+    "l40s": {
+     "gpus": 2,
+     "tps": 113.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 19505,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 47
+    },
+    "a100": {
+     "gpus": 2,
+     "tps": 148.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 25546,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 81
+    },
+    "h100": {
+     "gpus": 2,
+     "tps": 163.0,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 28046,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 95
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 153.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 26453,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 86
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 167.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 28757,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 99
+    }
+   }
+  },
+  {
+   "id": "llama-3.3-70b",
+   "label": "Llama 3.3 70B",
+   "hf": "meta-llama/Llama-3.3-70B-Instruct",
+   "released": "2024-11-26",
+   "downloads_30d": 344082,
+   "license": "llama3.3",
+   "params_b": 70.55,
+   "active_b": 70.55,
+   "kind": "dense",
+   "layers": 80,
+   "context": null,
+   "weights_gb": 70.6,
+   "need_gb": 84.0,
+   "need_src": "computed",
+   "kv_kb_per_token": 320.0,
+   "kv_note": null,
+   "on": {
+    "l40s": {
+     "gpus": 2,
+     "tps": 21.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.963
+      ],
+      [
+       8,
+       0.9177
+      ],
+      [
+       16,
+       0.8455
+      ],
+      [
+       32,
+       0.7063
+      ],
+      [
+       64,
+       0.5771
+      ],
+      [
+       128,
+       0.3817
+      ],
+      [
+       256,
+       0.2353
+      ],
+      [
+       512,
+       0.1281
+      ],
+      [
+       1024,
+       0.0697
+      ],
+      [
+       2048,
+       0.038
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX Llama-3.3-70B-Instruct-FP8, 2x H100, vllm, fp8, 2025-10-29, 1k prompt / 1k answer)",
+     "read": 4385,
+     "first": 24,
+     "seen": 64,
+     "knee": 2
+    },
+    "a100": {
+     "gpus": 2,
+     "tps": 42.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.963
+      ],
+      [
+       8,
+       0.9177
+      ],
+      [
+       16,
+       0.8455
+      ],
+      [
+       32,
+       0.7063
+      ],
+      [
+       64,
+       0.5771
+      ],
+      [
+       128,
+       0.3817
+      ],
+      [
+       256,
+       0.2353
+      ],
+      [
+       512,
+       0.1281
+      ],
+      [
+       1024,
+       0.0697
+      ],
+      [
+       2048,
+       0.038
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX Llama-3.3-70B-Instruct-FP8, 2x H100, vllm, fp8, 2025-10-29, 1k prompt / 1k answer)",
+     "read": 8738,
+     "first": 24,
+     "seen": 64,
+     "knee": 32
+    },
+    "h100": {
+     "gpus": 2,
+     "tps": 59.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.963
+      ],
+      [
+       8,
+       0.9177
+      ],
+      [
+       16,
+       0.8455
+      ],
+      [
+       32,
+       0.7063
+      ],
+      [
+       64,
+       0.5771
+      ],
+      [
+       128,
+       0.3817
+      ],
+      [
+       256,
+       0.2353
+      ],
+      [
+       512,
+       0.1281
+      ],
+      [
+       1024,
+       0.0697
+      ],
+      [
+       2048,
+       0.038
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX Llama-3.3-70B-Instruct-FP8, 2x H100, vllm, fp8, 2025-10-29, 1k prompt / 1k answer",
+     "read": 12232,
+     "first": 24,
+     "seen": 64,
+     "knee": 80
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 48.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.961
+      ],
+      [
+       8,
+       0.9134
+      ],
+      [
+       16,
+       0.8287
+      ],
+      [
+       32,
+       0.6179
+      ],
+      [
+       64,
+       0.5456
+      ],
+      [
+       128,
+       0.3609
+      ],
+      [
+       256,
+       0.2224
+      ],
+      [
+       512,
+       0.1211
+      ],
+      [
+       1024,
+       0.0659
+      ],
+      [
+       2048,
+       0.0359
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX Llama-3.3-70B-Instruct-FP8, 1x H200, vllm, fp8, 2025-10-29, 1k prompt / 1k answer",
+     "read": 7233,
+     "first": 33,
+     "seen": 64,
+     "knee": 31
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 62.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.9863
+      ],
+      [
+       8,
+       0.9685
+      ],
+      [
+       16,
+       0.9121
+      ],
+      [
+       32,
+       0.8267
+      ],
+      [
+       64,
+       0.6946
+      ],
+      [
+       128,
+       0.4594
+      ],
+      [
+       256,
+       0.2832
+      ],
+      [
+       512,
+       0.1541
+      ],
+      [
+       1024,
+       0.0839
+      ],
+      [
+       2048,
+       0.0457
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX Llama-3.3-70B-Instruct-FP8, 1x B200, vllm, fp8, 2025-10-29, 1k prompt / 1k answer",
+     "read": 13104,
+     "first": 29,
+     "seen": 64,
+     "knee": 117
+    }
+   }
+  },
+  {
+   "id": "gpt-oss-120b",
+   "label": "gpt-oss 120B",
+   "hf": "openai/gpt-oss-120b",
+   "released": "2025-08-04",
+   "downloads_30d": 2417172,
+   "license": "apache-2.0",
+   "params_b": 116.83,
+   "active_b": 5.13,
+   "kind": "moe",
+   "layers": 36,
+   "context": 131072,
+   "weights_gb": 65.2,
+   "need_gb": 96.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 72.0,
+   "kv_note": "upper bound: part of the layers keep a short window",
+   "on": {
+    "l40s": {
+     "gpus": 3,
+     "tps": 197.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.8422
+      ],
+      [
+       8,
+       0.6958
+      ],
+      [
+       16,
+       0.5304
+      ],
+      [
+       32,
+       0.3935
+      ],
+      [
+       64,
+       0.2893
+      ],
+      [
+       128,
+       0.1913
+      ],
+      [
+       256,
+       0.1179
+      ],
+      [
+       512,
+       0.0642
+      ],
+      [
+       1024,
+       0.0349
+      ],
+      [
+       2048,
+       0.019
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX gpt-oss-120b, 2x H100, vllm, fp4, 2026-05-17, 1k prompt / 1k answer)",
+     "read": 33898,
+     "first": 32,
+     "seen": 64,
+     "knee": 177
+    },
+    "a100": {
+     "gpus": 2,
+     "tps": 215.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.8422
+      ],
+      [
+       8,
+       0.6958
+      ],
+      [
+       16,
+       0.5304
+      ],
+      [
+       32,
+       0.3935
+      ],
+      [
+       64,
+       0.2893
+      ],
+      [
+       128,
+       0.1913
+      ],
+      [
+       256,
+       0.1179
+      ],
+      [
+       512,
+       0.0642
+      ],
+      [
+       1024,
+       0.0349
+      ],
+      [
+       2048,
+       0.019
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX gpt-oss-120b, 2x H100, vllm, fp4, 2026-05-17, 1k prompt / 1k answer)",
+     "read": 37072,
+     "first": 32,
+     "seen": 64,
+     "knee": 201
+    },
+    "h100": {
+     "gpus": 2,
+     "tps": 230.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.8422
+      ],
+      [
+       8,
+       0.6958
+      ],
+      [
+       16,
+       0.5304
+      ],
+      [
+       32,
+       0.3935
+      ],
+      [
+       64,
+       0.2893
+      ],
+      [
+       128,
+       0.1913
+      ],
+      [
+       256,
+       0.1179
+      ],
+      [
+       512,
+       0.0642
+      ],
+      [
+       1024,
+       0.0349
+      ],
+      [
+       2048,
+       0.019
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX gpt-oss-120b, 2x H100, vllm, fp4, 2026-05-17, 1k prompt / 1k answer",
+     "read": 39602,
+     "first": 32,
+     "seen": 64,
+     "knee": 221
+    },
+    "h200": {
+     "gpus": 1,
+     "tps": 190.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX gpt-oss-120b, 1x H200, trt, fp4, 2026-05-18, 1k prompt / 1k answer",
+     "read": 7104,
+     "first": 0,
+     "seen": 64,
+     "knee": 123
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 342.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.8432
+      ],
+      [
+       8,
+       0.6974
+      ],
+      [
+       16,
+       0.5174
+      ],
+      [
+       32,
+       0.3971
+      ],
+      [
+       64,
+       0.2954
+      ],
+      [
+       128,
+       0.2299
+      ],
+      [
+       256,
+       0.1417
+      ],
+      [
+       512,
+       0.0772
+      ],
+      [
+       1024,
+       0.042
+      ],
+      [
+       2048,
+       0.0229
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX gpt-oss-120b, 1x B200, vllm, fp4, 2026-05-31, 1k prompt / 1k answer",
+     "read": 90734,
+     "first": 20,
+     "seen": 128,
+     "knee": 442
+    }
+   }
+  },
+  {
+   "id": "nemotron-3-120b-a12b",
+   "label": "Nemotron 3 Super 120B-A12B",
+   "hf": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16",
+   "released": "2026-03-10",
+   "downloads_30d": 881304,
+   "license": "other",
+   "params_b": 123.61,
+   "active_b": 12.0,
+   "kind": "moe",
+   "layers": 88,
+   "context": 262144,
+   "weights_gb": 247.2,
+   "need_gb": 298.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 88.0,
+   "kv_note": null,
+   "on": {
+    "l40s": {
+     "gpus": 7,
+     "tps": 78.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 13472,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 19
+    },
+    "a100": {
+     "gpus": 4,
+     "tps": 85.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 14649,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 23
+    },
+    "h100": {
+     "gpus": 4,
+     "tps": 94.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 16242,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 30
+    },
+    "h200": {
+     "gpus": 3,
+     "tps": 95.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 16435,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 31
+    },
+    "b200": {
+     "gpus": 2,
+     "tps": 97.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.7407
+      ],
+      [
+       8,
+       0.5332
+      ],
+      [
+       16,
+       0.4145
+      ],
+      [
+       32,
+       0.31
+      ],
+      [
+       64,
+       0.2338
+      ],
+      [
+       128,
+       0.1546
+      ],
+      [
+       256,
+       0.0953
+      ],
+      [
+       512,
+       0.0519
+      ],
+      [
+       1024,
+       0.0282
+      ],
+      [
+       2048,
+       0.0154
+      ]
+     ],
+     "src": "estimate",
+     "ref": "bandwidth estimate",
+     "read": 16701,
+     "first": 40,
+     "full": false,
+     "curve_src": "borrowed",
+     "seen": 64,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 32
+    }
+   }
+  },
+  {
+   "id": "qwen3.8-flash-next",
+   "label": "Qwen3.8 Flash Next 176B-A6B",
+   "hf": "Qwen/Qwen3.8-Flash-Next-FP8",
+   "released": "2026-08-24",
+   "downloads_30d": 2968190,
+   "license": "other",
+   "params_b": 180.0,
+   "active_b": 6.0,
+   "kind": "moe",
+   "layers": 48,
+   "context": 262144,
+   "weights_gb": 185.5,
+   "need_gb": 220.7,
+   "need_src": "computed",
+   "kv_kb_per_token": 96.0,
+   "kv_note": null,
+   "on": {
+    "l40s": {
+     "gpus": 5,
+     "tps": 189.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       8,
+       0.7533
+      ],
+      [
+       12,
+       0.6286
+      ],
+      [
+       14,
+       0.5413
+      ],
+      [
+       16,
+       0.4702
+      ],
+      [
+       32,
+       0.2351
+      ],
+      [
+       64,
+       0.1176
+      ],
+      [
+       128,
+       0.0588
+      ],
+      [
+       256,
+       0.0294
+      ],
+      [
+       512,
+       0.0147
+      ],
+      [
+       1024,
+       0.0073
+      ],
+      [
+       2048,
+       0.0037
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H200 (InferenceX Qwen3.8-Flash-Next, 2x H200, sglang, fp8, 2026-11-09, coding-agent traces)",
+     "read": 32537,
+     "first": 40,
+     "seen": 16,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 16
+    },
+    "a100": {
+     "gpus": 3,
+     "tps": 202.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       8,
+       0.7533
+      ],
+      [
+       12,
+       0.6286
+      ],
+      [
+       14,
+       0.5413
+      ],
+      [
+       16,
+       0.4702
+      ],
+      [
+       32,
+       0.2351
+      ],
+      [
+       64,
+       0.1176
+      ],
+      [
+       128,
+       0.0588
+      ],
+      [
+       256,
+       0.0294
+      ],
+      [
+       512,
+       0.0147
+      ],
+      [
+       1024,
+       0.0073
+      ],
+      [
+       2048,
+       0.0037
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H200 (InferenceX Qwen3.8-Flash-Next, 2x H200, sglang, fp8, 2026-11-09, coding-agent traces)",
+     "read": 34891,
+     "first": 40,
+     "seen": 16,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 16
+    },
+    "h100": {
+     "gpus": 3,
+     "tps": 217.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       8,
+       0.7533
+      ],
+      [
+       12,
+       0.6286
+      ],
+      [
+       14,
+       0.5413
+      ],
+      [
+       16,
+       0.4702
+      ],
+      [
+       32,
+       0.2351
+      ],
+      [
+       64,
+       0.1176
+      ],
+      [
+       128,
+       0.0588
+      ],
+      [
+       256,
+       0.0294
+      ],
+      [
+       512,
+       0.0147
+      ],
+      [
+       1024,
+       0.0073
+      ],
+      [
+       2048,
+       0.0037
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H200 (InferenceX Qwen3.8-Flash-Next, 2x H200, sglang, fp8, 2026-11-09, coding-agent traces)",
+     "read": 37440,
+     "first": 40,
+     "seen": 16,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 16
+    },
+    "h200": {
+     "gpus": 2,
+     "tps": 216.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       8,
+       0.7533
+      ],
+      [
+       12,
+       0.6286
+      ],
+      [
+       14,
+       0.5413
+      ],
+      [
+       16,
+       0.4702
+      ],
+      [
+       32,
+       0.2351
+      ],
+      [
+       64,
+       0.1176
+      ],
+      [
+       128,
+       0.0588
+      ],
+      [
+       256,
+       0.0294
+      ],
+      [
+       512,
+       0.0147
+      ],
+      [
+       1024,
+       0.0073
+      ],
+      [
+       2048,
+       0.0037
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX Qwen3.8-Flash-Next, 2x H200, sglang, fp8, 2026-11-09, coding-agent traces",
+     "read": 37242,
+     "first": 40,
+     "seen": 16,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 16
+    },
+    "b200": {
+     "gpus": 1,
+     "tps": 309.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       8,
+       0.7407
+      ],
+      [
+       16,
+       0.5124
+      ],
+      [
+       24,
+       0.3723
+      ],
+      [
+       32,
+       0.2858
+      ],
+      [
+       64,
+       0.1511
+      ],
+      [
+       128,
+       0.0799
+      ],
+      [
+       256,
+       0.0422
+      ],
+      [
+       512,
+       0.0223
+      ],
+      [
+       1024,
+       0.0118
+      ],
+      [
+       2048,
+       0.0062
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX Qwen3.8-Flash-Next, 1x B200, sglang, fp4, 2026-11-07, coding-agent traces",
+     "read": 53272,
+     "first": 40,
+     "seen": 32,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 32
+    }
+   }
+  },
+  {
+   "id": "minimax-m3.1-flash",
+   "label": "MiniMax M3.1 Flash",
+   "hf": "MiniMaxAI/MiniMax-M3.1-Flash",
+   "released": "2026-10-17",
+   "downloads_30d": 68769,
+   "license": "other",
+   "params_b": 220.49,
+   "active_b": null,
+   "kind": "moe",
+   "layers": 60,
+   "context": 1048576,
+   "weights_gb": 250.1,
+   "need_gb": 297.6,
+   "need_src": "computed",
+   "kv_kb_per_token": 120.0,
+   "kv_note": null,
+   "on": {
+    "l40s": {
+     "gpus": 7,
+     "tps": 88.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9811
+      ],
+      [
+       4,
+       0.9263
+      ],
+      [
+       6,
+       0.8334
+      ],
+      [
+       8,
+       0.6954
+      ],
+      [
+       10,
+       0.5666
+      ],
+      [
+       12,
+       0.4198
+      ],
+      [
+       16,
+       0.3149
+      ],
+      [
+       32,
+       0.1574
+      ],
+      [
+       64,
+       0.0787
+      ],
+      [
+       128,
+       0.0394
+      ],
+      [
+       256,
+       0.0197
+      ],
+      [
+       512,
+       0.0098
+      ],
+      [
+       1024,
+       0.0049
+      ],
+      [
+       2048,
+       0.0025
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX MiniMax-M3.1-Flash, 8x H100, vllm, fp4, 2026-10-23, coding-agent traces)",
+     "read": 15264,
+     "first": 40,
+     "seen": 12,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 12
+    },
+    "a100": {
+     "gpus": 4,
+     "tps": 150.0,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9811
+      ],
+      [
+       4,
+       0.9263
+      ],
+      [
+       6,
+       0.8334
+      ],
+      [
+       8,
+       0.6954
+      ],
+      [
+       10,
+       0.5666
+      ],
+      [
+       12,
+       0.4198
+      ],
+      [
+       16,
+       0.3149
+      ],
+      [
+       32,
+       0.1574
+      ],
+      [
+       64,
+       0.0787
+      ],
+      [
+       128,
+       0.0394
+      ],
+      [
+       256,
+       0.0197
+      ],
+      [
+       512,
+       0.0098
+      ],
+      [
+       1024,
+       0.0049
+      ],
+      [
+       2048,
+       0.0025
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX MiniMax-M3.1-Flash, 8x H100, vllm, fp4, 2026-10-23, coding-agent traces)",
+     "read": 25810,
+     "first": 40,
+     "seen": 12,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 12
+    },
+    "h100": {
+     "gpus": 8,
+     "tps": 317.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9811
+      ],
+      [
+       4,
+       0.9263
+      ],
+      [
+       6,
+       0.8334
+      ],
+      [
+       8,
+       0.6954
+      ],
+      [
+       10,
+       0.5666
+      ],
+      [
+       12,
+       0.4198
+      ],
+      [
+       16,
+       0.3149
+      ],
+      [
+       32,
+       0.1574
+      ],
+      [
+       64,
+       0.0787
+      ],
+      [
+       128,
+       0.0394
+      ],
+      [
+       256,
+       0.0197
+      ],
+      [
+       512,
+       0.0098
+      ],
+      [
+       1024,
+       0.0049
+      ],
+      [
+       2048,
+       0.0025
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX MiniMax-M3.1-Flash, 8x H100, vllm, fp4, 2026-10-23, coding-agent traces",
+     "read": 54615,
+     "first": 40,
+     "seen": 12,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 12
+    },
+    "h200": {
+     "gpus": 8,
+     "tps": 378.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       1.0
+      ],
+      [
+       4,
+       0.9496
+      ],
+      [
+       8,
+       0.7833
+      ],
+      [
+       12,
+       0.7096
+      ],
+      [
+       16,
+       0.5354
+      ],
+      [
+       20,
+       0.3904
+      ],
+      [
+       24,
+       0.288
+      ],
+      [
+       32,
+       0.216
+      ],
+      [
+       64,
+       0.108
+      ],
+      [
+       128,
+       0.054
+      ],
+      [
+       256,
+       0.027
+      ],
+      [
+       512,
+       0.0135
+      ],
+      [
+       1024,
+       0.0068
+      ],
+      [
+       2048,
+       0.0034
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX MiniMax-M3.1-Flash, 8x H200, vllm, fp4, 2026-11-18, coding-agent traces",
+     "read": 65160,
+     "first": 40,
+     "seen": 24,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 24
+    },
+    "b200": {
+     "gpus": 4,
+     "tps": 537.6,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.9842
+      ],
+      [
+       8,
+       0.8858
+      ],
+      [
+       16,
+       0.7623
+      ],
+      [
+       24,
+       0.6159
+      ],
+      [
+       32,
+       0.5456
+      ],
+      [
+       40,
+       0.471
+      ],
+      [
+       48,
+       0.4079
+      ],
+      [
+       56,
+       0.3218
+      ],
+      [
+       64,
+       0.2816
+      ],
+      [
+       128,
+       0.1408
+      ],
+      [
+       256,
+       0.0704
+      ],
+      [
+       512,
+       0.0352
+      ],
+      [
+       1024,
+       0.0176
+      ],
+      [
+       2048,
+       0.0088
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX MiniMax-M3.1-Flash, 4x B200, vllm, fp4, 2026-10-25, coding-agent traces",
+     "read": 92476,
+     "first": 40,
+     "seen": 56,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 56
+    }
+   }
+  },
+  {
+   "id": "glm-5.3-flash",
+   "label": "GLM-5.3 Flash",
+   "hf": "zai-org/GLM-5.3-Flash",
+   "released": "2026-08-25",
+   "downloads_30d": 6378401,
+   "license": "mit",
+   "params_b": 321.32,
+   "active_b": null,
+   "kind": "moe",
+   "layers": 45,
+   "context": 1048576,
+   "weights_gb": 328.3,
+   "need_gb": 386.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 50.6,
+   "kv_note": "latent attention",
+   "on": {
+    "l40s": {
+     "gpus": 9,
+     "tps": 81.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9789
+      ],
+      [
+       4,
+       0.9367
+      ],
+      [
+       6,
+       0.8768
+      ],
+      [
+       8,
+       0.7629
+      ],
+      [
+       10,
+       0.6966
+      ],
+      [
+       16,
+       0.5507
+      ],
+      [
+       32,
+       0.3894
+      ],
+      [
+       64,
+       0.2754
+      ],
+      [
+       128,
+       0.1821
+      ],
+      [
+       256,
+       0.1123
+      ],
+      [
+       512,
+       0.0611
+      ],
+      [
+       1024,
+       0.0333
+      ],
+      [
+       2048,
+       0.0181
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX GLM-5.3-Flash, 8x H100, sglang, fp8, 2026-11-06, coding-agent traces)",
+     "read": 14013,
+     "first": 40,
+     "fits": false,
+     "seen": 10,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 10
+    },
+    "a100": {
+     "gpus": 6,
+     "tps": 144.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9789
+      ],
+      [
+       4,
+       0.9367
+      ],
+      [
+       6,
+       0.8768
+      ],
+      [
+       8,
+       0.7629
+      ],
+      [
+       10,
+       0.6966
+      ],
+      [
+       16,
+       0.5507
+      ],
+      [
+       32,
+       0.3894
+      ],
+      [
+       64,
+       0.2754
+      ],
+      [
+       128,
+       0.1821
+      ],
+      [
+       256,
+       0.1123
+      ],
+      [
+       512,
+       0.0611
+      ],
+      [
+       1024,
+       0.0333
+      ],
+      [
+       2048,
+       0.0181
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX GLM-5.3-Flash, 8x H100, sglang, fp8, 2026-11-06, coding-agent traces)",
+     "read": 24816,
+     "first": 40,
+     "seen": 10,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 10
+    },
+    "h100": {
+     "gpus": 8,
+     "tps": 270.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9789
+      ],
+      [
+       4,
+       0.9367
+      ],
+      [
+       6,
+       0.8768
+      ],
+      [
+       8,
+       0.7629
+      ],
+      [
+       10,
+       0.6966
+      ],
+      [
+       16,
+       0.5507
+      ],
+      [
+       32,
+       0.3894
+      ],
+      [
+       64,
+       0.2754
+      ],
+      [
+       128,
+       0.1821
+      ],
+      [
+       256,
+       0.1123
+      ],
+      [
+       512,
+       0.0611
+      ],
+      [
+       1024,
+       0.0333
+      ],
+      [
+       2048,
+       0.0181
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX GLM-5.3-Flash, 8x H100, sglang, fp8, 2026-11-06, coding-agent traces",
+     "read": 46496,
+     "first": 40,
+     "seen": 10,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 10
+    },
+    "h200": {
+     "gpus": 8,
+     "tps": 301.7,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9779
+      ],
+      [
+       4,
+       0.9364
+      ],
+      [
+       8,
+       0.7873
+      ],
+      [
+       10,
+       0.719
+      ],
+      [
+       12,
+       0.7084
+      ],
+      [
+       14,
+       0.6388
+      ],
+      [
+       16,
+       0.5639
+      ],
+      [
+       20,
+       0.5188
+      ],
+      [
+       24,
+       0.4624
+      ],
+      [
+       28,
+       0.3974
+      ],
+      [
+       32,
+       0.352
+      ],
+      [
+       64,
+       0.1875
+      ],
+      [
+       128,
+       0.0999
+      ],
+      [
+       256,
+       0.0532
+      ],
+      [
+       512,
+       0.0283
+      ],
+      [
+       1024,
+       0.0151
+      ],
+      [
+       2048,
+       0.008
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX GLM-5.3-Flash, 8x H200, sglang, fp8, 2026-11-06, coding-agent traces",
+     "read": 51893,
+     "first": 40,
+     "seen": 32,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 32
+    },
+    "b200": {
+     "gpus": 8,
+     "tps": 448.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.9868
+      ],
+      [
+       8,
+       0.8448
+      ],
+      [
+       16,
+       0.717
+      ],
+      [
+       24,
+       0.6144
+      ],
+      [
+       32,
+       0.5386
+      ],
+      [
+       40,
+       0.4579
+      ],
+      [
+       48,
+       0.3787
+      ],
+      [
+       64,
+       0.284
+      ],
+      [
+       128,
+       0.142
+      ],
+      [
+       256,
+       0.071
+      ],
+      [
+       512,
+       0.0355
+      ],
+      [
+       1024,
+       0.0178
+      ],
+      [
+       2048,
+       0.0089
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX GLM-5.3-Flash, 8x B200, sglang, fp8, 2026-11-06, coding-agent traces",
+     "read": 77132,
+     "first": 40,
+     "seen": 48,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 48
+    }
+   }
+  },
+  {
+   "id": "qwen3.5-397b-a17b",
+   "label": "Qwen3.5 397B-A17B",
+   "hf": "Qwen/Qwen3.5-397B-A17B-FP8",
+   "released": "2026-02-16",
+   "downloads_30d": 708573,
+   "license": "apache-2.0",
+   "params_b": 403.4,
+   "active_b": 17.0,
+   "kind": "moe",
+   "layers": 60,
+   "context": 262144,
+   "weights_gb": 406.1,
+   "need_gb": 483.2,
+   "need_src": "computed",
+   "kv_kb_per_token": 30.0,
+   "kv_note": "a quarter of the layers keep keys and values (measured here on Qwen3.5 0.8B to 9B)",
+   "on": {
+    "l40s": {
+     "gpus": 11,
+     "tps": 133.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.958
+      ],
+      [
+       4,
+       0.7863
+      ],
+      [
+       8,
+       0.6323
+      ],
+      [
+       16,
+       0.4471
+      ],
+      [
+       32,
+       0.3162
+      ],
+      [
+       64,
+       0.2236
+      ],
+      [
+       128,
+       0.1479
+      ],
+      [
+       256,
+       0.0911
+      ],
+      [
+       512,
+       0.0496
+      ],
+      [
+       1024,
+       0.027
+      ],
+      [
+       2048,
+       0.0147
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX Qwen-3.5-397B-A17B, 8x H100, sglang, fp8, 2026-07-05, 1k prompt / 1k answer)",
+     "read": 24499,
+     "first": 259,
+     "fits": false,
+     "seen": 8,
+     "knee": 32
+    },
+    "a100": {
+     "gpus": 7,
+     "tps": 145.0,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.958
+      ],
+      [
+       4,
+       0.7863
+      ],
+      [
+       8,
+       0.6323
+      ],
+      [
+       16,
+       0.4471
+      ],
+      [
+       32,
+       0.3162
+      ],
+      [
+       64,
+       0.2236
+      ],
+      [
+       128,
+       0.1479
+      ],
+      [
+       256,
+       0.0911
+      ],
+      [
+       512,
+       0.0496
+      ],
+      [
+       1024,
+       0.027
+      ],
+      [
+       2048,
+       0.0147
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX Qwen-3.5-397B-A17B, 8x H100, sglang, fp8, 2026-07-05, 1k prompt / 1k answer)",
+     "read": 26546,
+     "first": 259,
+     "seen": 8,
+     "knee": 32
+    },
+    "h100": {
+     "gpus": 8,
+     "tps": 157.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.958
+      ],
+      [
+       4,
+       0.7863
+      ],
+      [
+       8,
+       0.6323
+      ],
+      [
+       16,
+       0.4471
+      ],
+      [
+       32,
+       0.3162
+      ],
+      [
+       64,
+       0.2236
+      ],
+      [
+       128,
+       0.1479
+      ],
+      [
+       256,
+       0.0911
+      ],
+      [
+       512,
+       0.0496
+      ],
+      [
+       1024,
+       0.027
+      ],
+      [
+       2048,
+       0.0147
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX Qwen-3.5-397B-A17B, 8x H100, sglang, fp8, 2026-07-05, 1k prompt / 1k answer",
+     "read": 28787,
+     "first": 259,
+     "seen": 8,
+     "knee": 32
+    },
+    "h200": {
+     "gpus": 8,
+     "tps": 469.5,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       1.0
+      ],
+      [
+       4,
+       1.0
+      ],
+      [
+       8,
+       0.8875
+      ],
+      [
+       10,
+       0.7122
+      ],
+      [
+       12,
+       0.7122
+      ],
+      [
+       16,
+       0.4863
+      ],
+      [
+       20,
+       0.4863
+      ],
+      [
+       24,
+       0.4863
+      ],
+      [
+       32,
+       0.393
+      ],
+      [
+       48,
+       0.1666
+      ],
+      [
+       64,
+       0.1249
+      ],
+      [
+       128,
+       0.0625
+      ],
+      [
+       256,
+       0.0312
+      ],
+      [
+       512,
+       0.0156
+      ],
+      [
+       1024,
+       0.0078
+      ],
+      [
+       2048,
+       0.0039
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX Qwen-3.5-397B-A17B, 8x H200, sglang, fp8, 2026-10-28, coding-agent traces",
+     "read": 80762,
+     "first": 40,
+     "seen": 48,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 48
+    },
+    "b200": {
+     "gpus": 4,
+     "tps": 172.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.8223
+      ],
+      [
+       8,
+       0.6648
+      ],
+      [
+       16,
+       0.498
+      ],
+      [
+       32,
+       0.3929
+      ],
+      [
+       64,
+       0.3068
+      ],
+      [
+       128,
+       0.2307
+      ],
+      [
+       256,
+       0.1778
+      ],
+      [
+       512,
+       0.0968
+      ],
+      [
+       1024,
+       0.0527
+      ],
+      [
+       2048,
+       0.0287
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX Qwen-3.5-397B-A17B, 4x B200, sglang, fp8, 2026-07-05, 1k prompt / 1k answer",
+     "read": 29599,
+     "first": 40,
+     "seen": 256,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 261
+    }
+   }
+  },
+  {
+   "id": "minimax-m3",
+   "label": "MiniMax M3 427B",
+   "hf": "MiniMaxAI/MiniMax-M3-MXFP8",
+   "released": "2026-06-02",
+   "downloads_30d": 118992,
+   "license": "other",
+   "params_b": 427.04,
+   "active_b": 23.0,
+   "kind": "moe",
+   "layers": 60,
+   "context": 1048576,
+   "weights_gb": 430.5,
+   "need_gb": 512.3,
+   "need_src": "computed",
+   "kv_kb_per_token": 120.0,
+   "kv_note": null,
+   "on": {
+    "l40s": {
+     "gpus": 12,
+     "tps": 120.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9307
+      ],
+      [
+       4,
+       0.7712
+      ],
+      [
+       8,
+       0.611
+      ],
+      [
+       16,
+       0.4605
+      ],
+      [
+       32,
+       0.2323
+      ],
+      [
+       64,
+       0.2323
+      ],
+      [
+       128,
+       0.1748
+      ],
+      [
+       256,
+       0.1077
+      ],
+      [
+       512,
+       0.0586
+      ],
+      [
+       1024,
+       0.0319
+      ],
+      [
+       2048,
+       0.0174
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX MiniMax-M3, 8x H100, vllm, fp8, 2026-06-15, 1k prompt / 1k answer)",
+     "read": 6072,
+     "first": 0,
+     "fits": false,
+     "seen": 128,
+     "knee": 29
+    },
+    "a100": {
+     "gpus": 7,
+     "tps": 129.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9307
+      ],
+      [
+       4,
+       0.7712
+      ],
+      [
+       8,
+       0.611
+      ],
+      [
+       16,
+       0.4605
+      ],
+      [
+       32,
+       0.2323
+      ],
+      [
+       64,
+       0.2323
+      ],
+      [
+       128,
+       0.1748
+      ],
+      [
+       256,
+       0.1077
+      ],
+      [
+       512,
+       0.0586
+      ],
+      [
+       1024,
+       0.0319
+      ],
+      [
+       2048,
+       0.0174
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX MiniMax-M3, 8x H100, vllm, fp8, 2026-06-15, 1k prompt / 1k answer)",
+     "read": 6559,
+     "first": 0,
+     "seen": 128,
+     "knee": 64
+    },
+    "h100": {
+     "gpus": 8,
+     "tps": 144.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9307
+      ],
+      [
+       4,
+       0.7712
+      ],
+      [
+       8,
+       0.611
+      ],
+      [
+       16,
+       0.4605
+      ],
+      [
+       32,
+       0.2323
+      ],
+      [
+       64,
+       0.2323
+      ],
+      [
+       128,
+       0.1748
+      ],
+      [
+       256,
+       0.1077
+      ],
+      [
+       512,
+       0.0586
+      ],
+      [
+       1024,
+       0.0319
+      ],
+      [
+       2048,
+       0.0174
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX MiniMax-M3, 8x H100, vllm, fp8, 2026-06-15, 1k prompt / 1k answer",
+     "read": 7285,
+     "first": 0,
+     "seen": 128,
+     "knee": 83
+    },
+    "h200": {
+     "gpus": 4,
+     "tps": 139.9,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.8899
+      ],
+      [
+       4,
+       0.7355
+      ],
+      [
+       8,
+       0.5718
+      ],
+      [
+       16,
+       0.4196
+      ],
+      [
+       32,
+       0.3109
+      ],
+      [
+       64,
+       0.2087
+      ],
+      [
+       128,
+       0.1381
+      ],
+      [
+       256,
+       0.0851
+      ],
+      [
+       512,
+       0.0463
+      ],
+      [
+       1024,
+       0.0252
+      ],
+      [
+       2048,
+       0.0137
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX MiniMax-M3, 4x H200, vllm, fp8, 2026-06-15, 1k prompt / 1k answer",
+     "read": 15154,
+     "first": 53,
+     "seen": 64,
+     "knee": 61
+    },
+    "b200": {
+     "gpus": 4,
+     "tps": 174.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.818
+      ],
+      [
+       4,
+       0.7342
+      ],
+      [
+       8,
+       0.6722
+      ],
+      [
+       16,
+       0.5178
+      ],
+      [
+       32,
+       0.3927
+      ],
+      [
+       64,
+       0.2916
+      ],
+      [
+       128,
+       0.1929
+      ],
+      [
+       256,
+       0.1189
+      ],
+      [
+       512,
+       0.0647
+      ],
+      [
+       1024,
+       0.0352
+      ],
+      [
+       2048,
+       0.0192
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX MiniMax-M3, 4x B200, vllm, fp8, 2026-06-23, 1k prompt / 1k answer",
+     "read": 53096,
+     "first": 32,
+     "seen": 64,
+     "knee": 150
+    }
+   }
+  },
+  {
+   "id": "deepseek-v4.1-flash",
+   "label": "DeepSeek V4.1 Flash",
+   "hf": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+   "released": "2026-10-17",
+   "downloads_30d": 492972,
+   "license": "mit",
+   "params_b": 552.0,
+   "active_b": 16.0,
+   "kind": "moe",
+   "layers": 40,
+   "context": 1048576,
+   "weights_gb": 510.3,
+   "need_gb": 614.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 80.0,
+   "kv_note": "upper bound: part of the layers keep a short window",
+   "on": {
+    "l40s": {
+     "gpus": 14,
+     "tps": 315.8,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       1.0
+      ],
+      [
+       4,
+       0.9616
+      ],
+      [
+       8,
+       0.7461
+      ],
+      [
+       16,
+       0.5702
+      ],
+      [
+       20,
+       0.4758
+      ],
+      [
+       24,
+       0.4121
+      ],
+      [
+       28,
+       0.3229
+      ],
+      [
+       32,
+       0.2826
+      ],
+      [
+       64,
+       0.1413
+      ],
+      [
+       128,
+       0.0706
+      ],
+      [
+       256,
+       0.0353
+      ],
+      [
+       512,
+       0.0177
+      ],
+      [
+       1024,
+       0.0088
+      ],
+      [
+       2048,
+       0.0044
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX DeepSeek-V4.1-Flash, 8x H100, vllm, fp4, 2026-11-06, coding-agent traces)",
+     "read": 54316,
+     "first": 40,
+     "fits": false,
+     "seen": 28,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 28
+    },
+    "a100": {
+     "gpus": 9,
+     "tps": 343.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       1.0
+      ],
+      [
+       4,
+       0.9616
+      ],
+      [
+       8,
+       0.7461
+      ],
+      [
+       16,
+       0.5702
+      ],
+      [
+       20,
+       0.4758
+      ],
+      [
+       24,
+       0.4121
+      ],
+      [
+       28,
+       0.3229
+      ],
+      [
+       32,
+       0.2826
+      ],
+      [
+       64,
+       0.1413
+      ],
+      [
+       128,
+       0.0706
+      ],
+      [
+       256,
+       0.0353
+      ],
+      [
+       512,
+       0.0177
+      ],
+      [
+       1024,
+       0.0088
+      ],
+      [
+       2048,
+       0.0044
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H100 (InferenceX DeepSeek-V4.1-Flash, 8x H100, vllm, fp4, 2026-11-06, coding-agent traces)",
+     "read": 59027,
+     "first": 40,
+     "fits": false,
+     "seen": 28,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 28
+    },
+    "h100": {
+     "gpus": 8,
+     "tps": 362.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       1.0
+      ],
+      [
+       4,
+       0.9616
+      ],
+      [
+       8,
+       0.7461
+      ],
+      [
+       16,
+       0.5702
+      ],
+      [
+       20,
+       0.4758
+      ],
+      [
+       24,
+       0.4121
+      ],
+      [
+       28,
+       0.3229
+      ],
+      [
+       32,
+       0.2826
+      ],
+      [
+       64,
+       0.1413
+      ],
+      [
+       128,
+       0.0706
+      ],
+      [
+       256,
+       0.0353
+      ],
+      [
+       512,
+       0.0177
+      ],
+      [
+       1024,
+       0.0088
+      ],
+      [
+       2048,
+       0.0044
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX DeepSeek-V4.1-Flash, 8x H100, vllm, fp4, 2026-11-06, coding-agent traces",
+     "read": 62322,
+     "first": 40,
+     "seen": 28,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 28
+    },
+    "h200": {
+     "gpus": 8,
+     "tps": 375.9,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9816
+      ],
+      [
+       4,
+       0.971
+      ],
+      [
+       8,
+       0.7872
+      ],
+      [
+       16,
+       0.5722
+      ],
+      [
+       32,
+       0.3802
+      ],
+      [
+       64,
+       0.1607
+      ],
+      [
+       128,
+       0.0625
+      ],
+      [
+       256,
+       0.0313
+      ],
+      [
+       512,
+       0.0156
+      ],
+      [
+       1024,
+       0.0078
+      ],
+      [
+       2048,
+       0.0039
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX DeepSeek-V4.1-Flash, 8x H200, vllm, fp4, 2026-11-09, coding-agent traces",
+     "read": 64661,
+     "first": 40,
+     "seen": 128,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 106
+    },
+    "b200": {
+     "gpus": 4,
+     "tps": 677.9,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       4,
+       0.9336
+      ],
+      [
+       10,
+       0.8241
+      ],
+      [
+       16,
+       0.7092
+      ],
+      [
+       24,
+       0.6147
+      ],
+      [
+       66,
+       0.4042
+      ],
+      [
+       128,
+       0.2723
+      ],
+      [
+       256,
+       0.1678
+      ],
+      [
+       512,
+       0.0914
+      ],
+      [
+       1024,
+       0.0497
+      ],
+      [
+       2048,
+       0.0271
+      ]
+     ],
+     "full": false,
+     "src": "agentic",
+     "ref": "InferenceX DeepSeek-V4.1-Flash, 4x B200, vllm, fp4, 2026-11-05, coding-agent traces",
+     "read": 116613,
+     "first": 40,
+     "seen": 66,
+     "read_src": "ratio",
+     "first_src": "assumed",
+     "knee": 66
+    }
+   }
+  },
+  {
+   "id": "deepseek-v4-pro",
+   "label": "DeepSeek V4 Pro",
+   "hf": "deepseek-ai/DeepSeek-V4-Pro-0813",
+   "released": "2026-08-13",
+   "downloads_30d": 44421,
+   "license": "mit",
+   "params_b": 1600.0,
+   "active_b": 49.0,
+   "kind": "moe",
+   "layers": 61,
+   "context": 1048576,
+   "weights_gb": 892.7,
+   "need_gb": 960.0,
+   "need_src": "recipe",
+   "kv_kb_per_token": 122.0,
+   "kv_note": "upper bound: part of the layers keep a short window",
+   "on": {
+    "l40s": {
+     "gpus": 22,
+     "tps": 82.4,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.92
+      ],
+      [
+       4,
+       0.7741
+      ],
+      [
+       8,
+       0.6173
+      ],
+      [
+       16,
+       0.4353
+      ],
+      [
+       32,
+       0.3443
+      ],
+      [
+       64,
+       0.227
+      ],
+      [
+       128,
+       0.1086
+      ],
+      [
+       256,
+       0.0746
+      ],
+      [
+       512,
+       0.0406
+      ],
+      [
+       1024,
+       0.0221
+      ],
+      [
+       2048,
+       0.012
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H200 (InferenceX DeepSeek-V4-Pro, 8x H200, vllm, fp8, 2026-07-14, 1k prompt / 1k answer)",
+     "read": 2399,
+     "first": 51,
+     "fits": false,
+     "seen": 256,
+     "knee": 27
+    },
+    "a100": {
+     "gpus": 13,
+     "tps": 87.1,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.92
+      ],
+      [
+       4,
+       0.7741
+      ],
+      [
+       8,
+       0.6173
+      ],
+      [
+       16,
+       0.4353
+      ],
+      [
+       32,
+       0.3443
+      ],
+      [
+       64,
+       0.227
+      ],
+      [
+       128,
+       0.1086
+      ],
+      [
+       256,
+       0.0746
+      ],
+      [
+       512,
+       0.0406
+      ],
+      [
+       1024,
+       0.0221
+      ],
+      [
+       2048,
+       0.012
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H200 (InferenceX DeepSeek-V4-Pro, 8x H200, vllm, fp8, 2026-07-14, 1k prompt / 1k answer)",
+     "read": 2536,
+     "first": 51,
+     "fits": false,
+     "seen": 256,
+     "knee": 31
+    },
+    "h100": {
+     "gpus": 13,
+     "tps": 92.3,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.92
+      ],
+      [
+       4,
+       0.7741
+      ],
+      [
+       8,
+       0.6173
+      ],
+      [
+       16,
+       0.4353
+      ],
+      [
+       32,
+       0.3443
+      ],
+      [
+       64,
+       0.227
+      ],
+      [
+       128,
+       0.1086
+      ],
+      [
+       256,
+       0.0746
+      ],
+      [
+       512,
+       0.0406
+      ],
+      [
+       1024,
+       0.0221
+      ],
+      [
+       2048,
+       0.012
+      ]
+     ],
+     "full": false,
+     "src": "scaled",
+     "ref": "from H200 (InferenceX DeepSeek-V4-Pro, 8x H200, vllm, fp8, 2026-07-14, 1k prompt / 1k answer)",
+     "read": 2688,
+     "first": 51,
+     "fits": false,
+     "seen": 256,
+     "knee": 35
+    },
+    "h200": {
+     "gpus": 8,
+     "tps": 91.2,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.92
+      ],
+      [
+       4,
+       0.7741
+      ],
+      [
+       8,
+       0.6173
+      ],
+      [
+       16,
+       0.4353
+      ],
+      [
+       32,
+       0.3443
+      ],
+      [
+       64,
+       0.227
+      ],
+      [
+       128,
+       0.1086
+      ],
+      [
+       256,
+       0.0746
+      ],
+      [
+       512,
+       0.0406
+      ],
+      [
+       1024,
+       0.0221
+      ],
+      [
+       2048,
+       0.012
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX DeepSeek-V4-Pro, 8x H200, vllm, fp8, 2026-07-14, 1k prompt / 1k answer",
+     "read": 2655,
+     "first": 51,
+     "seen": 256,
+     "knee": 34
+    },
+    "b200": {
+     "gpus": 8,
+     "tps": 96.0,
+     "curve": [
+      [
+       1,
+       1.0
+      ],
+      [
+       2,
+       0.9771
+      ],
+      [
+       4,
+       0.8865
+      ],
+      [
+       8,
+       0.8052
+      ],
+      [
+       16,
+       0.7073
+      ],
+      [
+       32,
+       0.5302
+      ],
+      [
+       64,
+       0.4281
+      ],
+      [
+       128,
+       0.2832
+      ],
+      [
+       256,
+       0.1745
+      ],
+      [
+       512,
+       0.095
+      ],
+      [
+       1024,
+       0.0517
+      ],
+      [
+       2048,
+       0.0282
+      ]
+     ],
+     "full": false,
+     "src": "public",
+     "ref": "InferenceX DeepSeek-V4-Pro, 8x B200, vllm, fp4, 2026-07-12, 1k prompt / 1k answer",
+     "read": 35840,
+     "first": 48,
+     "seen": 64,
+     "knee": 108
+    }
+   }
+  }
+ ]
+}

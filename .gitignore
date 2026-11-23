@@ -1,0 +1,16 @@
+/target/
+/runtime/
+/dist/
+/runs/
+/verification/
+**/__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+/cache/
+/state/
+*.log
+/gateway/target/
+/gateway/tdb-backend/target/
+/gateway/demo/data/

@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ROI 대시보드</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --raise: #222220; --border: rgba(255,255,255,.10); --grid: #2c2c2a; --axis: #383835;
+  --text: #f0efec; --text2: #c3c2b7; --muted: #898781;
+  --s1: #3987e5; --s2: #d95926; --none: #6b6a65;
+  --good: #0ca30c; --warn: #fab219; --serious: #ec835a; --crit: #d03b3b; --tint: #1d2836;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+header { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+h1 { font-size: 15px; margin: 0; font-weight: 650; }
+.src { font-size: 12px; color: var(--text2); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; }
+.src.made { color: var(--warn); border-color: var(--warn); }
+nav { display: flex; gap: 2px; flex-wrap: wrap; }
+nav button { border: 0; background: none; color: var(--text2); padding: 6px 10px; border-radius: 6px; font: inherit; cursor: pointer; }
+nav button[aria-selected=true] { background: var(--tint); color: var(--text); font-weight: 600; }
+.controls { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--text2); }
+select, input, button.btn { font: inherit; color: var(--text); background: var(--raise); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; }
+input.n { width: 76px; }
+button.btn { cursor: pointer; }
+main { padding: 14px 16px 48px; max-width: 1400px; margin: 0 auto; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(12, 1fr); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; grid-column: span 12; min-width: 0; }
+.c6 { grid-column: span 6; } .c4 { grid-column: span 4; } .c8 { grid-column: span 8; }
+@media (max-width: 900px) { .c6, .c4, .c8 { grid-column: span 12; } }
+.card h2 { font-size: 13.5px; font-weight: 650; margin: 0 0 2px; }
+.card .sub { color: var(--text2); font-size: 12px; margin: 0 0 10px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; grid-column: span 12; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile .k { color: var(--text2); font-size: 12px; }
+.tile .v { font-size: 24px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .n { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { color: var(--text2); font-weight: 550; font-size: 12px; position: sticky; top: 0; background: var(--surface); cursor: pointer; user-select: none; }
+th[aria-sort]::after { content: " ▾"; color: var(--muted); } th[aria-sort=ascending]::after { content: " ▴"; }
+td.num, th.num { text-align: right; }
+tr.click { cursor: pointer; } tr.click:hover td, tr.sel td { background: var(--tint); }
+.scroll { overflow: auto; max-height: 460px; }
+.cellbar { display: inline-block; height: 8px; border-radius: 0 4px 4px 0; background: var(--s1); vertical-align: middle; margin-right: 6px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text2); margin: 4px 0 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+svg { display: block; width: 100%; }
+svg text { fill: var(--muted); font-size: 11px; }
+.tip { position: fixed; pointer-events: none; background: var(--text); color: #0d0d0d; padding: 6px 9px; border-radius: 6px; font-size: 12px; z-index: 20; white-space: pre; display: none; }
+.sg { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-top: 8px; background: var(--raise); }
+.sg .h { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.sg .t { font-weight: 650; }
+.sg p { margin: 4px 0 0; color: var(--text2); }
+.sg p.a { color: var(--text); }
+.chip { font-size: 11px; border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; color: var(--text2); white-space: nowrap; }
+.save { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.save small { color: var(--muted); font-weight: 400; }
+.stack { display: flex; height: 14px; gap: 2px; min-width: 160px; }
+.stack span { display: block; height: 100%; border-radius: 3px; }
+.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 16px; margin: 8px 0 4px; }
+.kv div { border-left: 2px solid var(--axis); padding-left: 8px; }
+.kv b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
+.kv span { color: var(--text2); font-size: 12px; } .kv em { color: var(--muted); font-style: normal; font-size: 11.5px; display: block; }
+.note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+dl { margin: 0; display: grid; grid-template-columns: minmax(120px, 200px) 1fr; gap: 6px 14px; }
+dt { color: var(--text); font-weight: 600; } dd { margin: 0; color: var(--text2); }
+.empty { color: var(--muted); padding: 24px 0; text-align: center; }
+.gate { max-width: 420px; margin: 80px auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ROI 대시보드</h1>
+  <span class="src" id="src"></span>
+  <nav id="nav"></nav>
+  <div class="controls" id="controls"></div>
+</header>
+<main id="main"></main>
+<div class="tip" id="tip"></div>
+<script>
+const EMBED = /*__INSIGHT__*/null;
+const TABS = [["summary", "요약"], ["people", "개인"], ["teams", "팀"], ["serving", "모델 서빙"], ["advice", "제안"], ["terms", "기준과 용어"]];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const nf = (d) => new Intl.NumberFormat("ko-KR", { maximumFractionDigits: d, minimumFractionDigits: d });
+const fmt = {
+  int: (v) => v == null ? "–" : nf(0).format(v),
+  usd: (v) => v == null ? "–" : "$" + (Math.abs(v) >= 100 ? nf(0).format(v) : nf(2).format(v)),
+  pct: (v) => v == null ? "–" : nf(0).format(v * 100) + "%",
+  x: (v) => v == null ? "–" : (v >= 0 ? "+" : "") + nf(Math.abs(v) >= 10 ? 0 : 1).format(v) + "배",
+  sec: (ms) => ms == null ? "–" : nf(1).format(ms / 1000) + "초",
+  hours: (h) => h == null ? "–" : nf(1).format(h) + "시간",
+  num1: (v) => v == null ? "–" : nf(1).format(v),
+  compact: (v) => v == null ? "–" : new Intl.NumberFormat("ko-KR", { notation: "compact", maximumFractionDigits: 1 }).format(v),
+};
+let D = EMBED, tab = "summary", teamFilter = "", scopeFilter = "", picked = null;
+const sort = { people: ["cost", -1], teams: ["cost", -1] };
+const state = { range: 7 * 24, price: "", slots: "" };
+let token = "";
+try { token = sessionStorage.getItem("gw-admin") || ""; } catch (e) {}
+
+const money = () => D.cost_basis !== "none";
+const spend = (r) => money() ? r.cost_usd : r.server_s;
+const spendFmt = (r) => money() ? fmt.usd(r.cost_usd) : fmt.hours(r.server_s / 3600);
+const spendLabel = () => money() ? "비용" : "서버 시간";
+const SCOPE = { person: "개인", team: "팀", serving: "모델 서빙", setup: "측정" };
+
+function tipOn(el, text) {
+  el.addEventListener("mousemove", (e) => { const t = $("tip"); t.textContent = text; t.style.display = "block"; t.style.left = Math.min(e.clientX + 12, innerWidth - t.offsetWidth - 8) + "px"; t.style.top = (e.clientY + 14) + "px"; });
+  el.addEventListener("mouseleave", () => { $("tip").style.display = "none"; });
+}
+
+function suggestion(s, showTarget) {
+  const save = s.saving_usd == null ? "" : `<span class="save">${fmt.usd(s.saving_usd)} <small>${s.basis === "measured" ? "이 기간에 실제로 쓴 금액" : "추정"}</small></span>`;
+  return `<div class="sg"><div class="h"><span class="chip">${SCOPE[s.scope]}</span>${showTarget && s.scope !== "serving" && s.scope !== "setup" ? `<span class="chip">${esc(s.target)}</span>` : ""}<span class="t">${esc(s.title)}</span>${save}</div><p>${esc(s.detail)}</p><p class="a">${esc(s.action)}</p></div>`;
+}
+const suggestions = (list, showTarget, none) => list.length ? list.map((s) => suggestion(s, showTarget)).join("") : `<div class="empty">${none || "기준을 넘은 항목이 없습니다."}</div>`;
+
+function split(r) {
+  const seg = [["쓸모 있게 쓴 비용", r.useful_share, "var(--s1)"], ["버려진 비용", r.waste_share, "var(--s2)"], ["연결되지 않은 비용", r.unattributed_share, "var(--none)"]];
+  return `<div class="stack" data-tip="${seg.map((s) => s[0] + " " + fmt.pct(s[1])).join("\n")}">${seg.filter((s) => s[1] > 0.004).map((s) => `<span style="flex:${s[1]};background:${s[2]}"></span>`).join("")}</div>`;
+}
+const SPLIT_LEGEND = `<div class="legend"><span><i style="background:var(--s1)"></i>쓸모 있게 쓴 비용 (승인되었거나 진행 중인 산출물)</span><span><i style="background:var(--s2)"></i>버려진 비용 (실패, 중단, 반려)</span><span><i style="background:var(--none)"></i>연결되지 않은 비용</span></div>`;
+
+// One measure per chart. Bars are coloured by the hour's state, and the state is named in the legend and the tooltip.
+function hourChart(key, label, f, line) {
+  const H = D.serving.hours, W = 720, Hh = 190, L = 44, B = 22, T = 10;
+  const max = Math.max(line || 0, ...H.map((h) => h[key] || 0)) * 1.08 || 1;
+  const bw = (W - L - 8) / 24, y = (v) => T + (Hh - T - B) * (1 - v / max);
+  const col = { pressed: "var(--serious)", idle: "var(--none)", normal: "var(--s1)" }, name = { pressed: "붐빔", idle: "한가함", normal: "보통" };
+  let s = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="${label}">`;
+  for (let i = 0; i <= 4; i++) { const v = max * i / 4; s += `<line x1="${L}" x2="${W - 8}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${f(v)}</text>`; }
+  H.forEach((h, i) => {
+    const v = h[key] || 0, x = L + i * bw + 1, top = y(v), ht = Math.max(Hh - B - top, v > 0 ? 1 : 0), r = Math.min(4, ht);
+    s += `<path d="M${x},${Hh - B} v${-(ht - r)} q0,${-r} ${r},${-r} h${bw - 2 - 2 * r} q${r},0 ${r},${r} v${ht - r} z" fill="${col[h.state]}"/>`;
+    s += `<rect class="hit" x="${L + i * bw}" y="${T}" width="${bw}" height="${Hh - T - B}" fill="transparent" data-tip="${h.hour}시 (${name[h.state]})\n${label} ${f(v)}\n요청 ${fmt.int(h.requests)}건, 그중 batch ${fmt.int(h.batch)}건"/>`;
+    if (i % 3 === 0) s += `<text x="${x + bw / 2 - 1}" y="${Hh - 6}" text-anchor="middle">${h.hour}시</text>`;
+  });
+  if (line) s += `<line x1="${L}" x2="${W - 8}" y1="${y(line)}" y2="${y(line)}" stroke="var(--text2)" stroke-dasharray="4 4"/><text x="${W - 10}" y="${y(line) - 5}" text-anchor="end" style="fill:var(--text2)">처리 능력 100%</text>`;
+  return s + `<line x1="${L}" x2="${W - 8}" y1="${Hh - B}" y2="${Hh - B}" stroke="var(--axis)"/></svg>`;
+}
+const HOUR_LEGEND = `<div class="legend"><span><i style="background:var(--serious)"></i>붐빔 (대기 p95가 길거나 거절이 나오거나 능력 초과)</span><span><i style="background:var(--s1)"></i>보통</span><span><i style="background:var(--none)"></i>한가함</span></div>`;
+
+function table(id, cols, rows, onClick) {
+  const [k, dir] = sort[id] || [null, -1];
+  const col = cols.find((c) => c.key === k);
+  if (col) rows = [...rows].sort((a, b) => { const x = col.val(a), y = col.val(b); return (x == null) - (y == null) || (typeof x === "string" ? x.localeCompare(y) : x - y) * dir; });
+  const head = cols.map((c) => `<th class="${c.num ? "num" : ""}" data-k="${c.key}" ${c.key === k ? `aria-sort="${dir > 0 ? "ascending" : "descending"}"` : ""} title="${esc(c.tip || "")}">${c.label}</th>`).join("");
+  const body = rows.map((r, i) => `<tr class="${onClick ? "click" : ""} ${picked && picked === r.user ? "sel" : ""}" data-i="${i}">${cols.map((c) => `<td class="${c.num ? "num" : ""}">${c.html ? c.html(r) : esc(c.fmt ? c.fmt(c.val(r), r) : c.val(r))}</td>`).join("")}</tr>`).join("");
+  setTimeout(() => {
+    const el = $("t-" + id); if (!el) return;
+    el.querySelectorAll("th").forEach((th) => th.onclick = () => { sort[id] = [th.dataset.k, sort[id] && sort[id][0] === th.dataset.k ? -sort[id][1] : -1]; render(); });
+    if (onClick) el.querySelectorAll("tbody tr").forEach((tr) => tr.onclick = () => onClick(rows[+tr.dataset.i]));
+  });
+  return `<div class="scroll"><table id="t-${id}"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+const few = (r) => r.few ? ` <span class="chip" title="요청이 ${D.limits.min_requests}건 미만이라 제안을 내지 않습니다">표본 적음</span>` : "";
+const baseCols = () => [
+  { key: "requests", label: "요청", num: 1, val: (r) => r.requests, fmt: fmt.int },
+  { key: "cost", label: spendLabel(), num: 1, val: spend, fmt: (v, r) => spendFmt(r) },
+  { key: "accepted", label: "승인 산출물", num: 1, val: (r) => r.accepted, fmt: fmt.num1, tip: "승인된 산출물 수. 여럿이 함께 쓴 산출물은 쓴 비용 비율대로 나눠 셉니다." },
+  { key: "cpa", label: "승인 1건당", num: 1, val: (r) => r.cost_per_accepted, fmt: fmt.usd },
+  { key: "value", label: "가치", num: 1, val: (r) => r.value_usd, fmt: fmt.usd },
+  { key: "roi", label: "ROI", num: 1, val: (r) => r.roi, fmt: fmt.x, tip: "(가치 - 비용) / 비용" },
+  { key: "split", label: "비용이 간 곳", val: (r) => r.useful_share, html: split },
+  { key: "cache", label: "캐시 재사용", num: 1, val: (r) => r.cache_share, fmt: fmt.pct },
+  { key: "input", label: "요청당 입력", num: 1, val: (r) => r.input_p50, fmt: fmt.int, tip: "요청당 입력 토큰 중앙값" },
+  { key: "fail", label: "못 받은 요청", num: 1, val: (r) => r.fail_rate, fmt: fmt.pct, tip: "오류로 끝났거나 중간에 끊은 요청의 비율" },
+  { key: "wait", label: "첫 토큰 p95", num: 1, val: (r) => r.wait_p95_ms, fmt: fmt.sec, tip: "batch가 아닌 요청이 첫 토큰까지 기다린 시간의 p95" },
+  { key: "waith", label: "기다린 시간", num: 1, val: (r) => r.wait_hours, fmt: fmt.hours },
+  { key: "n", label: "제안", num: 1, val: (r) => r.suggestions.length, fmt: fmt.int },
+];
+
+const view = {
+  summary() {
+    const t = D.total, s = D.serving, top = ["serving", "team", "person", "setup"].flatMap((k) => D.suggestions.filter((x) => x.scope === k).slice(0, 2));
+    const tiles = [
+      { k: money() ? "쓴 비용" : "쓴 서버 시간", v: spendFmt(t), n: `요청 ${fmt.int(t.requests)}건 · 사람 ${D.people.length}명 · 팀 ${D.teams.length}개` },
+      { k: "승인된 산출물의 가치", v: t.deliverables ? fmt.usd(t.value_usd) : "–", n: t.deliverables ? `승인 ${fmt.num1(t.accepted)}건 · ROI ${fmt.x(t.roi)}` : "등록된 산출물 없음" },
+      { k: "쓸모 있게 쓴 비율", v: t.deliverables ? fmt.pct(t.useful_share) : "–", n: `버려진 ${fmt.pct(t.waste_share)} · 연결 안 된 ${fmt.pct(t.unattributed_share)}` },
+      { k: "사람이 기다린 시간", v: fmt.hours(t.wait_hours), n: t.wait_cost_usd != null ? `시간당 단가로 ${fmt.usd(t.wait_cost_usd)} · 첫 토큰 p95 ${fmt.sec(t.wait_p95_ms)}` : `첫 토큰 p95 ${fmt.sec(t.wait_p95_ms)}` },
+      { k: "붐비는 시간대", v: s.pressed_hours.length + "시간", n: `한가한 시간대 ${s.idle_hours.length}시간 · 하루 24시간 중` },
+      { k: "제안이 가리키는 금액", v: fmt.usd(D.saving_usd), n: `제안 ${D.suggestions.length}건 · 추정 포함, 서로 겹칠 수 있음` },
+    ];
+    return `<div class="grid"><div class="tiles">${tiles.map((x) => `<div class="tile"><div class="k">${x.k}</div><div class="v">${x.v}</div><div class="n">${x.n}</div></div>`).join("")}</div>
+      <div class="card c6"><h2>팀별 비용이 간 곳</h2><p class="sub">막대 길이는 팀이 쓴 ${spendLabel()}에 비례합니다.</p>${SPLIT_LEGEND}${teamBars()}</div>
+      <div class="card c6"><h2>시간대별 서버 사용률</h2><p class="sub">그 시간에 들어온 일을 처리 능력으로 나눈 값입니다. 100%를 넘으면 줄이 쌓입니다.</p>${HOUR_LEGEND}${hourChart("util", "사용률", fmt.pct, 1)}</div>
+      <div class="card"><h2>먼저 볼 제안</h2><p class="sub">모델 서빙, 팀, 개인 순으로 각각 가장 큰 것 두 개입니다. 전체는 제안 탭에 있습니다.</p>${suggestions(top, true)}</div></div>`;
+  },
+  people() {
+    const rows = D.people.filter((p) => !teamFilter || p.team === teamFilter);
+    const cols = [{ key: "user", label: "사람", val: (r) => r.user, html: (r) => esc(r.user || "(이름 없음)") + few(r) }, { key: "team", label: "팀", val: (r) => r.team }, ...baseCols()];
+    const p = D.people.find((x) => x.user === picked);
+    return `<div class="grid"><div class="card"><h2>개인별 사용과 성과</h2><p class="sub">행을 누르면 그 사람의 보고서가 아래에 열립니다. 맡은 일의 난이도가 다르므로 순위표가 아니라 각자에게 줄 제안의 근거로 쓰세요.</p>
+      <div class="legend"><label>팀 <select id="teamsel"><option value="">전체</option>${D.teams.map((t) => `<option ${t.team === teamFilter ? "selected" : ""}>${esc(t.team)}</option>`).join("")}</select></label></div>${SPLIT_LEGEND}
+      ${table("people", cols, rows, (r) => { picked = r.user; render(); setTimeout(() => $("person")?.scrollIntoView({ behavior: "smooth", block: "nearest" })); })}</div>
+      ${p ? personCard(p) : `<div class="card"><div class="empty">표에서 사람을 고르면 개인 보고서가 여기에 나옵니다.</div></div>`}</div>`;
+  },
+  teams() {
+    const cols = [{ key: "team", label: "팀", val: (r) => r.team, html: (r) => esc(r.team || "(팀 없음)") + few(r) }, { key: "users", label: "사람", num: 1, val: (r) => r.users, fmt: fmt.int },
+      ...baseCols().slice(0, 7), { key: "top", label: "가장 많이 쓴 사람", val: (r) => r.top_user_share, fmt: (v, r) => `${r.top_user || "–"} ${fmt.pct(v)}` }, ...baseCols().slice(7)];
+    return `<div class="grid"><div class="card"><h2>팀별 사용과 성과</h2><p class="sub">산출물의 가치는 그 산출물에 쓴 비용 비율대로 팀에 나눕니다.</p>${SPLIT_LEGEND}${table("teams", cols, D.teams)}</div>
+      ${D.teams.map((t) => `<div class="card c6"><h2>${esc(t.team || "(팀 없음)")} 팀에 주는 제안</h2><p class="sub">${spendLabel()} ${spendFmt(t)} · 승인 ${fmt.num1(t.accepted)}건 · 기다린 시간 ${fmt.hours(t.wait_hours)}${t.rate_usd ? ` · 시간당 단가 ${fmt.usd(t.rate_usd)}` : ""}</p>${suggestions(t.suggestions, false)}</div>`).join("")}</div>`;
+  },
+  serving() {
+    const s = D.serving;
+    const tiles = [
+      { k: "서버와 동시 처리 수", v: `${s.servers.length}대 · ${fmt.int(s.slots)}`, n: s.slots_assumed ? "동시 처리 수는 관측된 최대값으로 가정" : "동시 처리 수는 입력한 값" },
+      { k: "붐비는 시간대", v: s.pressed_hours.length ? ranges(s.pressed_hours) : "없음", n: `대기 p95 ${fmt.sec(D.limits.pressed_queue_p95_ms)} 초과, 거절, 능력 초과 중 하나` },
+      { k: "한가한 시간대", v: s.idle_hours.length ? ranges(s.idle_hours) : "없음", n: `사용률 ${fmt.pct(D.limits.idle_busy)} 미만 · 빈 슬롯 ${fmt.hours(s.idle_slot_hours)}` },
+      { k: "서버에 들어간 뒤 첫 토큰", v: fmt.sec(s.prompt_p50_ms), n: "줄 선 시간을 뺀 중앙값" },
+      { k: "거절된 요청", v: fmt.pct(s.refused), n: "429 또는 503" },
+      ...(s.fleet_cost_usd != null ? [{ k: "서버 가격 중 쓰이지 않은 몫", v: fmt.usd(s.idle_cost_usd), n: `서버 전체 ${fmt.usd(s.fleet_cost_usd)} 중 · 서버 시간당 가격은 입력한 가정` }] : []),
+    ];
+    const sc = [{ key: "backend", label: "서버", val: (r) => r.backend }, { key: "models", label: "모델", val: (r) => r.models.join(", ") }, { key: "requests", label: "요청", num: 1, val: (r) => r.requests, fmt: fmt.int },
+      { key: "busy", label: "일한 시간 비율", num: 1, val: (r) => r.busy_share, html: (r) => `<span class="cellbar" style="width:${Math.min(1, r.busy_share) * 70}px"></span>${fmt.pct(r.busy_share)}` },
+      { key: "q", label: "대기 p95", num: 1, val: (r) => r.queue_p95_ms, fmt: fmt.sec }, { key: "p", label: "첫 토큰 (줄 제외)", num: 1, val: (r) => r.prompt_p50_ms, fmt: fmt.sec },
+      { key: "tps", label: "초당 토큰", num: 1, val: (r) => r.tps_p50, fmt: fmt.num1, tip: "요청 하나의 생성 속도 중앙값" }, { key: "cache", label: "캐시 재사용", num: 1, val: (r) => r.cache_share, fmt: fmt.pct },
+      { key: "err", label: "오류", num: 1, val: (r) => r.error_rate, fmt: fmt.pct }, { key: "stall", label: "멈춤 p95", num: 1, val: (r) => r.stall_p95_ms, fmt: fmt.sec }];
+    const mc = [{ key: "model", label: "모델", val: (r) => r.model }, { key: "requests", label: "요청", num: 1, val: (r) => r.requests, fmt: fmt.int }, { key: "cost", label: spendLabel(), num: 1, val: spend, fmt: (v, r) => spendFmt(r) },
+      { key: "tok", label: "토큰", num: 1, val: (r) => r.tokens, fmt: fmt.compact }, { key: "price", label: "백만 토큰당", num: 1, val: (r) => r.usd_per_mtok, fmt: fmt.usd },
+      { key: "small", label: "짧은 요청 비율", num: 1, val: (r) => r.small_share, fmt: fmt.pct, tip: `입력 ${fmt.int(D.limits.small_in)}토큰 이하이고 출력 ${fmt.int(D.limits.small_out)}토큰 이하` }];
+    return `<div class="grid"><div class="tiles">${tiles.map((x) => `<div class="tile"><div class="k">${x.k}</div><div class="v" style="font-size:19px">${x.v}</div><div class="n">${x.n}</div></div>`).join("")}</div>
+      <div class="card c6"><h2>시간대별 사용률</h2><p class="sub">그 시간에 들어온 일을 처리 능력으로 나눈 값</p>${HOUR_LEGEND}${hourChart("util", "사용률", fmt.pct, 1)}</div>
+      <div class="card c6"><h2>시간대별 대기 p95</h2><p class="sub">서버에 들어가기 전 게이트웨이에서 줄 선 시간</p>${HOUR_LEGEND}${hourChart("queue_p95_ms", "대기 p95", fmt.sec)}</div>
+      <div class="card"><h2>모델 서빙 쪽에서 할 수 있는 일</h2><p class="sub">서버를 늘리기 전에 할 수 있는 일을 앞에 두었습니다.</p>${suggestions(s.suggestions, false)}</div>
+      <div class="card c8"><h2>서버별</h2><p class="sub">일한 시간 비율은 서버 동시 처리 수 기준입니다.</p>${table("servers", sc, s.servers)}</div>
+      <div class="card c4"><h2>모델별</h2><p class="sub">짧은 요청이 큰 모델로 가는지 봅니다.</p>${table("models", mc, s.models)}</div></div>`;
+  },
+  advice() {
+    const list = D.suggestions.filter((s) => !scopeFilter || s.scope === scopeFilter);
+    const count = (k) => D.suggestions.filter((s) => s.scope === k).length;
+    return `<div class="grid"><div class="card"><h2>제안 전체</h2><p class="sub">금액이 있는 것을 큰 순서로, 그다음은 기준을 넘은 정도가 큰 순서로 둡니다. "추정"은 비교 대상 수준까지 고쳤을 때를 가정한 값입니다.</p>
+      <div class="legend"><label>대상 <select id="scopesel"><option value="">전체 (${D.suggestions.length})</option>${Object.entries(SCOPE).map(([k, v]) => `<option value="${k}" ${k === scopeFilter ? "selected" : ""}>${v} (${count(k)})</option>`).join("")}</select></label></div>
+      ${suggestions(list, true)}</div></div>`;
+  },
+  terms() {
+    const L = D.limits, basis = { billed: "요청마다 기록된 비용(cost_usd)을 더했습니다.", server_time: "요청에 비용이 없어서, 요청이 서버를 잡고 있던 시간에 입력한 서버 시간당 가격을 곱했습니다. 서버 가격은 가정입니다.", none: "비용 정보가 없어서 비중을 서버 사용 시간으로 계산했습니다. 금액은 나오지 않습니다." }[D.cost_basis];
+    const terms = [["비용 기준", basis], ["쓸모 있게 쓴 비용", "승인되었거나 진행 중인 산출물에 연결된 요청의 비용입니다."], ["버려진 비용", "오류로 끝났거나 호출자가 중간에 끊은 요청, 그리고 반려되거나 중단된 산출물에 쓴 비용입니다."],
+      ["연결되지 않은 비용", "어떤 산출물에도 연결되지 않은 비용입니다. 요청의 x-gateway-deliverable-id 헤더나 실행과 산출물의 연결 등록으로 연결합니다."],
+      ["가치와 ROI", "산출물의 가치는 등록한 금액, 없으면 절약 시간에 팀의 시간당 단가를 곱한 값이고, 승인된 것만 셉니다. 여럿이 쓴 산출물은 쓴 비용 비율대로 나눕니다. ROI는 (가치 - 비용) / 비용입니다."],
+      ["기다린 시간", "batch가 아닌 요청이 첫 토큰까지 걸린 시간을 더한 값입니다. 사람이 그동안 기다렸다고 가정하고 시간당 단가를 곱해 금액으로 바꿉니다. 에이전트가 혼자 돌린 요청도 섞여 있으면 실제보다 큽니다."],
+      ["캐시 재사용", "입력 토큰 중 캐시로 다시 읽은 비율입니다. 캐시 토큰을 보고하지 않는 로컬 서버는 게이트웨이가 센 값(그 서버가 이미 가지고 있던 앞부분)을 씁니다."],
+      ["사용률", "한 시간대에 들어온 요청의 처리 시간을 더해, 서버 동시 처리 수에 시간을 곱한 값으로 나눈 것입니다."],
+      ["붐빔과 한가함", `붐빔은 대기 p95가 ${fmt.sec(L.pressed_queue_p95_ms)}를 넘거나, 거절이 ${fmt.pct(L.pressed_refused)}를 넘거나, 사용률이 100%를 넘는 시간대입니다. 한가함은 사용률 ${fmt.pct(L.idle_busy)} 미만입니다.`],
+      ["추정과 실제", "\"이 기간에 실제로 쓴 금액\"은 로그에 있는 지출입니다. \"추정\"은 팀이나 전체 수준까지 고쳤을 때 줄어들 몫을 계산한 값이라 실제 효과는 다를 수 있습니다. 제안끼리 겹치므로 합계는 상한으로 보세요."]];
+    const rules = [["표본", `요청 ${L.min_requests}건 미만인 사람과 팀에는 제안을 내지 않습니다.`], ["캐시 재사용 낮음", `비교 대상(개인은 팀, 팀은 전체)의 ${fmt.pct(L.cache_gap)} 미만`], ["입력이 김", `요청당 입력 중앙값이 팀 중앙값의 ${L.context_factor}배 초과`],
+      ["못 받은 요청 많음", `오류와 중단이 요청의 ${fmt.pct(L.waste_share)} 초과`], ["짧은 요청을 비싼 모델로", `입력 ${fmt.int(L.small_in)}토큰 이하, 출력 ${fmt.int(L.small_out)}토큰 이하인 요청이 가장 싼 모델보다 토큰당 ${L.price_factor}배 이상 비싼 모델로 갔고, 그 비용이 ${fmt.pct(L.small_on_big_share)} 초과`],
+      ["산출물과 연결 안 됨", `비용의 ${fmt.pct(L.unattributed_share)} 초과`], ["반려와 중단", `비용의 ${fmt.pct(L.rejected_share)} 초과`], ["붐비는 시간의 batch", `batch 요청의 ${fmt.pct(L.batch_peak_share)} 초과가 붐비는 시간대에 들어옴`],
+      ["한 사람에게 몰림", `한 사람이 팀 사용량의 ${fmt.pct(L.top_user_share)} 초과`], ["팀 안의 차이", `승인 1건당 비용이 가장 낮은 사람의 ${L.spread}배 초과`], ["기다림", `첫 토큰이 ${fmt.sec(L.slow_first_token_ms)}를 넘는 요청이 ${fmt.pct(L.slow_share)} 초과`],
+      ["서버 증설", `가장 붐비는 시간대 사용률을 ${fmt.pct(L.target_busy)} 아래로 두는 데 필요한 대수`], ["서버 간 쏠림", `같은 모델을 올린 서버끼리 일한 시간 비율 차이가 ${fmt.pct(L.imbalance)}p 초과`],
+      ["붐빌 때 속도 저하", `붐비는 시간대의 생성 속도 중앙값이 평소의 ${fmt.pct(L.speed_drop)} 미만`], ["서버 오류", `요청의 ${fmt.pct(L.error_rate)} 초과`], ["생성 중 멈춤", `토큰 사이 가장 긴 멈춤의 p95가 ${fmt.sec(L.stall_ms)} 초과`], ["첫 토큰이 늦음", `줄을 빼고도 중앙값 ${fmt.sec(L.slow_prompt_ms)} 초과이고 캐시 재사용 30% 미만`]];
+    const dl = (x) => `<dl>${x.map(([a, b]) => `<dt>${a}</dt><dd>${esc(b)}</dd>`).join("")}</dl>`;
+    return `<div class="grid"><div class="card c6"><h2>용어</h2><p class="sub">화면에 나오는 숫자가 무엇을 센 것인지</p>${dl(terms)}</div>
+      <div class="card c6"><h2>제안을 내는 기준</h2><p class="sub">모두 정해 둔 값이고 데이터에 맞춰 조정한 값이 아닙니다.</p>${dl(rules)}</div>
+      ${D.setup.length ? `<div class="card"><h2>측정에서 빠진 것</h2><p class="sub">아래가 채워지면 더 많은 숫자가 나옵니다.</p>${suggestions(D.setup, false)}</div>` : ""}</div>`;
+  },
+};
+
+function ranges(h) { const out = []; for (let i = 0; i < h.length; i++) { let j = i; while (j + 1 < h.length && h[j + 1] === h[j] + 1) j++; out.push(`${h[i]}~${h[j] + 1}시`); i = j; } return out.join(", "); }
+
+function teamBars() {
+  const max = Math.max(...D.teams.map(spend), 1e-9);
+  return `<table><tbody>${D.teams.map((t) => `<tr><td>${esc(t.team || "(팀 없음)")}</td><td style="width:60%"><div style="width:${Math.max(6, spend(t) / max * 100)}%">${split(t)}</div></td><td class="num">${spendFmt(t)}</td><td class="num">${t.roi == null ? "" : "ROI " + fmt.x(t.roi)}</td></tr>`).join("")}</tbody></table>`;
+}
+
+function personCard(p) {
+  const cmp = (own, grp, f, lowBad) => grp == null || own == null ? "" : `<em>팀 ${f(grp)}</em>`;
+  const kv = [["쓴 " + spendLabel(), spendFmt(p), `요청 ${fmt.int(p.requests)}건 · 세션 ${fmt.int(p.sessions)}개`], ["승인된 산출물", fmt.num1(p.accepted) + "건", `관여한 산출물 ${p.deliverables}개 · 가치 ${fmt.usd(p.value_usd)}`],
+    ["승인 1건당 비용", fmt.usd(p.cost_per_accepted), p.roi == null ? "" : `ROI ${fmt.x(p.roi)}`], ["캐시 재사용", fmt.pct(p.cache_share), `팀 ${fmt.pct(p.team_cache_share)}`],
+    ["요청당 입력 토큰", fmt.int(p.input_p50), `팀 중앙값 ${fmt.int(p.team_input_p50)}`], ["못 받은 요청", fmt.pct(p.fail_rate), "오류 또는 중간에 끊음"],
+    ["기다린 시간", fmt.hours(p.wait_hours), `첫 토큰 중앙값 ${fmt.sec(p.wait_p50_ms)} · p95 ${fmt.sec(p.wait_p95_ms)}`], ["붐비는 시간대의 요청", fmt.pct(p.pressed_share), `batch ${fmt.int(p.batch)}건 중 ${fmt.int(p.batch_pressed)}건`]];
+  return `<div class="card" id="person"><h2>${esc(p.user)} 님의 보고서 <span class="chip">${esc(p.team)}</span>${few(p)}</h2><p class="sub">본인에게 그대로 전달할 수 있게 썼습니다.</p>
+    <div style="max-width:420px">${split(p)}</div><div class="kv">${kv.map(([k, v, n]) => `<div><span>${k}</span><b>${v}</b><em>${n}</em></div>`).join("")}</div>
+    ${suggestions(p.suggestions, false, p.few ? "요청이 적어 제안을 내지 않았습니다." : "기준을 넘은 항목이 없습니다. 지금 방식대로 쓰면 됩니다.")}</div>`;
+}
+
+function render() {
+  $("nav").innerHTML = TABS.map(([k, v]) => `<button data-t="${k}" aria-selected="${k === tab}">${v}</button>`).join("");
+  $("nav").querySelectorAll("button").forEach((b) => b.onclick = () => { tab = b.dataset.t; try { location.hash = tab; } catch (e) {} render(); });
+  if (!D) return;
+  $("src").textContent = D.source || "실제 게이트웨이 로그"; $("src").className = "src" + (D.generated ? " made" : "");
+  $("main").innerHTML = D.total.requests ? view[tab]() : `<div class="card"><div class="empty">이 기간에 기록된 요청이 없습니다.</div></div>`;
+  document.querySelectorAll("[data-tip]").forEach((el) => tipOn(el, el.dataset.tip));
+  const ts = $("teamsel"); if (ts) ts.onchange = () => { teamFilter = ts.value; render(); };
+  const ss = $("scopesel"); if (ss) ss.onchange = () => { scopeFilter = ss.value; render(); };
+}
+
+async function load() {
+  const to = Date.now(), from = to - state.range * 3600e3, q = new URLSearchParams({ from, to, tz: -new Date().getTimezoneOffset() / 60 });
+  if (+state.price > 0) q.set("server_hour_usd", state.price);
+  if (+state.slots >= 1) q.set("slots", state.slots);
+  const res = await fetch("/gateway/obs/insights?" + q, { headers: token ? { authorization: "Bearer " + token } : {} });
+  if (res.status === 401) return gate("관리자 토큰이 필요합니다.");
+  if (!res.ok) { $("main").innerHTML = `<div class="card"><div class="empty">불러오지 못했습니다 (${res.status}). ${esc((await res.text()).slice(0, 200))}</div></div>`; return; }
+  D = await res.json(); render();
+}
+function gate(msg) {
+  $("main").innerHTML = `<div class="card gate"><h2>${msg}</h2><p class="sub">게이트웨이 설정의 admin_token 값을 넣으세요. 이 브라우저 탭에만 보관합니다.</p><form id="gate"><input id="tok" type="password" style="width:70%" autocomplete="off"> <button class="btn">확인</button></form></div>`;
+  $("gate").onsubmit = (e) => { e.preventDefault(); token = $("tok").value.trim(); try { sessionStorage.setItem("gw-admin", token); } catch (e) {} load(); };
+}
+function controls() {
+  $("controls").innerHTML = `<label>기간 <select id="range">${[[24, "24시간"], [168, "7일"], [720, "30일"]].map(([h, l]) => `<option value="${h}" ${h === state.range ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    <label title="자체 서버라 요청에 비용이 없을 때 쓰는 가정입니다">서버 시간당 $ <input class="n" id="price" inputmode="decimal" placeholder="없음"></label>
+    <label title="비우면 관측된 최대 동시 처리 수를 씁니다">서버당 동시 처리 <input class="n" id="slots" inputmode="numeric" placeholder="자동"></label><button class="btn" id="go">새로 고침</button>`;
+  $("range").onchange = (e) => { state.range = +e.target.value; load(); };
+  $("go").onclick = () => { state.price = $("price").value; state.slots = $("slots").value; load(); };
+}
+const h = location.hash.slice(1); if (view[h]) tab = h;
+addEventListener("hashchange", () => { const h = location.hash.slice(1); if (view[h] && h !== tab) { tab = h; render(); } });
+render();
+if (!EMBED) { controls(); load().catch((e) => { $("main").innerHTML = `<div class="card"><div class="empty">불러오지 못했습니다. ${esc(e.message)}</div></div>`; }); }
+</script>
+</body>
+</html>

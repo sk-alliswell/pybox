@@ -1,0 +1,36 @@
+# LiteLLM Proxy for a day run that costs nothing: the two local models as in
+# litellm.yaml, and the three hosted names answered by mock_cloud.py (:9300).
+model_list:
+  - model_name: qwen-0.5b
+    litellm_params:
+      model: openai/qwen-0.5b
+      api_base: http://127.0.0.1:9201/v1
+      api_key: sk-local
+  - model_name: smollm2-360m
+    litellm_params:
+      model: openai/smollm2-360m
+      api_base: http://127.0.0.1:9202/v1
+      api_key: sk-local
+  - model_name: gemini-flash-lite
+    litellm_params:
+      model: openai/gemini-flash-lite
+      api_base: http://127.0.0.1:9300/v1
+      api_key: sk-mock
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_base: http://127.0.0.1:9300/v1
+      api_key: sk-mock
+  - model_name: claude-haiku
+    litellm_params:
+      model: openai/claude-haiku
+      api_base: http://127.0.0.1:9300/v1
+      api_key: sk-mock
+
+litellm_settings:
+  callbacks: ["otel"]
+  num_retries: 0
+  request_timeout: 120
+
+general_settings:
+  master_key: sk-lab-master

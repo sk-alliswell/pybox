@@ -1,0 +1,65 @@
+# The system of gateway/lab/gateway.day.toml, for `gwsim replay`: three
+# local servers that run one request at a time and keep two prompts each,
+# prefix routing, staged refusal. The clients are templates by kind of work
+# (weight and how long the driver's callers wait); the replay puts the
+# log's agents and their requests in their place. Server speed is read off
+# the log with --fit; the numbers here are placeholders.
+name = "lab day"
+seed = 1
+max_s = 3600
+
+[net]
+default_ms = 0
+
+[gateway]
+[[gateway.upstream]]
+name = "local"
+models = ["qwen-0.5b"]
+targets = ["s"]
+max_concurrency = 3
+max_queue = 30
+routing = "prefix"
+prefix_slots = 2
+shed = { from = 0.25, low_ceiling = 0.75, floor = 0.1 }
+
+[[model_server]]
+name = "s"
+count = 3
+models = ["qwen-0.5b"]
+slots = 1
+prefix_cache_entries = 2
+prompt_cache_saving = 1.0
+tokens_per_s = 16
+prefill_ms = 200
+prefill_tokens_per_s = 100
+jitter = 0.1
+
+[[client]]
+name = "ide"
+weight = 4
+entry = "gateway"
+models = ["qwen-0.5b"]
+arrival = { kind = "trace", rows = [] }
+to_s = 0
+output_tokens = 24
+timeout_s = 15
+
+[[client]]
+name = "chat"
+weight = 2
+entry = "gateway"
+models = ["qwen-0.5b"]
+arrival = { kind = "trace", rows = [] }
+to_s = 0
+output_tokens = 32
+timeout_s = 30
+
+[[client]]
+name = "batch"
+weight = 1
+entry = "gateway"
+models = ["qwen-0.5b"]
+arrival = { kind = "trace", rows = [] }
+to_s = 0
+output_tokens = 16
+timeout_s = 60

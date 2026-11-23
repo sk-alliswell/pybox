@@ -1,0 +1,127 @@
+# Not a measured replay, and larger than anything that was measured: the
+# accuracy of the simulator is checked on two model servers only. Every number
+# here is assumed. It shows what a fleet looks like: 1,200 callers in four teams,
+# ten LiteLLM instances, 240 model servers in three pools (example-fleet times five).
+name = "example-fleet-xl"
+description = "1,200 callers in four teams, ten LiteLLM instances and 240 model servers in three pools: example-fleet times five. From 120 s to 300 s a hundred batch jobs flood the large-model pool. All numbers are assumed; nothing this large has been measured."
+description_ko = "네 팀의 호출자 1,200개, LiteLLM 10대, 세 묶음의 모델 서버 240대로 example-fleet의 다섯 배입니다. 120초부터 300초까지 배치 작업 100개가 큰 모델 묶음에 몰립니다. 모든 수치는 가정이며, 이 규모는 아직 측정으로 검증하지 않았습니다."
+max_s = 900
+
+[[phase]]
+name = "normal"
+from_s = 0
+to_s = 120
+
+[[phase]]
+name = "flood"
+from_s = 120
+to_s = 300
+
+[[phase]]
+name = "recovery"
+from_s = 300
+to_s = 480
+
+[gateway]
+[[gateway.upstream]]
+name = "small"
+models = ["small"]
+targets = ["litellm"]
+routing = "least_inflight"
+max_concurrency = 1000
+max_queue = 2000
+strict_priority = true
+
+[[gateway.upstream]]
+name = "large"
+models = ["large"]
+targets = ["litellm"]
+routing = "least_inflight"
+max_concurrency = 640
+max_queue = 1500
+strict_priority = true
+
+[[proxy]]
+name = "litellm"
+count = 10
+workers = 4
+routing = "least_inflight"
+
+# Eight requests at once on a GPU share it: together they make about six
+# times the tokens of one request alone.
+[[model_server]]
+name = "gpu-large"
+count = 80
+models = ["large"]
+slots = 8
+tokens_per_s = 45
+batch_scaling = 0.85
+prefill_ms = 250
+
+[[model_server]]
+name = "gpu-small"
+count = 120
+models = ["small"]
+slots = 8
+tokens_per_s = 90
+batch_scaling = 0.85
+prefill_ms = 120
+
+# Old CPU boxes that also serve the small model, one request at a time.
+[[model_server]]
+name = "cpu-edge"
+count = 40
+models = ["small"]
+slots = 1
+tokens_per_s = 25
+prefill_ms = 200
+
+[[client]]
+name = "ide"
+count = 600
+weight = 4
+entry = "gateway"
+models = ["small"]
+arrival = { kind = "poisson", rate_per_s = 0.25 }
+to_s = 480
+output_tokens = 120
+output_sigma = 0.4
+timeout_s = 20
+
+[[client]]
+name = "chat"
+count = 300
+weight = 4
+entry = "gateway"
+models = ["large"]
+arrival = { kind = "poisson", rate_per_s = 0.08 }
+to_s = 480
+output_tokens = 300
+output_sigma = 0.5
+timeout_s = 60
+
+[[client]]
+name = "agents"
+count = 200
+weight = 2
+entry = "gateway"
+models = ["small"]
+arrival = { kind = "closed", agents = 2, think_s = 2 }
+to_s = 480
+output_tokens = 200
+output_sigma = 0.5
+timeout_s = 120
+retry = true
+
+[[client]]
+name = "batch"
+count = 100
+entry = "gateway"
+models = ["large"]
+arrival = { kind = "poisson", rate_per_s = 0.5 }
+from_s = 120
+to_s = 300
+output_tokens = 400
+output_sigma = 0.3
+timeout_s = 300
+retry = true

@@ -1,0 +1,20 @@
+[
+  {
+    "platform": "windows",
+    "version": "v0.19.1",
+    "url": "https://github.com/hyperlight-dev/hyperlight-unikraft/releases/download/v0.19.1/hluk-v0.19.1-x86_64-pc-windows-msvc.zip",
+    "archive_bytes": 3625022,
+    "archive_sha256": "867a4dc40f2d746c80435420e37b30f228545c62af026725573764f29abe0f38",
+    "binary_bytes": 8975360,
+    "binary_sha256": "e1918d26309d29382ff4a79de1c457ec563378addce032f3ea4c68dc71a0ea7c"
+  },
+  {
+    "platform": "linux",
+    "version": "v0.19.1",
+    "url": "https://github.com/hyperlight-dev/hyperlight-unikraft/releases/download/v0.19.1/hluk-v0.19.1-x86_64-unknown-linux-musl.tar.gz",
+    "archive_bytes": 4174380,
+    "archive_sha256": "57b6889d670481b6b5d44d15305c7819d946d681b7180f5acc5312f81cf06ba4",
+    "binary_bytes": 11535104,
+    "binary_sha256": "decd42e99cf2a7907a835fc41f4b1c7ef1b968b0d9019b33be89267ff794dc62"
+  }
+]

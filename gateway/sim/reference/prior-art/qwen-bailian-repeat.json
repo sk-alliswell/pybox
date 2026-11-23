@@ -1,0 +1,144 @@
+{
+ "coder": {
+  "requests": 43011,
+  "span_s": 7199,
+  "requests_per_s": 5.97,
+  "input_tokens": {
+   "p50": 4540,
+   "mean": 5748,
+   "p90": 12776
+  },
+  "output_tokens": {
+   "p50": 469,
+   "mean": 808,
+   "p90": 1789
+  },
+  "has_previous_turn": 0.3861,
+  "share_repeating_previous_turn": {
+   "mean": 0.2677,
+   "token_weighted": 0.3123,
+   "p50": 0.0,
+   "hist_0_25_50_75_90_100": [
+    0.6145,
+    0.0359,
+    0.0458,
+    0.0966,
+    0.108,
+    0.0992
+   ]
+  },
+  "share_repeating_anything_earlier": {
+   "mean": 0.5243,
+   "token_weighted": 0.6639,
+   "p50": 0.581,
+   "hist_0_25_50_75_90_100": [
+    0.0602,
+    0.2805,
+    0.1203,
+    0.1345,
+    0.1333,
+    0.271
+   ]
+  },
+  "first_turns_repeating_anything_earlier_mean": 0.418,
+  "gap_to_previous_turn_s": {
+   "p10": 6.1,
+   "p50": 117.7,
+   "p90": 941.9,
+   "p99": 3488.9
+  }
+ },
+ "chat": {
+  "requests": 43058,
+  "span_s": 7199,
+  "requests_per_s": 5.98,
+  "input_tokens": {
+   "p50": 1046,
+   "mean": 2331,
+   "p90": 6436
+  },
+  "output_tokens": {
+   "p50": 376,
+   "mean": 430,
+   "p90": 808
+  },
+  "has_previous_turn": 0.4635,
+  "share_repeating_previous_turn": {
+   "mean": 0.3093,
+   "token_weighted": 0.4881,
+   "p50": 0.0,
+   "hist_0_25_50_75_90_100": [
+    0.5365,
+    0.0522,
+    0.0481,
+    0.1495,
+    0.1224,
+    0.0913
+   ]
+  },
+  "share_repeating_anything_earlier": {
+   "mean": 0.5872,
+   "token_weighted": 0.5779,
+   "p50": 0.633,
+   "hist_0_25_50_75_90_100": [
+    0.028,
+    0.1863,
+    0.1146,
+    0.2764,
+    0.1704,
+    0.2244
+   ]
+  },
+  "first_turns_repeating_anything_earlier_mean": 0.5178,
+  "gap_to_previous_turn_s": {
+   "p10": 27.1,
+   "p50": 110.6,
+   "p90": 718.7,
+   "p99": 2207.4
+  }
+ },
+ "api": {
+  "requests": 172800,
+  "span_s": 7200,
+  "requests_per_s": 24.0,
+  "input_tokens": {
+   "p50": 574,
+   "mean": 915,
+   "p90": 1720
+  },
+  "output_tokens": {
+   "p50": 39,
+   "mean": 92,
+   "p90": 180
+  },
+  "has_previous_turn": 0.0,
+  "share_repeating_previous_turn": {
+   "mean": 0.0,
+   "token_weighted": 0.0,
+   "p50": 0.0,
+   "hist_0_25_50_75_90_100": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "share_repeating_anything_earlier": {
+   "mean": 0.5695,
+   "token_weighted": 0.5339,
+   "p50": 0.671,
+   "hist_0_25_50_75_90_100": [
+    0.0225,
+    0.1966,
+    0.1329,
+    0.2971,
+    0.1851,
+    0.1658
+   ]
+  },
+  "first_turns_repeating_anything_earlier_mean": 0.5695,
+  "gap_to_previous_turn_s": null
+ }
+}

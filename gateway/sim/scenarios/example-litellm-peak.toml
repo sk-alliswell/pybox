@@ -1,0 +1,61 @@
+# Not a measured replay: an illustration of the "realistic day" finding that
+# LiteLLM, one Python process, runs out of CPU when a batch starts.
+# The proxy's CPU budget (about 67 ms per request in total) is what that run
+# measured: 227 CPU-seconds for 3,365 requests. The provider's latency numbers
+# are assumptions.
+name = "example-litellm-peak"
+description = "Eight coding assistants all day; sixty batch workers join from 60 s to 180 s. One LiteLLM process in front of a hosted API."
+description_ko = "코딩 어시스턴트 8개가 계속 일하는 중에 60초부터 180초까지 배치 워커 60개가 합류합니다. 호스티드 API 앞에 LiteLLM 프로세스 하나가 있습니다."
+max_s = 400
+
+[[phase]]
+name = "quiet"
+from_s = 0
+to_s = 60
+
+[[phase]]
+name = "batch"
+from_s = 60
+to_s = 180
+
+[gateway]
+[[gateway.upstream]]
+name = "cloud"
+targets = ["litellm"]
+max_concurrency = 60
+
+[[proxy]]
+name = "litellm"
+workers = 1
+cpu_ms_per_request = 18
+cpu_ms_per_chunk = 0.3
+cpu_ms_after_request = 28
+
+[[hosted_api]]
+name = "provider"
+models = ["gpt-4o-mini", "claude-haiku"]
+ttft_ms = { median = 550, sigma = 0.35 }
+tokens_per_s = { median = 70, sigma = 0.25 }
+
+[[client]]
+name = "ide"
+class = "interactive"
+entry = "gateway"
+models = ["claude-haiku"]
+arrival = { kind = "closed", agents = 8, think_s = 4 }
+to_s = 240
+prompt_tokens = 8000
+output_tokens = 180
+output_sigma = 0.4
+
+[[client]]
+name = "eval-batch"
+class = "batch"
+entry = "gateway"
+models = ["gpt-4o-mini"]
+arrival = { kind = "closed", agents = 60, think_s = 0 }
+from_s = 60
+to_s = 180
+prompt_tokens = 1140
+output_tokens = 67
+output_sigma = 0.3
